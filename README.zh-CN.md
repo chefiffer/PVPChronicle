@@ -1,6 +1,6 @@
 # PvP Chronicle · 战场纪事
 
-[English](README.md) | [简体中文](README.zh-CN.md)
+[English](README.md) | **简体中文** | [繁體中文](README.zh-TW.md) | [한국어](README.ko-KR.md) | [Русский](README.ru-RU.md) | [Português (Brasil)](README.pt-BR.md) | [Español](README.es-ES.md) | [ไทย](README.th-TH.md) | [Tiếng Việt](README.vi-VN.md) | [日本語](README.ja-JP.md) | [Deutsch](README.de-DE.md) | [Français](README.fr-FR.md)
 
 PvP Chronicle 是用于记录和复盘《最终幻想 XIV》PvP 战局的 Dalamud 插件。
 它支持纷争前线和水晶冲突的本地战绩、详细复盘、地图机制、数据统计与具有

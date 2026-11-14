@@ -1,9 +1,9 @@
 [
   {
-    "Author": "Battlefield Logs Project",
+    "Author": "chefiffer",
     "Name": "Battlefield Frontline Collector",
     "InternalName": "BattlefieldFrontlineCollector",
-    "AssemblyVersion": "0.8.133.0",
+    "AssemblyVersion": "0.0.2.0",
     "TestingAssemblyVersion": null,
     "Description": "Informational PvP recorder with local Frontline and Crystalline Conflict history, replay, optional upload, and server-generated Logs scoring. It never automates gameplay.",
     "Punchline": "Records and reviews Frontline and Crystalline Conflict matches.",

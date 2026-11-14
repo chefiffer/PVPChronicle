@@ -1,7 +1,7 @@
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
   <PropertyGroup>
-    <Version>0.8.133</Version>
-    <Author>Battlefield Logs Project</Author>
+    <Version>0.0.2</Version>
+    <Author>chefiffer</Author>
     <Name>Battlefield Frontline Collector</Name>
     <Punchline>Records and reviews Frontline and Crystalline Conflict matches.</Punchline>
     <Description>Informational PvP recorder with local review, optional upload and server-side Logs scoring. It never automates gameplay.</Description>
