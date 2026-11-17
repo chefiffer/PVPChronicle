@@ -15,12 +15,15 @@ internal sealed class Configuration : IPluginConfiguration
     private static readonly byte[] TokenEntropy =
         Encoding.UTF8.GetBytes("BattlefieldFrontlineCollector.UploadToken.v1");
 
-    public int Version { get; set; } = 15;
+    public int Version { get; set; } = 16;
     public bool AutoUpload { get; set; }
     public bool OpenAfterMatch { get; set; } = true;
     // Opens the rolling, local-only combat slice when a supported duty starts.
     // Capture itself is never disabled by this presentation preference.
     public bool AutoOpenLiveSliceOnMatchStart { get; set; } = true;
+    // The marker page can become a transparent, borderless overlay without
+    // changing capture or the other three live pages.
+    public bool TransparentLiveMarkerMap { get; set; }
     // Navigation preferences only. Hidden modes remain safely captured and
     // their existing local records are never deleted.
     public bool ShowFrontline { get; set; } = true;
@@ -68,7 +71,7 @@ internal sealed class Configuration : IPluginConfiguration
         // A corrupted/future clock must not lock the UI indefinitely.
         if (ManualUploadCooldownUntilUtc > DateTime.UtcNow.AddMinutes(5))
             ManualUploadCooldownUntilUtc = DateTime.UtcNow.AddMinutes(5);
-        Version = 15;
+        Version = 16;
     }
 
     public string GetCollectorToken()

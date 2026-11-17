@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 
@@ -45,15 +46,6 @@ internal sealed class MovementAnomalyTracker
     private const int RequiredIntervals = 3;
     private static readonly double[] DistributionUpperBounds =
         [2, 4, 6, 6.5, 7, 7.5, 8, 10, 12, 14, 16, 18, 22, 30, 45];
-    // Versioned PvP displacement catalog. These actions move their caster by
-    // design and therefore explain a short speed spike; effect type 32 covers
-    // observed pull/knockback displacement applied by another actor.
-    // 版本化的合法位移目录；不能把突进、后跳、缩地或被拉/击退误报为改速。
-    private static readonly HashSet<uint> CasterDisplacementActions =
-        [29065, 29079, 29092, 29123, 29229, 29261, 29430, 29479, 29494,
-         29510, 29513, 29522, 29532, 29550, 29660, 29689, 29692, 29699,
-         29700, 29707, 29708, 39148, 39153, 39184, 41488, 41581, 41646,
-         41654, 41942, 42039];
     private sealed record DisplacementAttribution(long ElapsedMs, uint ActionId, string Kind,
         long? EndElapsedMs = null);
     private sealed class PendingForcedMovement
@@ -77,6 +69,8 @@ internal sealed class MovementAnomalyTracker
         public long ElapsedMs; public float X; public float Y; public float Z; public int Tick;
         public string Name = string.Empty; public ushort WorldId; public byte ClassJobId;
         public bool Mounted;
+        public bool WasAlive;
+        public long StableInsideSinceMs = -1;
         public int[] SpeedStatusIds = [];
         public int ContinuousIntervals;
         public readonly int[] Distribution = new int[DistributionUpperBounds.Length + 1];
@@ -96,13 +90,15 @@ internal sealed class MovementAnomalyTracker
     private readonly Dictionary<(uint Source, uint Sequence, uint Action, uint Target),
         PendingForcedMovement> pendingForcedMovement = new();
     private readonly object forcedMovementGate = new();
+    private readonly Dictionary<uint, long> lifeBoundaryUntil = new();
+    private readonly object lifeBoundaryGate = new();
     private int tick;
 
     public void ObserveAction(ActionEffectEvent value)
     {
         lock (displacementGate)
         {
-            if (value.AffectsPosition || CasterDisplacementActions.Contains(value.ActionId))
+            if (value.AffectsPosition || MovementIntegrityRules.IsCasterDisplacementAction(value.ActionId))
                 AddAttribution(value.SourceEntityId,
                     new DisplacementAttribution(value.ElapsedMs, value.ActionId, "caster_displacement_action"));
             if (value.Effects.Any(effect => MovementIntegrityRules.IsForcedTargetEffect(
@@ -136,6 +132,31 @@ internal sealed class MovementAnomalyTracker
                                 TargetClassJobId = (byte)(targetIdentity?.ClassJobId ?? 0)
                             });
                 }
+        }
+    }
+
+    /// <summary>
+    /// Death and the following return-to-base relocation form one lifecycle
+    /// boundary. The death hook may run outside the framework thread, so only
+    /// a timestamp is exchanged under a lock; track state is changed later by
+    /// Observe on the framework thread.
+    /// 死亡与随后回城属于同一条生命边界；回调线程只登记时间，不直接修改轨迹。
+    /// </summary>
+    public void ObserveDeath(ExactDeathEvent value)
+    {
+        if (value.TargetEntityId == 0) return;
+        lock (lifeBoundaryGate)
+            lifeBoundaryUntil[value.TargetEntityId] = value.ElapsedMs + 15_000;
+    }
+
+    private bool CrossesLifeBoundary(uint entityId, long elapsedMs)
+    {
+        lock (lifeBoundaryGate)
+        {
+            if (!lifeBoundaryUntil.TryGetValue(entityId, out var until)) return false;
+            if (elapsedMs <= until) return true;
+            lifeBoundaryUntil.Remove(entityId);
+            return false;
         }
     }
 
@@ -256,12 +277,15 @@ internal sealed class MovementAnomalyTracker
     }
 
     public IReadOnlyList<MovementAnomalyObservationEvent> Observe(string schema, string matchUid,
-        long elapsedMs, IEnumerable<IBattleChara> actors)
+        long elapsedMs, IEnumerable<IBattleChara> actors, Vector3? observerPosition)
     {
         tick++; var result = new List<MovementAnomalyObservationEvent>();
         foreach (var actor in actors)
         {
             var entity = actor.EntityId;
+            var insideObserverRadius = observerPosition is Vector3 observer &&
+                MovementIntegrityRules.IsInsideObserverRadius(observer.X, observer.Y, observer.Z,
+                    actor.Position.X, actor.Position.Y, actor.Position.Z);
             if (!tracks.TryGetValue(entity, out var track))
             {
                 tracks[entity] = new Track { ElapsedMs = elapsedMs, X = actor.Position.X,
@@ -270,19 +294,30 @@ internal sealed class MovementAnomalyTracker
                     WorldId = (ushort)((actor as IPlayerCharacter)?.HomeWorld.RowId ?? 0),
                     ClassJobId = (byte)actor.ClassJob.RowId,
                     Mounted = actor.CurrentMount is not null,
+                    WasAlive = actor.CurrentHp > 0 && actor.MaxHp > 0,
+                    StableInsideSinceMs = MovementIntegrityRules.NextStableWindowStart(
+                        -1, insideObserverRadius, elapsedMs),
                     SpeedStatusIds = actor.StatusList.Select(x => x.StatusId).Where(IsKnownSpeedStatus)
                         .Select(x => (int)x).ToArray() };
                 continue;
             }
             var dt = (elapsedMs - track.ElapsedMs) / 1000.0;
             var currentMounted = actor.CurrentMount is not null;
+            var currentAlive = actor.CurrentHp > 0 && actor.MaxHp > 0;
+            var lifeBoundary = CrossesLifeBoundary(entity, elapsedMs);
+            var stableInsideSinceMs = MovementIntegrityRules.NextStableWindowStart(
+                track.StableInsideSinceMs, insideObserverRadius, elapsedMs);
+            var stableObserverWindow = MovementIntegrityRules.IsStableObserverWindow(
+                stableInsideSinceMs, elapsedMs);
             var aliveContinuous = track.Tick == tick - 1 && dt is >= .10 and <= .50 &&
-                                  actor.CurrentHp > 0 && actor.MaxHp > 0;
+                                  track.WasAlive && currentAlive && !lifeBoundary &&
+                                  stableObserverWindow;
             var continuous = aliveContinuous && !track.Mounted && !currentMounted;
             var mountedContinuous = aliveContinuous && track.Mounted && currentMounted;
             var fromX = track.X; var fromY = track.Y; var fromZ = track.Z;
             var distance = Math.Sqrt(Math.Pow(actor.Position.X - fromX, 2) +
                                      Math.Pow(actor.Position.Z - fromZ, 2));
+            var verticalDistance = Math.Abs(actor.Position.Y - fromY);
             var speed = aliveContinuous ? distance / dt : 0;
             // A status may expire between the two endpoints.  Attribute the
             // whole interval using the union of start/end states so expiry on
@@ -293,7 +328,7 @@ internal sealed class MovementAnomalyTracker
             var attributions = aliveContinuous
                 ? RecentAttributions(entity, track.ElapsedMs, elapsedMs) : [];
             var activeMovement = aliveContinuous &&
-                MovementIntegrityRules.IsActiveMovement(distance, dt);
+                MovementIntegrityRules.IsGroundLocomotionInterval(distance, verticalDistance, dt);
             var normalizedSpeed = continuous
                 ? speed / MovementMultiplier(speedStatuses, (byte)actor.ClassJob.RowId)
                 : 0;
@@ -358,7 +393,7 @@ internal sealed class MovementAnomalyTracker
                         (ushort)((actor as IPlayerCharacter)?.HomeWorld.RowId ?? 0),
                         (byte)actor.ClassJob.RowId, HardEnvelope,
                         track.Streak.ToArray(),
-                        $"continuous_loaded_active_unmounted_100_500ms_far_tail_envelope_v8:{MovementCatalogVersion}:{DisplacementCatalogVersion}:{gameVersion}"));
+                        $"continuous_observer_200yalm_stable_2s_ground_active_unmounted_100_500ms_far_tail_envelope_v10:{MovementCatalogVersion}:{DisplacementCatalogVersion}:{gameVersion}"));
                     track.LastPublishedMs = elapsedMs;
                 }
                 if (track.Streak.Count > RequiredIntervals + 2) track.Streak.RemoveAt(0);
@@ -369,11 +404,17 @@ internal sealed class MovementAnomalyTracker
             track.WorldId = (ushort)((actor as IPlayerCharacter)?.HomeWorld.RowId ?? 0);
             track.ClassJobId = (byte)actor.ClassJob.RowId;
             track.Mounted = currentMounted;
+            track.WasAlive = currentAlive;
+            track.StableInsideSinceMs = stableInsideSinceMs;
             track.SpeedStatusIds = currentSpeedStatuses;
         }
         // Missing from one ObjectTable sample breaks continuity.  Keeping the
         // last coordinate is safe because Tick prevents it being joined later.
-        foreach (var track in tracks.Values.Where(x => x.Tick < tick - 1)) track.Streak.Clear();
+        foreach (var track in tracks.Values.Where(x => x.Tick < tick))
+        {
+            track.Streak.Clear();
+            track.StableInsideSinceMs = -1;
+        }
         return result;
     }
 
@@ -382,12 +423,13 @@ internal sealed class MovementAnomalyTracker
         tracks.Clear(); tick = 0;
         lock (displacementGate) displacement.Clear();
         lock (forcedMovementGate) pendingForcedMovement.Clear();
+        lock (lifeBoundaryGate) lifeBoundaryUntil.Clear();
     }
     public IReadOnlyList<MovementSpeedDistributionEvent> ExportProfiles(string schema,
         string matchUid, long elapsedMs)
     {
         if (!catalogCompatible) return [];
-        var scope = $"continuous_loaded_active_100_500ms_histogram_v6:{MovementCatalogVersion}:{DisplacementCatalogVersion}:{gameVersion}";
+        var scope = $"continuous_observer_200yalm_stable_2s_ground_active_100_500ms_histogram_v8:{MovementCatalogVersion}:{DisplacementCatalogVersion}:{gameVersion}";
         return tracks
             .Where(x => x.Value.ContinuousIntervals > 0 && !string.IsNullOrWhiteSpace(x.Value.Name))
             .Select(x => new MovementSpeedDistributionEvent(schema, "movement_speed_distribution",

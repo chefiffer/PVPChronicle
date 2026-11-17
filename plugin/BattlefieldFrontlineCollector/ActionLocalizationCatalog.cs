@@ -8,7 +8,7 @@ namespace BattlefieldFrontlineCollector;
 internal sealed class ActionLocalizationCatalog
 {
     private sealed record Entry(string? ZhHans, string? ZhHant, string? En, string? Ja,
-        string? De = null, string? Fr = null);
+        string? De = null, string? Fr = null, string? Ko = null);
     private sealed record Document(string Schema, Dictionary<string, Entry> Actions);
 
     private readonly Dictionary<uint, Entry> actions = new();
@@ -43,6 +43,7 @@ internal sealed class ActionLocalizationCatalog
             "ja" => entry.Ja,
             "de" => entry.De,
             "fr" => entry.Fr,
+            "ko" => entry.Ko ?? entry.En,
             "th" or "vi" => entry.En,
             _ => null
         };

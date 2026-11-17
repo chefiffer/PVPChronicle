@@ -24,7 +24,8 @@
       "en": "Burst",
       "ja": "大爆発",
       "de": "Einschlag",
-      "fr": "Explosion"
+      "fr": "Explosion",
+      "ko": "버스트"
     },
     "2018": {
       "zhHans": "拘束圈",
@@ -532,7 +533,8 @@
       "zhHant": "防禦",
       "ja": "防御",
       "de": "Wehr",
-      "fr": "Garde"
+      "fr": "Garde",
+      "ko": "방어"
     },
     "29055": {
       "zhHans": "军用圣灵药",
@@ -540,7 +542,8 @@
       "zhHant": "軍用聖靈藥",
       "ja": "軍用エリクサー",
       "de": "Frontenelixier",
-      "fr": "Élixir militaire"
+      "fr": "Élixir militaire",
+      "ko": "군용 엘릭서"
     },
     "29056": {
       "zhHans": "净化",
@@ -548,7 +551,8 @@
       "zhHant": "淨化",
       "ja": "浄化",
       "de": "Purifikation",
-      "fr": "Dépuration"
+      "fr": "Dépuration",
+      "ko": "정화"
     },
     "29057": {
       "zhHans": "冲刺",
@@ -556,7 +560,8 @@
       "zhHant": "衝刺",
       "ja": "スプリント",
       "de": "Sprint",
-      "fr": "Sprint"
+      "fr": "Sprint",
+      "ko": "전력 질주"
     },
     "29058": {
       "zhHans": "先锋剑",
@@ -564,7 +569,8 @@
       "en": "Fast Blade",
       "ja": "ファストブレード",
       "de": "Vortexschnitt",
-      "fr": "Lame rapide"
+      "fr": "Lame rapide",
+      "ko": "재빠른 검격"
     },
     "29059": {
       "zhHans": "暴乱剑",
@@ -572,7 +578,8 @@
       "en": "Riot Blade",
       "ja": "ライオットソード",
       "de": "Donnerklinge",
-      "fr": "Lame déchaînée"
+      "fr": "Lame déchaînée",
+      "ko": "폭도의 검격"
     },
     "29060": {
       "zhHans": "王权剑",
@@ -580,7 +587,8 @@
       "en": "Royal Authority",
       "ja": "ロイヤルアソリティ",
       "de": "Königsklinge",
-      "fr": "Autorité royale"
+      "fr": "Autorité royale",
+      "ko": "제왕의 권위"
     },
     "29061": {
       "zhHans": "赎罪剑",
@@ -588,7 +596,8 @@
       "en": "Atonement",
       "ja": "ロイエ",
       "de": "Absolution",
-      "fr": "Absolution"
+      "fr": "Absolution",
+      "ko": "회한의 검"
     },
     "29062": {
       "zhHans": "圣灵",
@@ -596,7 +605,8 @@
       "zhHant": "聖靈",
       "ja": "ホーリースピリット",
       "de": "Heiliger Geist",
-      "fr": "Esprit saint"
+      "fr": "Esprit saint",
+      "ko": "성령의 권능"
     },
     "29064": {
       "zhHans": "盾牌猛击",
@@ -612,7 +622,8 @@
       "zhHant": "調停",
       "ja": "インターヴィーン",
       "de": "Einschreiten",
-      "fr": "Irruption brutale"
+      "fr": "Irruption brutale",
+      "ko": "개입"
     },
     "29066": {
       "zhHans": "卫护",
@@ -620,7 +631,8 @@
       "en": "Guardian",
       "ja": "ガーディアン",
       "de": "Wächter",
-      "fr": "Gardien"
+      "fr": "Gardien",
+      "ko": "수호자"
     },
     "29067": {
       "zhHans": "圣盾阵",
@@ -628,7 +640,8 @@
       "zhHant": "聖盾陣",
       "ja": "ホーリーシェルトロン",
       "de": "Heiliges Schiltron",
-      "fr": "Schiltron sacré"
+      "fr": "Schiltron sacré",
+      "ko": "신성한 방벽"
     },
     "29068": {
       "zhHans": "圣盾阵",
@@ -636,7 +649,8 @@
       "zhHant": "聖盾陣",
       "ja": "ホーリーシェルトロン",
       "de": "Heiliges Schiltron",
-      "fr": "Schiltron sacré"
+      "fr": "Schiltron sacré",
+      "ko": "신성한 방벽"
     },
     "29069": {
       "zhHans": "列阵",
@@ -644,7 +658,8 @@
       "zhHant": "列陣",
       "ja": "ファランクス",
       "de": "Phalanx",
-      "fr": "Phalanx"
+      "fr": "Phalanx",
+      "ko": "팔랑크스"
     },
     "29070": {
       "zhHans": "悔罪",
@@ -652,7 +667,8 @@
       "en": "Confiteor",
       "ja": "コンフィテオル",
       "de": "Confiteor",
-      "fr": "Confiteor"
+      "fr": "Confiteor",
+      "ko": "고백 기도"
     },
     "29071": {
       "zhHans": "信念之剑",
@@ -660,7 +676,8 @@
       "zhHant": "信念之劍",
       "ja": "ブレード・オブ・フェイス",
       "de": "Klinge der Frömmigkeit",
-      "fr": "Lame de foi"
+      "fr": "Lame de foi",
+      "ko": "신의의 검"
     },
     "29072": {
       "zhHans": "真理之剑",
@@ -668,7 +685,8 @@
       "zhHant": "真理之劍",
       "ja": "ブレード・オブ・トゥルース",
       "de": "Klinge der Redlichkeit",
-      "fr": "Lame de vérité"
+      "fr": "Lame de vérité",
+      "ko": "진실의 검"
     },
     "29073": {
       "zhHans": "英勇之剑",
@@ -676,7 +694,8 @@
       "zhHant": "英勇之劍",
       "ja": "ブレード・オブ・ヴァラー",
       "de": "Klinge der Tapferkeit",
-      "fr": "Lame de vaillance"
+      "fr": "Lame de vaillance",
+      "ko": "용맹의 검"
     },
     "29074": {
       "zhHans": "重劈",
@@ -684,7 +703,8 @@
       "en": "Heavy Swing",
       "ja": "ヘヴィスウィング",
       "de": "Gewaltiger Hieb",
-      "fr": "Coup puissant"
+      "fr": "Coup puissant",
+      "ko": "육중한 일격"
     },
     "29075": {
       "zhHans": "凶残裂",
@@ -692,7 +712,8 @@
       "en": "Maim",
       "ja": "メイム",
       "de": "Verstümmelung",
-      "fr": "Mutilation"
+      "fr": "Mutilation",
+      "ko": "관절 파괴"
     },
     "29076": {
       "zhHans": "暴风斩",
@@ -700,7 +721,8 @@
       "en": "Storm's Path",
       "ja": "シュトルムヴィント",
       "de": "Sturmkeil",
-      "fr": "Couperet de justice"
+      "fr": "Couperet de justice",
+      "ko": "폭풍 쐐기"
     },
     "29077": {
       "zhHans": "狂魂",
@@ -708,7 +730,8 @@
       "zhHant": "狂魂",
       "ja": "インナーカオス",
       "de": "Inneres Chaos",
-      "fr": "Chaos intérieur"
+      "fr": "Chaos intérieur",
+      "ko": "내면의 혼돈"
     },
     "29078": {
       "zhHans": "裂石飞环",
@@ -716,7 +739,8 @@
       "en": "Fell Cleave",
       "ja": "フェルクリーヴ",
       "de": "Niedermähen",
-      "fr": "Sape-fendeur"
+      "fr": "Sape-fendeur",
+      "ko": "참수"
     },
     "29079": {
       "zhHans": "猛攻",
@@ -724,7 +748,8 @@
       "zhHant": "猛攻",
       "ja": "オンスロート",
       "de": "Sturmlauf",
-      "fr": "Assaut violent"
+      "fr": "Assaut violent",
+      "ko": "맹공격"
     },
     "29080": {
       "zhHans": "群山隆起",
@@ -732,7 +757,8 @@
       "zhHant": "群山隆起",
       "ja": "オロジェネシス",
       "de": "Orogenese",
-      "fr": "Orogenèse"
+      "fr": "Orogenèse",
+      "ko": "대지 융기"
     },
     "29081": {
       "zhHans": "献身",
@@ -740,7 +766,8 @@
       "zhHant": "獻身",
       "ja": "ブロート",
       "de": "Blot",
-      "fr": "Libation"
+      "fr": "Libation",
+      "ko": "희생양"
     },
     "29082": {
       "zhHans": "原初的血气",
@@ -748,7 +775,8 @@
       "zhHant": "原初的血氣",
       "ja": "原初の血気",
       "de": "Urimpuls",
-      "fr": "Intuition fougueuse"
+      "fr": "Intuition fougueuse",
+      "ko": "원초의 혈기"
     },
     "29083": {
       "zhHans": "原初的怒号",
@@ -756,7 +784,8 @@
       "zhHant": "原初的怒號",
       "ja": "原初の怒号",
       "de": "Urschrei",
-      "fr": "Rugissement bestial"
+      "fr": "Rugissement bestial",
+      "ko": "원초의 노호"
     },
     "29084": {
       "zhHans": "蛮荒崩裂",
@@ -764,7 +793,8 @@
       "zhHant": "蠻荒崩裂",
       "ja": "プライマルレンド",
       "de": "Brachiale Gewalt",
-      "fr": "Griffade primitive"
+      "fr": "Griffade primitive",
+      "ko": "원초적 분쇄"
     },
     "29085": {
       "zhHans": "重斩",
@@ -772,7 +802,8 @@
       "zhHant": "重斬",
       "ja": "ヘヴィスラッシュ",
       "de": "Gewaltiger Schlitzer",
-      "fr": "Taillade puissante"
+      "fr": "Taillade puissante",
+      "ko": "강렬한 참격"
     },
     "29086": {
       "zhHans": "吸收斩",
@@ -780,7 +811,8 @@
       "en": "Syphon Strike",
       "ja": "サイフォンストライク",
       "de": "Osmose",
-      "fr": "Frappe siphon"
+      "fr": "Frappe siphon",
+      "ko": "흡수의 일격"
     },
     "29087": {
       "zhHans": "噬魂斩",
@@ -788,7 +820,8 @@
       "en": "Souleater",
       "ja": "ソウルイーター",
       "de": "Seelenfresser",
-      "fr": "Dévoreur d'âme"
+      "fr": "Dévoreur d'âme",
+      "ko": "흡혼검"
     },
     "29088": {
       "zhHans": "血溅",
@@ -820,7 +853,8 @@
       "zhHant": "暗影使者",
       "ja": "シャドウブリンガー",
       "de": "Schattenbringer",
-      "fr": "Porteur d'ombre"
+      "fr": "Porteur d'ombre",
+      "ko": "칠흑 도래"
     },
     "29092": {
       "zhHans": "跳斩",
@@ -828,7 +862,8 @@
       "zhHant": "跳斬",
       "ja": "プランジカット",
       "de": "Hiebsprung",
-      "fr": "Coupe plongeante"
+      "fr": "Coupe plongeante",
+      "ko": "돌진"
     },
     "29093": {
       "zhHans": "至黑之夜",
@@ -844,7 +879,8 @@
       "zhHant": "腐穢大地",
       "ja": "ソルトアース",
       "de": "Salzige Erde",
-      "fr": "Terre salée"
+      "fr": "Terre salée",
+      "ko": "감염 지대"
     },
     "29095": {
       "zhHans": "腐秽黑暗",
@@ -852,7 +888,8 @@
       "zhHant": "腐穢黑暗",
       "ja": "ソルト・アンド・ダーク",
       "de": "Salz und Schwärze",
-      "fr": "Sel et Ténèbres"
+      "fr": "Sel et Ténèbres",
+      "ko": "어둠 감염"
     },
     "29096": {
       "zhHans": "腐秽黑暗",
@@ -860,7 +897,8 @@
       "zhHant": "腐穢黑暗",
       "ja": "ソルト・アンド・ダーク",
       "de": "Salz und Schwärze",
-      "fr": "Sel et Ténèbres"
+      "fr": "Sel et Ténèbres",
+      "ko": "어둠 감염"
     },
     "29097": {
       "en": "Eventide",
@@ -868,7 +906,8 @@
       "zhHant": "夜昏",
       "ja": "イーブンタイド",
       "de": "Dämmerung",
-      "fr": "Crépuscule"
+      "fr": "Crépuscule",
+      "ko": "황혼검"
     },
     "29098": {
       "zhHans": "利刃斩",
@@ -876,7 +915,8 @@
       "en": "Keen Edge",
       "ja": "キーンエッジ",
       "de": "Zerfetzer",
-      "fr": "Tranchant acéré"
+      "fr": "Tranchant acéré",
+      "ko": "예리한 총검"
     },
     "29099": {
       "zhHans": "残暴弹",
@@ -884,7 +924,8 @@
       "en": "Brutal Shell",
       "ja": "ブルータルシェル",
       "de": "Brutaler Einschlag",
-      "fr": "Impact brutal"
+      "fr": "Impact brutal",
+      "ko": "잔혹한 탄피"
     },
     "29100": {
       "zhHans": "迅连斩",
@@ -892,7 +933,8 @@
       "en": "Solid Barrel",
       "ja": "ソリッドバレル",
       "de": "Stahlwalze",
-      "fr": "Salve tranchante"
+      "fr": "Salve tranchante",
+      "ko": "곧은 총열"
     },
     "29101": {
       "zhHans": "爆发击",
@@ -900,7 +942,8 @@
       "en": "Burst Strike",
       "ja": "バーストストライク",
       "de": "Explosiver Stoß",
-      "fr": "Frappe explosive"
+      "fr": "Frappe explosive",
+      "ko": "파열격"
     },
     "29102": {
       "en": "Gnashing Fang",
@@ -908,7 +951,8 @@
       "zhHant": "烈牙",
       "ja": "ビートファング",
       "de": "Schlagfänge",
-      "fr": "Croc pugnace"
+      "fr": "Croc pugnace",
+      "ko": "난폭한 송곳니"
     },
     "29103": {
       "en": "Savage Claw",
@@ -916,7 +960,8 @@
       "zhHant": "猛獸爪",
       "ja": "サベッジクロウ",
       "de": "Wilde Klauen",
-      "fr": "Griffe sauvage"
+      "fr": "Griffe sauvage",
+      "ko": "사나운 발톱"
     },
     "29104": {
       "zhHans": "凶禽爪",
@@ -924,7 +969,8 @@
       "en": "Wicked Talon",
       "ja": "ウィケッドタロン",
       "de": "Tückische Kralle",
-      "fr": "Serre vicieuse"
+      "fr": "Serre vicieuse",
+      "ko": "악랄한 갈퀴"
     },
     "29105": {
       "zhHans": "倍攻",
@@ -940,7 +986,8 @@
       "en": "Continuation",
       "ja": "コンティニュエーション",
       "de": "Triggerfolge",
-      "fr": "Consécution"
+      "fr": "Consécution",
+      "ko": "연속기"
     },
     "29107": {
       "zhHans": "超高速",
@@ -948,7 +995,8 @@
       "en": "Hypervelocity",
       "ja": "ハイパーヴェロシティ",
       "de": "Überschall",
-      "fr": "Hypervitesse"
+      "fr": "Hypervitesse",
+      "ko": "초신속격"
     },
     "29108": {
       "en": "Jugular Rip",
@@ -956,7 +1004,8 @@
       "zhHant": "撕喉",
       "ja": "ジャギュラーリップ",
       "de": "Kehlreißer",
-      "fr": "Arrachage de la jugulaire"
+      "fr": "Arrachage de la jugulaire",
+      "ko": "급소 베기"
     },
     "29109": {
       "zhHans": "裂膛",
@@ -964,7 +1013,8 @@
       "en": "Abdomen Tear",
       "ja": "アブドメンテアー",
       "de": "Bauchschlitzer",
-      "fr": "Lacération de l'abdomen"
+      "fr": "Lacération de l'abdomen",
+      "ko": "복부 가르기"
     },
     "29110": {
       "zhHans": "穿目",
@@ -972,7 +1022,8 @@
       "en": "Eye Gouge",
       "ja": "アイガウジ",
       "de": "Augenstecher",
-      "fr": "Perforation des yeux"
+      "fr": "Perforation des yeux",
+      "ko": "안구 찌르기"
     },
     "29111": {
       "zhHans": "超高速",
@@ -980,7 +1031,8 @@
       "en": "Hypervelocity",
       "ja": "ハイパーヴェロシティ",
       "de": "Überschall",
-      "fr": "Hypervitesse"
+      "fr": "Hypervitesse",
+      "ko": "초신속격"
     },
     "29112": {
       "zhHans": "撕喉",
@@ -988,7 +1040,8 @@
       "en": "Jugular Rip",
       "ja": "ジャギュラーリップ",
       "de": "Kehlreißer",
-      "fr": "Arrachage de la jugulaire"
+      "fr": "Arrachage de la jugulaire",
+      "ko": "급소 베기"
     },
     "29113": {
       "zhHans": "裂膛",
@@ -996,7 +1049,8 @@
       "en": "Abdomen Tear",
       "ja": "アブドメンテアー",
       "de": "Bauchschlitzer",
-      "fr": "Lacération de l'abdomen"
+      "fr": "Lacération de l'abdomen",
+      "ko": "복부 가르기"
     },
     "29114": {
       "zhHans": "穿目",
@@ -1004,7 +1058,8 @@
       "en": "Eye Gouge",
       "ja": "アイガウジ",
       "de": "Augenstecher",
-      "fr": "Perforation des yeux"
+      "fr": "Perforation des yeux",
+      "ko": "안구 찌르기"
     },
     "29115": {
       "zhHans": "超高速",
@@ -1012,7 +1067,8 @@
       "en": "Hypervelocity",
       "ja": "ハイパーヴェロシティ",
       "de": "Überschall",
-      "fr": "Hypervitesse"
+      "fr": "Hypervitesse",
+      "ko": "초신속격"
     },
     "29116": {
       "zhHans": "撕喉",
@@ -1020,7 +1076,8 @@
       "en": "Jugular Rip",
       "ja": "ジャギュラーリップ",
       "de": "Kehlreißer",
-      "fr": "Arrachage de la jugulaire"
+      "fr": "Arrachage de la jugulaire",
+      "ko": "급소 베기"
     },
     "29117": {
       "zhHans": "裂膛",
@@ -1028,7 +1085,8 @@
       "en": "Abdomen Tear",
       "ja": "アブドメンテアー",
       "de": "Bauchschlitzer",
-      "fr": "Lacération de l'abdomen"
+      "fr": "Lacération de l'abdomen",
+      "ko": "복부 가르기"
     },
     "29118": {
       "zhHans": "穿目",
@@ -1036,7 +1094,8 @@
       "en": "Eye Gouge",
       "ja": "アイガウジ",
       "de": "Augenstecher",
-      "fr": "Perforation des yeux"
+      "fr": "Perforation des yeux",
+      "ko": "안구 찌르기"
     },
     "29119": {
       "zhHans": "超高速",
@@ -1044,7 +1103,8 @@
       "en": "Hypervelocity",
       "ja": "ハイパーヴェロシティ",
       "de": "Überschall",
-      "fr": "Hypervitesse"
+      "fr": "Hypervitesse",
+      "ko": "초신속격"
     },
     "29120": {
       "zhHans": "撕喉",
@@ -1052,7 +1112,8 @@
       "en": "Jugular Rip",
       "ja": "ジャギュラーリップ",
       "de": "Kehlreißer",
-      "fr": "Arrachage de la jugulaire"
+      "fr": "Arrachage de la jugulaire",
+      "ko": "급소 베기"
     },
     "29121": {
       "zhHans": "裂膛",
@@ -1060,7 +1121,8 @@
       "en": "Abdomen Tear",
       "ja": "アブドメンテアー",
       "de": "Bauchschlitzer",
-      "fr": "Lacération de l'abdomen"
+      "fr": "Lacération de l'abdomen",
+      "ko": "복부 가르기"
     },
     "29122": {
       "zhHans": "穿目",
@@ -1068,7 +1130,8 @@
       "en": "Eye Gouge",
       "ja": "アイガウジ",
       "de": "Augenstecher",
-      "fr": "Perforation des yeux"
+      "fr": "Perforation des yeux",
+      "ko": "안구 찌르기"
     },
     "29123": {
       "en": "Rough Divide",
@@ -1076,7 +1139,8 @@
       "zhHant": "粗分斬",
       "ja": "ラフディバイド",
       "de": "Grobspalter",
-      "fr": "Lamineur"
+      "fr": "Lamineur",
+      "ko": "대분할"
     },
     "29124": {
       "zhHans": "抽取融合",
@@ -1108,7 +1172,8 @@
       "zhHant": "爆破領域",
       "ja": "ブラスティングゾーン",
       "de": "Erda-Detonation",
-      "fr": "Zone de destruction"
+      "fr": "Zone de destruction",
+      "ko": "발파 지대"
     },
     "29129": {
       "zhHans": "极光",
@@ -1124,7 +1189,8 @@
       "zhHant": "連續劍",
       "ja": "連続剣",
       "de": "Multi",
-      "fr": "Multi-taillade"
+      "fr": "Multi-taillade",
+      "ko": "연속검"
     },
     "29131": {
       "en": "Terminal Trigger",
@@ -1132,7 +1198,8 @@
       "zhHant": "終結擊",
       "ja": "フィニッシュトリガー",
       "de": "Finaler Trigger",
-      "fr": "Gâchette terminale"
+      "fr": "Gâchette terminale",
+      "ko": "종결의 방아쇠"
     },
     "29134": {
       "zhHans": "轰炎法",
@@ -1364,7 +1431,8 @@
       "en": "Fast Blade",
       "ja": "ファストブレード",
       "de": "Vortexschnitt",
-      "fr": "Lame rapide"
+      "fr": "Lame rapide",
+      "ko": "재빠른 검격"
     },
     "29170": {
       "zhHans": "先锋剑",
@@ -1372,7 +1440,8 @@
       "en": "Fast Blade",
       "ja": "ファストブレード",
       "de": "Vortexschnitt",
-      "fr": "Lame rapide"
+      "fr": "Lame rapide",
+      "ko": "재빠른 검격"
     },
     "29171": {
       "zhHans": "强突",
@@ -1748,7 +1817,8 @@
       "zhHant": "閃灼",
       "ja": "グレアガ",
       "de": "Blendga",
-      "fr": "Méga Chatoiement"
+      "fr": "Méga Chatoiement",
+      "ko": "글레어가"
     },
     "29224": {
       "zhHans": "救疗",
@@ -1756,7 +1826,8 @@
       "zhHant": "中療傷",
       "ja": "ケアルラ",
       "de": "Vitra",
-      "fr": "Extra Soin"
+      "fr": "Extra Soin",
+      "ko": "케알라"
     },
     "29225": {
       "zhHans": "愈疗",
@@ -1764,7 +1835,8 @@
       "zhHant": "大療傷",
       "ja": "ケアルガ",
       "de": "Vitaga",
-      "fr": "Méga Soin"
+      "fr": "Méga Soin",
+      "ko": "케알가"
     },
     "29226": {
       "zhHans": "苦难之心",
@@ -1772,7 +1844,8 @@
       "zhHant": "苦難之心",
       "ja": "ハート・オブ・ミゼリ",
       "de": "Afflatus miseriae",
-      "fr": "Offrande de misère"
+      "fr": "Offrande de misère",
+      "ko": "참담한 마음"
     },
     "29227": {
       "zhHans": "水流幕",
@@ -1780,7 +1853,8 @@
       "zhHant": "水流幕",
       "ja": "アクアヴェール",
       "de": "Wasserschleier",
-      "fr": "Aquavoile"
+      "fr": "Aquavoile",
+      "ko": "물의 장막"
     },
     "29228": {
       "en": "Miracle of Nature",
@@ -1788,7 +1862,8 @@
       "zhHant": "自然的奇蹟",
       "ja": "ミラクル・オブ・ネイチャー",
       "de": "Wunder der Natur",
-      "fr": "Miracle de la nature"
+      "fr": "Miracle de la nature",
+      "ko": "자연의 기적"
     },
     "29229": {
       "zhHans": "炽天强袭",
@@ -1796,7 +1871,8 @@
       "zhHant": "熾天強襲",
       "ja": "セラフストライク",
       "de": "Seraphenschlag",
-      "fr": "Frappe séraphine"
+      "fr": "Frappe séraphine",
+      "ko": "치천사의 일격"
     },
     "29230": {
       "zhHans": "涤罪之心",
@@ -1804,7 +1880,8 @@
       "zhHant": "滌罪之心",
       "ja": "ハート・オブ・パーゲーション",
       "de": "Afflatus purgatio",
-      "fr": "Purge fondamentale"
+      "fr": "Purge fondamentale",
+      "ko": "정죄의 마음"
     },
     "29231": {
       "zhHans": "极炎法",
@@ -1812,7 +1889,8 @@
       "zhHant": "極炎法",
       "ja": "極炎法",
       "de": "Rabiate Bravade",
-      "fr": "Loi de l'ébullition IV"
+      "fr": "Loi de l'ébullition IV",
+      "ko": "극염법"
     },
     "29232": {
       "zhHans": "鼓舞激励之策",
@@ -1820,7 +1898,8 @@
       "zhHant": "鼓舞激勵之策",
       "ja": "鼓舞激励の策",
       "de": "Adloquium",
-      "fr": "Traité du réconfort"
+      "fr": "Traité du réconfort",
+      "ko": "고무격려책"
     },
     "29233": {
       "zhHans": "蛊毒法",
@@ -1828,7 +1907,8 @@
       "zhHant": "蠱毒法",
       "ja": "蠱毒法",
       "de": "Causae et Curae",
-      "fr": "Loi de l'infection"
+      "fr": "Loi de l'infection",
+      "ko": "고독법"
     },
     "29234": {
       "zhHans": "展开战术",
@@ -1836,7 +1916,8 @@
       "zhHant": "展開戰術",
       "ja": "展開戦術",
       "de": "Dislokation",
-      "fr": "Stratagème du déploiement"
+      "fr": "Stratagème du déploiement",
+      "ko": "전개전술"
     },
     "29235": {
       "zhHans": "枯骨法",
@@ -1852,7 +1933,8 @@
       "zhHant": "疾風怒濤之計",
       "ja": "疾風怒濤の計",
       "de": "Sturm und Drang",
-      "fr": "Thèse fluidique"
+      "fr": "Thèse fluidique",
+      "ko": "질풍노도계"
     },
     "29237": {
       "zhHans": "炽天召唤",
@@ -1860,7 +1942,8 @@
       "zhHant": "熾天召喚",
       "ja": "サモン・セラフィム",
       "de": "Seraph-Beschwörung",
-      "fr": "Invocation Séraphin"
+      "fr": "Invocation Séraphin",
+      "ko": "세라핌 소환"
     },
     "29238": {
       "zhHans": "慰藉",
@@ -1884,7 +1967,8 @@
       "en": "Seraphic Veil",
       "ja": "セラフィックヴェール",
       "de": "Schleier der Seraphim",
-      "fr": "Voile séraphique"
+      "fr": "Voile séraphique",
+      "ko": "세라핌의 보호"
     },
     "29241": {
       "zhHans": "慰藉",
@@ -1900,7 +1984,8 @@
       "en": "Fall Malefic",
       "ja": "フォールマレフィク",
       "de": "Aspekt im Fall",
-      "fr": "Malfaisance en chute"
+      "fr": "Malfaisance en chute",
+      "ko": "폴 말레피크"
     },
     "29243": {
       "zhHans": "吉星相位",
@@ -1908,7 +1993,8 @@
       "zhHant": "吉星相位",
       "ja": "アスペクト・ベネフィク",
       "de": "Harmonischer Orbis",
-      "fr": "Bienfaisance aspectée"
+      "fr": "Bienfaisance aspectée",
+      "ko": "별읽기: 베네피크"
     },
     "29244": {
       "zhHans": "中重力",
@@ -1916,7 +2002,8 @@
       "zhHant": "中重力",
       "ja": "グラビラ",
       "de": "Gravitra",
-      "fr": "Extra Gravité"
+      "fr": "Extra Gravité",
+      "ko": "그라비라"
     },
     "29245": {
       "zhHans": "双重咏唱",
@@ -1924,7 +2011,8 @@
       "en": "Double Cast",
       "ja": "ダブルキャスト",
       "de": "Zweifacher Zauber",
-      "fr": "Double incantation"
+      "fr": "Double incantation",
+      "ko": "이중 마술"
     },
     "29246": {
       "zhHans": "落陷凶星",
@@ -1932,7 +2020,8 @@
       "en": "Fall Malefic",
       "ja": "フォールマレフィク",
       "de": "Aspekt im Fall",
-      "fr": "Malfaisance en chute"
+      "fr": "Malfaisance en chute",
+      "ko": "폴 말레피크"
     },
     "29247": {
       "zhHans": "吉星相位",
@@ -1940,7 +2029,8 @@
       "zhHant": "吉星相位",
       "ja": "アスペクト・ベネフィク",
       "de": "Harmonischer Orbis",
-      "fr": "Bienfaisance aspectée"
+      "fr": "Bienfaisance aspectée",
+      "ko": "별읽기: 베네피크"
     },
     "29248": {
       "zhHans": "中重力",
@@ -1948,7 +2038,8 @@
       "zhHant": "中重力",
       "ja": "グラビラ",
       "de": "Gravitra",
-      "fr": "Extra Gravité"
+      "fr": "Extra Gravité",
+      "ko": "그라비라"
     },
     "29249": {
       "zhHans": "抽卡",
@@ -1988,7 +2079,8 @@
       "zhHant": "大宇宙",
       "ja": "マクロコスモス",
       "de": "Makrokosmos",
-      "fr": "Macrocosme"
+      "fr": "Macrocosme",
+      "ko": "대우주"
     },
     "29254": {
       "zhHans": "小宇宙",
@@ -1996,7 +2088,8 @@
       "zhHant": "小宇宙",
       "ja": "ミクロコスモス",
       "de": "Mikrokosmos",
-      "fr": "Microcosme"
+      "fr": "Microcosme",
+      "ko": "소우주"
     },
     "29255": {
       "zhHans": "星河漫天",
@@ -2004,7 +2097,8 @@
       "zhHant": "星河漫天",
       "ja": "星河一天",
       "de": "Säule der Herrlichkeit",
-      "fr": "Rivière céleste"
+      "fr": "Rivière céleste",
+      "ko": "하늘별물결"
     },
     "29256": {
       "zhHans": "注药III",
@@ -2012,7 +2106,8 @@
       "en": "Dosis III",
       "ja": "ドシスIII",
       "de": "Dosis III",
-      "fr": "Dosis III"
+      "fr": "Dosis III",
+      "ko": "도시스 3"
     },
     "29257": {
       "en": "Eukrasian Dosis III",
@@ -2020,7 +2115,8 @@
       "zhHant": "均衡注藥III",
       "ja": "エウクラシア・ドシスIII",
       "de": "Eukratische Dosis III",
-      "fr": "Dosis eucrasique III"
+      "fr": "Dosis eucrasique III",
+      "ko": "정상건강: 도시스 3"
     },
     "29258": {
       "zhHans": "均衡",
@@ -2028,7 +2124,8 @@
       "zhHant": "均衡",
       "ja": "エウクラシア",
       "de": "Eukrasie",
-      "fr": "Eukrasia"
+      "fr": "Eukrasia",
+      "ko": "정상건강"
     },
     "29259": {
       "zhHans": "发炎III",
@@ -2036,7 +2133,8 @@
       "zhHant": "發炎III",
       "ja": "フレグマIII",
       "de": "Phlegma III",
-      "fr": "Phlegma III"
+      "fr": "Phlegma III",
+      "ko": "플레그마 3"
     },
     "29260": {
       "zhHans": "魂灵风息",
@@ -2044,7 +2142,8 @@
       "zhHant": "魂靈風息",
       "ja": "プネウマ",
       "de": "Pneuma",
-      "fr": "Pneuma"
+      "fr": "Pneuma",
+      "ko": "프네우마"
     },
     "29261": {
       "zhHans": "神翼",
@@ -2052,7 +2151,8 @@
       "zhHant": "神翼",
       "ja": "イカロス",
       "de": "Ikarus",
-      "fr": "Ikaros"
+      "fr": "Ikaros",
+      "ko": "이카로스"
     },
     "29262": {
       "zhHans": "箭毒",
@@ -2060,7 +2160,8 @@
       "zhHant": "箭毒",
       "ja": "トキシコン",
       "de": "Toxikon",
-      "fr": "Toxikon"
+      "fr": "Toxikon",
+      "ko": "톡시콘"
     },
     "29263": {
       "en": "Toxikon II",
@@ -2068,7 +2169,8 @@
       "zhHant": "箭毒II",
       "ja": "トキシコンII",
       "de": "Toxikon II",
-      "fr": "Toxikon II"
+      "fr": "Toxikon II",
+      "ko": "톡시콘 2"
     },
     "29264": {
       "zhHans": "心关",
@@ -2076,7 +2178,8 @@
       "en": "Kardia",
       "ja": "カルディア",
       "de": "Kardia",
-      "fr": "Kardia"
+      "fr": "Kardia",
+      "ko": "심각인"
     },
     "29265": {
       "zhHans": "カルディア",
@@ -2092,7 +2195,8 @@
       "en": "Mesotes",
       "ja": "メソテース",
       "de": "Mesotes",
-      "fr": "Mesotes"
+      "fr": "Mesotes",
+      "ko": "중용"
     },
     "29267": {
       "zhHans": "中庸之道",
@@ -2100,7 +2204,8 @@
       "en": "Mesotes",
       "ja": "メソテース",
       "de": "Mesotes",
-      "fr": "Mesotes"
+      "fr": "Mesotes",
+      "ko": "중용"
     },
     "29268": {
       "zhHans": "请求轰炸",
@@ -2356,7 +2461,8 @@
       "en": "Heavy Swing",
       "ja": "ヘヴィスウィング",
       "de": "Gewaltiger Hieb",
-      "fr": "Coup puissant"
+      "fr": "Coup puissant",
+      "ko": "육중한 일격"
     },
     "29300": {
       "zhHans": "凶残裂",
@@ -2364,7 +2470,8 @@
       "en": "Maim",
       "ja": "メイム",
       "de": "Verstümmelung",
-      "fr": "Mutilation"
+      "fr": "Mutilation",
+      "ko": "관절 파괴"
     },
     "29301": {
       "zhHans": "暴风斩",
@@ -2372,7 +2479,8 @@
       "en": "Storm's Path",
       "ja": "シュトルムヴィント",
       "de": "Sturmkeil",
-      "fr": "Couperet de justice"
+      "fr": "Couperet de justice",
+      "ko": "폭풍 쐐기"
     },
     "29302": {
       "zhHans": "暴风碎",
@@ -2476,7 +2584,8 @@
       "en": "Blizzard",
       "ja": "ブリザド",
       "de": "Eis",
-      "fr": "Glace"
+      "fr": "Glace",
+      "ko": "블리자드"
     },
     "29315": {
       "zhHans": "火炎",
@@ -2484,7 +2593,8 @@
       "en": "Fire",
       "ja": "ファイア",
       "de": "Feuer",
-      "fr": "Feu"
+      "fr": "Feu",
+      "ko": "파이어"
     },
     "29316": {
       "zhHans": "爆炎",
@@ -2492,7 +2602,8 @@
       "en": "Fire III",
       "ja": "ファイガ",
       "de": "Feuga",
-      "fr": "Méga Feu"
+      "fr": "Méga Feu",
+      "ko": "파이가"
     },
     "29317": {
       "zhHans": "治疗",
@@ -2508,7 +2619,8 @@
       "en": "Cure II",
       "ja": "ケアルラ",
       "de": "Vitra",
-      "fr": "Extra Soin"
+      "fr": "Extra Soin",
+      "ko": "케알라"
     },
     "29319": {
       "zhHans": "救疗",
@@ -2516,7 +2628,8 @@
       "en": "Cure II",
       "ja": "ケアルラ",
       "de": "Vitra",
-      "fr": "Extra Soin"
+      "fr": "Extra Soin",
+      "ko": "케알라"
     },
     "29320": {
       "zhHans": "医治",
@@ -2628,7 +2741,8 @@
       "en": "Burst",
       "ja": "爆発",
       "de": "Explosion",
-      "fr": "Explosion"
+      "fr": "Explosion",
+      "ko": "버스트"
     },
     "29334": {
       "zhHans": "古火喷发",
@@ -2996,7 +3110,8 @@
       "zhHant": "強勁射擊",
       "ja": "パワーショット",
       "de": "Mächtiger Schuss",
-      "fr": "Tir puissant"
+      "fr": "Tir puissant",
+      "ko": "강력 사격"
     },
     "29392": {
       "zhHans": "完美音调",
@@ -3004,7 +3119,8 @@
       "zhHant": "完美音調",
       "ja": "ピッチパーフェクト",
       "de": "Absolutes Gehör",
-      "fr": "Ton parfait"
+      "fr": "Ton parfait",
+      "ko": "절대음감"
     },
     "29393": {
       "zhHans": "绝峰箭",
@@ -3012,7 +3128,8 @@
       "zhHant": "絕峰箭",
       "ja": "エイペックスアロー",
       "de": "Apex-Pfeil",
-      "fr": "Trait alpha"
+      "fr": "Trait alpha",
+      "ko": "정점의 화살"
     },
     "29394": {
       "zhHans": "爆破箭",
@@ -3020,7 +3137,8 @@
       "zhHant": "爆破箭",
       "ja": "ブラストアロー",
       "de": "Stoßpfeil",
-      "fr": "Flèche explosive"
+      "fr": "Flèche explosive",
+      "ko": "돌풍 화살"
     },
     "29395": {
       "zhHans": "默者的夜曲",
@@ -3028,7 +3146,8 @@
       "zhHant": "默者的夜曲",
       "ja": "黙者のノクターン",
       "de": "Stumme Nocturne",
-      "fr": "Nocturne muet"
+      "fr": "Nocturne muet",
+      "ko": "침묵의 야상곡"
     },
     "29396": {
       "zhHans": "九天连箭",
@@ -3060,7 +3179,8 @@
       "en": "Repelling Shot",
       "ja": "リペリングショット",
       "de": "Mannstopper",
-      "fr": "Tir repoussant"
+      "fr": "Tir repoussant",
+      "ko": "후퇴 사격"
     },
     "29400": {
       "zhHans": "光阴神的礼赞凯歌",
@@ -3076,7 +3196,8 @@
       "zhHant": "英雄的幻想曲",
       "ja": "英雄のファンタジア",
       "de": "Fantasie des Helden",
-      "fr": "Fantaisie héroïque"
+      "fr": "Fantaisie héroïque",
+      "ko": "영웅의 환상곡"
     },
     "29402": {
       "zhHans": "蓄力冲击",
@@ -3084,7 +3205,8 @@
       "zhHant": "蓄力衝擊",
       "ja": "チャージブラスト",
       "de": "Explosiver Schuss",
-      "fr": "Souffle explosif"
+      "fr": "Souffle explosif",
+      "ko": "충전 분사"
     },
     "29403": {
       "zhHans": "热冲击",
@@ -3100,7 +3222,8 @@
       "en": "Scattergun",
       "ja": "スキャッターガン",
       "de": "Schrotflinte",
-      "fr": "Fusil à pompe"
+      "fr": "Fusil à pompe",
+      "ko": "산탄총"
     },
     "29405": {
       "zhHans": "钻头",
@@ -3108,7 +3231,8 @@
       "zhHant": "鑽頭",
       "ja": "ドリル",
       "de": "Bohrer",
-      "fr": "Foreuse"
+      "fr": "Foreuse",
+      "ko": "드릴"
     },
     "29406": {
       "zhHans": "毒菌冲击",
@@ -3116,7 +3240,8 @@
       "zhHant": "毒化衝擊",
       "ja": "バイオブラスト",
       "de": "Bioblaster",
-      "fr": "Lance-toxine"
+      "fr": "Lance-toxine",
+      "ko": "생화학무기"
     },
     "29407": {
       "zhHans": "空气锚",
@@ -3124,7 +3249,8 @@
       "zhHant": "空氣錨",
       "ja": "エアアンカー",
       "de": "Luftanker",
-      "fr": "Ancre aérienne"
+      "fr": "Ancre aérienne",
+      "ko": "사슬닻"
     },
     "29408": {
       "zhHans": "回转飞锯",
@@ -3132,7 +3258,8 @@
       "zhHant": "迴轉飛鋸",
       "ja": "回転のこぎり",
       "de": "Kreissäge",
-      "fr": "Tronçonneuses rotatives"
+      "fr": "Tronçonneuses rotatives",
+      "ko": "회전톱"
     },
     "29409": {
       "zhHans": "野火",
@@ -3140,7 +3267,8 @@
       "zhHant": "野火",
       "ja": "ワイルドファイア",
       "de": "Wildfeuer",
-      "fr": "Flambée"
+      "fr": "Flambée",
+      "ko": "소이탄"
     },
     "29410": {
       "zhHans": "野火",
@@ -3148,7 +3276,8 @@
       "en": "Wildfire",
       "ja": "ワイルドファイア",
       "de": "Wildfeuer",
-      "fr": "Flambée"
+      "fr": "Flambée",
+      "ko": "소이탄"
     },
     "29411": {
       "zhHans": "野火",
@@ -3156,7 +3285,8 @@
       "en": "Wildfire",
       "ja": "ワイルドファイア",
       "de": "Wildfeuer",
-      "fr": "Flambée"
+      "fr": "Flambée",
+      "ko": "소이탄"
     },
     "29412": {
       "zhHans": "象式浮空炮塔",
@@ -3164,7 +3294,8 @@
       "zhHant": "象型浮游砲塔",
       "ja": "オートタレット・ビショップ",
       "de": "Selbstschuss-Gyrocopter LÄUFER",
-      "fr": "Auto-tourelle Fou"
+      "fr": "Auto-tourelle Fou",
+      "ko": "자동포탑 비숍"
     },
     "29413": {
       "zhHans": "以太炮",
@@ -3172,7 +3303,8 @@
       "en": "Aether Mortar",
       "ja": "エーテルモーター",
       "de": "Äthermörser",
-      "fr": "Mortier d'éther"
+      "fr": "Mortier d'éther",
+      "ko": "에테르 박격포"
     },
     "29414": {
       "zhHans": "分析",
@@ -3180,7 +3312,8 @@
       "zhHant": "分析",
       "ja": "アナライズ",
       "de": "Analyse",
-      "fr": "Analyse"
+      "fr": "Analyse",
+      "ko": "분석"
     },
     "29415": {
       "zhHans": "魔弹射手",
@@ -3188,7 +3321,8 @@
       "zhHant": "魔彈射手",
       "ja": "魔弾の射手",
       "de": "Freischütz",
-      "fr": "Fusil mystique"
+      "fr": "Fusil mystique",
+      "ko": "마탄의 사수"
     },
     "29416": {
       "zhHans": "瀑泻",
@@ -3196,7 +3330,8 @@
       "zhHant": "瀑瀉",
       "ja": "カスケード",
       "de": "Cascade",
-      "fr": "Cascade"
+      "fr": "Cascade",
+      "ko": "캐스케이드"
     },
     "29417": {
       "zhHans": "喷泉",
@@ -3204,7 +3339,8 @@
       "en": "Fountain",
       "ja": "ファウンテン",
       "de": "Fontäne",
-      "fr": "Fontaine"
+      "fr": "Fontaine",
+      "ko": "파운틴"
     },
     "29418": {
       "zhHans": "逆瀑泻",
@@ -3212,7 +3348,8 @@
       "zhHant": "逆瀑瀉",
       "ja": "リバースカスケード",
       "de": "Invertierte Cascade",
-      "fr": "Cascade inversée"
+      "fr": "Cascade inversée",
+      "ko": "리버스 캐스케이드"
     },
     "29419": {
       "zhHans": "坠喷泉",
@@ -3220,7 +3357,8 @@
       "en": "Fountainfall",
       "ja": "ファウンテンフォール",
       "de": "Fallende Fontäne",
-      "fr": "Fontaine en cascade"
+      "fr": "Fontaine en cascade",
+      "ko": "파운틴 폴"
     },
     "29420": {
       "zhHans": "剑舞",
@@ -3228,7 +3366,8 @@
       "en": "Saber Dance",
       "ja": "剣の舞い",
       "de": "Schwerttanz",
-      "fr": "Danse du sabre"
+      "fr": "Danse du sabre",
+      "ko": "검무"
     },
     "29421": {
       "zhHans": "流星舞",
@@ -3236,7 +3375,8 @@
       "zhHant": "流星舞",
       "ja": "流星の舞い",
       "de": "Sternenfalltanz",
-      "fr": "Danse de la pluie étoilée"
+      "fr": "Danse de la pluie étoilée",
+      "ko": "별똥별 춤"
     },
     "29422": {
       "zhHans": "刃舞",
@@ -3244,7 +3384,8 @@
       "zhHant": "刃舞",
       "ja": "刃の舞い",
       "de": "Klingentanz",
-      "fr": "Danse tranchante"
+      "fr": "Danse tranchante",
+      "ko": "칼춤"
     },
     "29423": {
       "zhHans": "刃舞·终",
@@ -3252,7 +3393,8 @@
       "zhHant": "刃舞・終",
       "ja": "刃の舞い【終】",
       "de": "Scharfes Finale",
-      "fr": "Final tranchant"
+      "fr": "Final tranchant",
+      "ko": "칼춤: 결말"
     },
     "29424": {
       "zhHans": "刃舞·终",
@@ -3260,7 +3402,8 @@
       "en": "Honing Ovation",
       "ja": "刃の舞い【終】",
       "de": "Scharfes Finale",
-      "fr": "Final tranchant"
+      "fr": "Final tranchant",
+      "ko": "칼춤: 결말"
     },
     "29425": {
       "zhHans": "刃舞·终",
@@ -3268,7 +3411,8 @@
       "en": "Honing Ovation",
       "ja": "刃の舞い【終】",
       "de": "Scharfes Finale",
-      "fr": "Final tranchant"
+      "fr": "Final tranchant",
+      "ko": "칼춤: 결말"
     },
     "29426": {
       "zhHans": "刃舞·终",
@@ -3276,7 +3420,8 @@
       "zhHant": "刃舞・終",
       "ja": "刃の舞い【終】",
       "de": "Scharfes Finale",
-      "fr": "Final tranchant"
+      "fr": "Final tranchant",
+      "ko": "칼춤: 결말"
     },
     "29427": {
       "zhHans": "刃舞·终",
@@ -3284,7 +3429,8 @@
       "en": "Honing Ovation",
       "ja": "刃の舞い【終】",
       "de": "Scharfes Finale",
-      "fr": "Final tranchant"
+      "fr": "Final tranchant",
+      "ko": "칼춤: 결말"
     },
     "29428": {
       "zhHans": "扇舞",
@@ -3292,7 +3438,8 @@
       "zhHant": "扇舞",
       "ja": "扇の舞い",
       "de": "Fächertanz",
-      "fr": "Danse de l'éventail"
+      "fr": "Danse de l'éventail",
+      "ko": "부채춤"
     },
     "29429": {
       "zhHans": "治疗之华尔兹",
@@ -3300,7 +3447,8 @@
       "zhHant": "治療之華爾滋",
       "ja": "癒やしのワルツ",
       "de": "Heilender Walzer",
-      "fr": "Valse revigorante"
+      "fr": "Valse revigorante",
+      "ko": "치유의 왈츠"
     },
     "29430": {
       "zhHans": "前冲步",
@@ -3308,7 +3456,8 @@
       "zhHant": "前衝步",
       "ja": "アン・アヴァン",
       "de": "En Avant",
-      "fr": "En avant"
+      "fr": "En avant",
+      "ko": "앞걸음"
     },
     "29431": {
       "zhHans": "闭式舞姿",
@@ -3316,7 +3465,8 @@
       "en": "Closed Position",
       "ja": "クローズドポジション",
       "de": "Tanzpartner",
-      "fr": "Position rapprochée"
+      "fr": "Position rapprochée",
+      "ko": "마주서기"
     },
     "29432": {
       "zhHans": "行列舞",
@@ -3324,7 +3474,8 @@
       "zhHant": "行列舞",
       "ja": "コントラダンス",
       "de": "Kontratanz",
-      "fr": "Contredanse"
+      "fr": "Contredanse",
+      "ko": "콘트라댄스"
     },
     "29433": {
       "zhHans": "工艺神造",
@@ -3596,7 +3747,8 @@
       "en": "Terminal Trigger",
       "ja": "フィニッシュトリガー",
       "de": "Finaler Trigger",
-      "fr": "Gâchette terminale"
+      "fr": "Gâchette terminale",
+      "ko": "종결의 방아쇠"
     },
     "29470": {
       "zhHans": "刃舞·终",
@@ -3604,7 +3756,8 @@
       "en": "Honing Ovation",
       "ja": "刃の舞い【終】",
       "de": "Scharfes Finale",
-      "fr": "Final tranchant"
+      "fr": "Final tranchant",
+      "ko": "칼춤: 결말"
     },
     "29471": {
       "zhHans": "榴散弾",
@@ -3644,7 +3797,8 @@
       "zhHant": "雙龍腳",
       "ja": "双竜脚",
       "de": "Drachentritt",
-      "fr": "Tacle du dragon"
+      "fr": "Tacle du dragon",
+      "ko": "쌍룡각"
     },
     "29476": {
       "en": "Twin Snakes",
@@ -3652,7 +3806,8 @@
       "zhHant": "雙掌打",
       "ja": "双掌打",
       "de": "Doppelviper",
-      "fr": "Serpents jumeaux"
+      "fr": "Serpents jumeaux",
+      "ko": "쌍장타"
     },
     "29477": {
       "zhHans": "破碎拳",
@@ -3660,7 +3815,8 @@
       "en": "Demolish",
       "ja": "破砕拳",
       "de": "Demolieren",
-      "fr": "Démolition"
+      "fr": "Démolition",
+      "ko": "파쇄권"
     },
     "29478": {
       "zhHans": "梦幻斗舞",
@@ -3668,7 +3824,8 @@
       "en": "Phantom Rush",
       "ja": "夢幻闘舞",
       "de": "Phantomstoß",
-      "fr": "Rixe évanescente"
+      "fr": "Rixe évanescente",
+      "ko": "몽환투무"
     },
     "29479": {
       "zhHans": "六合星导脚",
@@ -3692,7 +3849,8 @@
       "zhHant": "鳳凰舞",
       "ja": "鳳凰の舞",
       "de": "Phönixtanz",
-      "fr": "Danse du Phénix"
+      "fr": "Danse du Phénix",
+      "ko": "봉황의 춤"
     },
     "29482": {
       "zhHans": "金刚极意",
@@ -3700,7 +3858,8 @@
       "zhHant": "金剛極意",
       "ja": "金剛の極意",
       "de": "Steinernes Enigma",
-      "fr": "Énigme de la terre"
+      "fr": "Énigme de la terre",
+      "ko": "금강의 극의"
     },
     "29483": {
       "en": "Earth's Reply",
@@ -3708,7 +3867,8 @@
       "zhHant": "金剛轉輪",
       "ja": "金剛転輪",
       "de": "Echo der Erde",
-      "fr": "Cercles de terre"
+      "fr": "Cercles de terre",
+      "ko": "금강전륜"
     },
     "29484": {
       "zhHans": "轻身步法",
@@ -3716,7 +3876,8 @@
       "zhHant": "輕身步法",
       "ja": "抜重歩法",
       "de": "Donnersprung",
-      "fr": "Élan fulgurant"
+      "fr": "Élan fulgurant",
+      "ko": "발중보법"
     },
     "29485": {
       "en": "Meteodrive",
@@ -3724,7 +3885,8 @@
       "zhHant": "隕石衝擊",
       "ja": "メテオドライヴ",
       "de": "Meteorschub",
-      "fr": "Plongeon météore"
+      "fr": "Plongeon météore",
+      "ko": "메테오 드라이브"
     },
     "29486": {
       "zhHans": "龙眼雷电",
@@ -3732,7 +3894,8 @@
       "en": "Raiden Thrust",
       "ja": "竜眼雷電",
       "de": "Überfallsstoß",
-      "fr": "Percée Raiden"
+      "fr": "Percée Raiden",
+      "ko": "용안뇌전"
     },
     "29487": {
       "zhHans": "龙牙龙爪",
@@ -3740,7 +3903,8 @@
       "en": "Fang and Claw",
       "ja": "竜牙竜爪",
       "de": "Fang und Klaue",
-      "fr": "Croc-et-griffe"
+      "fr": "Croc-et-griffe",
+      "ko": "용의 발톱"
     },
     "29488": {
       "zhHans": "龙尾大回旋",
@@ -3748,7 +3912,8 @@
       "en": "Wheeling Thrust",
       "ja": "竜尾大車輪",
       "de": "Fächerstoß",
-      "fr": "Percée tournante"
+      "fr": "Percée tournante",
+      "ko": "용의 꼬리"
     },
     "29489": {
       "zhHans": "苍穹刺",
@@ -3756,7 +3921,8 @@
       "zhHant": "蒼天刺",
       "ja": "ヘヴンスラスト",
       "de": "Himmelsstoß",
-      "fr": "Percée céleste"
+      "fr": "Percée céleste",
+      "ko": "하늘 찌르기"
     },
     "29490": {
       "zhHans": "樱花缭乱",
@@ -3764,7 +3930,8 @@
       "zhHant": "櫻花繚亂",
       "ja": "桜華繚乱",
       "de": "Chaotischer Sturm",
-      "fr": "Floraison chaotique"
+      "fr": "Floraison chaotique",
+      "ko": "꽃잎 만발"
     },
     "29491": {
       "zhHans": "武神枪",
@@ -3772,7 +3939,8 @@
       "zhHant": "武神槍",
       "ja": "ゲイルスコグル",
       "de": "Geirskogul",
-      "fr": "Geirskögul"
+      "fr": "Geirskögul",
+      "ko": "게이르스코굴"
     },
     "29492": {
       "zhHans": "死者之岸",
@@ -3780,7 +3948,8 @@
       "zhHant": "死者之岸",
       "ja": "ナーストレンド",
       "de": "Nastrond",
-      "fr": "Naströnd"
+      "fr": "Naströnd",
+      "ko": "나스트론드"
     },
     "29493": {
       "zhHans": "高跳",
@@ -3788,7 +3957,8 @@
       "zhHant": "高跳",
       "ja": "ハイジャンプ",
       "de": "Hochsprung",
-      "fr": "Grand saut"
+      "fr": "Grand saut",
+      "ko": "하이 점프"
     },
     "29494": {
       "zhHans": "回避跳跃",
@@ -3796,7 +3966,8 @@
       "zhHant": "迴避跳躍",
       "ja": "イルーシブジャンプ",
       "de": "Ausweichsprung",
-      "fr": "Saut insaisissable"
+      "fr": "Saut insaisissable",
+      "ko": "교묘한 점프"
     },
     "29495": {
       "zhHans": "天龙点睛",
@@ -3804,7 +3975,8 @@
       "zhHant": "天龍點睛",
       "ja": "天竜点睛",
       "de": "Zwillingswyrm",
-      "fr": "Percée des dragons anciens"
+      "fr": "Percée des dragons anciens",
+      "ko": "천룡점정"
     },
     "29496": {
       "zhHans": "恐惧咆哮",
@@ -3812,7 +3984,8 @@
       "zhHant": "恐懼咆哮",
       "ja": "ホリッドロア",
       "de": "Entsetzliches Brüllen",
-      "fr": "Rugissement horrible"
+      "fr": "Rugissement horrible",
+      "ko": "소름 끼치는 포효"
     },
     "29497": {
       "zhHans": "冲天",
@@ -3820,7 +3993,8 @@
       "zhHant": "衝天",
       "ja": "スカイハイ",
       "de": "Himmelhoch",
-      "fr": "Tourbillon vertigineux"
+      "fr": "Tourbillon vertigineux",
+      "ko": "고공 도약"
     },
     "29498": {
       "zhHans": "天穹破碎",
@@ -3828,7 +4002,8 @@
       "zhHant": "蒼天破碎",
       "ja": "スカイシャッター",
       "de": "Himmelsbrecher",
-      "fr": "Briseur des cieux"
+      "fr": "Briseur des cieux",
+      "ko": "고공 분쇄"
     },
     "29499": {
       "zhHans": "天穹破碎",
@@ -3836,7 +4011,8 @@
       "zhHant": "蒼天破碎",
       "ja": "スカイシャッター",
       "de": "Himmelsbrecher",
-      "fr": "Briseur des cieux"
+      "fr": "Briseur des cieux",
+      "ko": "고공 분쇄"
     },
     "29500": {
       "zhHans": "双刃旋",
@@ -3844,7 +4020,8 @@
       "en": "Spinning Edge",
       "ja": "双刃旋",
       "de": "Wirbelklinge",
-      "fr": "Lame tournoyante"
+      "fr": "Lame tournoyante",
+      "ko": "쌍검 회전베기"
     },
     "29501": {
       "zhHans": "绝风",
@@ -3852,7 +4029,8 @@
       "en": "Gust Slash",
       "ja": "風断ち",
       "de": "Windschlitzer",
-      "fr": "Tourbillon tailladant"
+      "fr": "Tourbillon tailladant",
+      "ko": "돌풍베기"
     },
     "29502": {
       "zhHans": "旋风刃",
@@ -3860,7 +4038,8 @@
       "en": "Aeolian Edge",
       "ja": "旋風刃",
       "de": "Äolusklinge",
-      "fr": "Lame éolienne"
+      "fr": "Lame éolienne",
+      "ko": "칼날 선풍"
     },
     "29503": {
       "zhHans": "断绝",
@@ -3868,7 +4047,8 @@
       "en": "Assassinate",
       "ja": "終撃",
       "de": "Meuchelsprung",
-      "fr": "Assassinement"
+      "fr": "Assassinement",
+      "ko": "마무리 일격"
     },
     "29504": {
       "zhHans": "劫火灭却之术",
@@ -3876,7 +4056,8 @@
       "zhHant": "劫火滅卻之術",
       "ja": "劫火滅却の術",
       "de": "Goka Mekkyaku",
-      "fr": "Gôka Mekkyaku"
+      "fr": "Gôka Mekkyaku",
+      "ko": "겁화멸각술"
     },
     "29505": {
       "zhHans": "风魔手里剑",
@@ -3884,7 +4065,8 @@
       "zhHant": "風魔手裏劍",
       "ja": "風魔手裏剣",
       "de": "Fuma Shuriken",
-      "fr": "Fûma Shuriken"
+      "fr": "Fûma Shuriken",
+      "ko": "풍마의 수리검"
     },
     "29506": {
       "zhHans": "冰晶乱流之术",
@@ -3892,7 +4074,8 @@
       "zhHant": "冰晶亂流之術",
       "ja": "氷晶乱流の術",
       "de": "Hyosho Ranryu",
-      "fr": "Hyôshô Ranryû"
+      "fr": "Hyôshô Ranryû",
+      "ko": "빙정난류술"
     },
     "29507": {
       "zhHans": "三印自在",
@@ -3900,7 +4083,8 @@
       "zhHant": "三印自在",
       "ja": "三印自在",
       "de": "Tri-Mudra",
-      "fr": "Trimudrâ"
+      "fr": "Trimudrâ",
+      "ko": "삼인술"
     },
     "29508": {
       "zhHans": "命水",
@@ -3908,7 +4092,8 @@
       "zhHant": "命水",
       "ja": "命水",
       "de": "Meisui",
-      "fr": "Meisui"
+      "fr": "Meisui",
+      "ko": "생명의 물"
     },
     "29509": {
       "zhHans": "夺取",
@@ -3924,7 +4109,8 @@
       "zhHant": "月影雷獸爪",
       "ja": "月影雷獣爪",
       "de": "Tanzendes Raiju",
-      "fr": "Griffe de Raijû"
+      "fr": "Griffe de Raijû",
+      "ko": "월영뇌수조"
     },
     "29511": {
       "zhHans": "分身之术",
@@ -3932,7 +4118,8 @@
       "zhHant": "分身術",
       "ja": "分身の術",
       "de": "Doppeltes Ich",
-      "fr": "Bunshin"
+      "fr": "Bunshin",
+      "ko": "분신술"
     },
     "29512": {
       "zhHans": "风遁之术",
@@ -3940,7 +4127,8 @@
       "zhHant": "風遁之術",
       "ja": "風遁の術",
       "de": "Huton",
-      "fr": "Fûton"
+      "fr": "Fûton",
+      "ko": "풍둔술"
     },
     "29513": {
       "zhHans": "缩地",
@@ -3948,7 +4136,8 @@
       "zhHant": "縮地",
       "ja": "縮地",
       "de": "Shukuchi",
-      "fr": "Shukuchi"
+      "fr": "Shukuchi",
+      "ko": "축지법"
     },
     "29514": {
       "zhHans": "土遁之术",
@@ -3956,7 +4145,8 @@
       "en": "Doton",
       "ja": "土遁の術",
       "de": "Doton",
-      "fr": "Doton"
+      "fr": "Doton",
+      "ko": "토둔술"
     },
     "29515": {
       "zhHans": "星遁天诛",
@@ -3964,7 +4154,8 @@
       "en": "Seiton Tenchu",
       "ja": "星遁天誅",
       "de": "Seiton Tenchu",
-      "fr": "Seiton Tenchû"
+      "fr": "Seiton Tenchû",
+      "ko": "성둔천주"
     },
     "29516": {
       "zhHans": "星遁天诛",
@@ -3972,7 +4163,8 @@
       "en": "Seiton Tenchu",
       "ja": "星遁天誅",
       "de": "Seiton Tenchu",
-      "fr": "Seiton Tenchû"
+      "fr": "Seiton Tenchû",
+      "ko": "성둔천주"
     },
     "29517": {
       "zhHans": "双刃旋",
@@ -3980,7 +4172,8 @@
       "en": "Spinning Edge",
       "ja": "双刃旋",
       "de": "Wirbelklinge",
-      "fr": "Lame tournoyante"
+      "fr": "Lame tournoyante",
+      "ko": "쌍검 회전베기"
     },
     "29518": {
       "zhHans": "绝风",
@@ -3988,7 +4181,8 @@
       "en": "Gust Slash",
       "ja": "風断ち",
       "de": "Windschlitzer",
-      "fr": "Tourbillon tailladant"
+      "fr": "Tourbillon tailladant",
+      "ko": "돌풍베기"
     },
     "29519": {
       "zhHans": "旋风刃",
@@ -3996,7 +4190,8 @@
       "en": "Aeolian Edge",
       "ja": "旋風刃",
       "de": "Äolusklinge",
-      "fr": "Lame éolienne"
+      "fr": "Lame éolienne",
+      "ko": "칼날 선풍"
     },
     "29520": {
       "zhHans": "断绝",
@@ -4004,7 +4199,8 @@
       "en": "Assassinate",
       "ja": "終撃",
       "de": "Meuchelsprung",
-      "fr": "Assassinement"
+      "fr": "Assassinement",
+      "ko": "마무리 일격"
     },
     "29521": {
       "zhHans": "风魔手里剑",
@@ -4012,7 +4208,8 @@
       "en": "Fuma Shuriken",
       "ja": "風魔手裏剣",
       "de": "Fuma Shuriken",
-      "fr": "Fûma Shuriken"
+      "fr": "Fûma Shuriken",
+      "ko": "풍마의 수리검"
     },
     "29522": {
       "zhHans": "月影雷兽爪",
@@ -4020,7 +4217,8 @@
       "en": "Forked Raiju",
       "ja": "月影雷獣爪",
       "de": "Tanzendes Raiju",
-      "fr": "Griffe de Raijû"
+      "fr": "Griffe de Raijû",
+      "ko": "월영뇌수조"
     },
     "29523": {
       "zhHans": "雪风",
@@ -4028,7 +4226,8 @@
       "en": "Yukikaze",
       "ja": "雪風",
       "de": "Yukikaze",
-      "fr": "Yukikaze"
+      "fr": "Yukikaze",
+      "ko": "설풍"
     },
     "29524": {
       "zhHans": "月光",
@@ -4036,7 +4235,8 @@
       "en": "Gekko",
       "ja": "月光",
       "de": "Gekko",
-      "fr": "Gekkô"
+      "fr": "Gekkô",
+      "ko": "월광"
     },
     "29525": {
       "zhHans": "花车",
@@ -4044,7 +4244,8 @@
       "en": "Kasha",
       "ja": "花車",
       "de": "Kasha",
-      "fr": "Kasha"
+      "fr": "Kasha",
+      "ko": "화차"
     },
     "29526": {
       "zhHans": "冰雪",
@@ -4052,7 +4253,8 @@
       "zhHant": "冰雪",
       "ja": "氷雪",
       "de": "Hyosetsu",
-      "fr": "Hyosetsu"
+      "fr": "Hyosetsu",
+      "ko": "빙설"
     },
     "29527": {
       "en": "Mangetsu",
@@ -4060,7 +4262,8 @@
       "zhHant": "滿月",
       "ja": "満月",
       "de": "Mangetsu",
-      "fr": "Mangetsu"
+      "fr": "Mangetsu",
+      "ko": "만월"
     },
     "29528": {
       "zhHans": "樱花",
@@ -4068,7 +4271,8 @@
       "en": "Oka",
       "ja": "桜花",
       "de": "Oka",
-      "fr": "Ôka"
+      "fr": "Ôka",
+      "ko": "앵화"
     },
     "29529": {
       "zhHans": "纷乱雪月花",
@@ -4084,7 +4288,8 @@
       "zhHant": "奧義斬浪",
       "ja": "奥義波切",
       "de": "Ogi Namikiri",
-      "fr": "Ôgi : Namikiri"
+      "fr": "Ôgi : Namikiri",
+      "ko": "오의파절"
     },
     "29531": {
       "en": "Kaeshi: Namikiri",
@@ -4092,7 +4297,8 @@
       "zhHant": "回返斬浪",
       "ja": "返し波切",
       "de": "Kaeshi Namikiri",
-      "fr": "Kaeshi Namikiri"
+      "fr": "Kaeshi Namikiri",
+      "ko": "반전파절"
     },
     "29532": {
       "zhHans": "必杀剑·早天",
@@ -4100,7 +4306,8 @@
       "zhHant": "必殺劍・早天",
       "ja": "必殺剣・早天",
       "de": "Hissatsu: Soten",
-      "fr": "Hissatsu : Sôten"
+      "fr": "Hissatsu : Sôten",
+      "ko": "필살검: 조천"
     },
     "29533": {
       "zhHans": "必杀剑·地天",
@@ -4108,7 +4315,8 @@
       "zhHant": "必殺劍・地天",
       "ja": "必殺剣・地天",
       "de": "Hissatsu: Chiten",
-      "fr": "Hissatsu : Chiten"
+      "fr": "Hissatsu : Chiten",
+      "ko": "필살검: 지천"
     },
     "29534": {
       "zhHans": "地天返",
@@ -4124,7 +4332,8 @@
       "zhHant": "刀背擊打",
       "ja": "峰打ち",
       "de": "Mineuchi",
-      "fr": "Mineuchi"
+      "fr": "Mineuchi",
+      "ko": "칼등치기"
     },
     "29536": {
       "zhHans": "明镜止水",
@@ -4132,7 +4341,8 @@
       "zhHant": "明鏡止水",
       "ja": "明鏡止水",
       "de": "Meikyo Shisui",
-      "fr": "Meikyô Shisui"
+      "fr": "Meikyô Shisui",
+      "ko": "명경지수"
     },
     "29537": {
       "zhHans": "斩铁剑",
@@ -4140,7 +4350,8 @@
       "zhHant": "斬鐵劍",
       "ja": "斬鉄剣",
       "de": "Zantetsuken",
-      "fr": "Zantetsuken"
+      "fr": "Zantetsuken",
+      "ko": "참철검"
     },
     "29538": {
       "zhHans": "切割",
@@ -4148,7 +4359,8 @@
       "en": "Slice",
       "ja": "スライス",
       "de": "Schlitzer",
-      "fr": "Tranchage"
+      "fr": "Tranchage",
+      "ko": "낫질"
     },
     "29539": {
       "zhHans": "增盈切割",
@@ -4156,7 +4368,8 @@
       "en": "Waxing Slice",
       "ja": "ワクシングスライス",
       "de": "Neulicht-Schlitzer",
-      "fr": "Tranchage blafard"
+      "fr": "Tranchage blafard",
+      "ko": "반달 낫질"
     },
     "29540": {
       "zhHans": "地狱切割",
@@ -4164,7 +4377,8 @@
       "en": "Infernal Slice",
       "ja": "インファナルスライス",
       "de": "Infernalischer Schlitzer",
-      "fr": "Tranchage infernal"
+      "fr": "Tranchage infernal",
+      "ko": "지옥 낫질"
     },
     "29541": {
       "zhHans": "绞决",
@@ -4188,7 +4402,8 @@
       "en": "Void Reaping",
       "ja": "ヴォイドリーパー",
       "de": "Nichtsmäher",
-      "fr": "Fauchage du néant"
+      "fr": "Fauchage du néant",
+      "ko": "보이드 리퍼"
     },
     "29544": {
       "zhHans": "交错收割",
@@ -4196,7 +4411,8 @@
       "en": "Cross Reaping",
       "ja": "クロスリーパー",
       "de": "Kreuzmäher",
-      "fr": "Fauchage croisé"
+      "fr": "Fauchage croisé",
+      "ko": "크로스 리퍼"
     },
     "29545": {
       "en": "Harvest Moon",
@@ -4204,7 +4420,8 @@
       "zhHant": "收穫月",
       "ja": "ハーベストムーン",
       "de": "Erntemond",
-      "fr": "Lune des moissons"
+      "fr": "Lune des moissons",
+      "ko": "수확의 달"
     },
     "29546": {
       "en": "Plentiful Harvest",
@@ -4212,7 +4429,8 @@
       "zhHant": "大豐收",
       "ja": "プレンティフルハーベスト",
       "de": "Große Mahd",
-      "fr": "Moisson abondante"
+      "fr": "Moisson abondante",
+      "ko": "풍성한 수확"
     },
     "29547": {
       "en": "Grim Swathe",
@@ -4220,7 +4438,8 @@
       "zhHant": "束縛揮割",
       "ja": "シーフスウェーズ",
       "de": "Nachtschwad",
-      "fr": "Andain sinistre"
+      "fr": "Andain sinistre",
+      "ko": "음산한 할퀴기"
     },
     "29548": {
       "zhHans": "夜游魂钐割",
@@ -4228,7 +4447,8 @@
       "en": "Lemure's Slice",
       "ja": "レムールサイズ",
       "de": "Lemurensense",
-      "fr": "Faux du lémure"
+      "fr": "Faux du lémure",
+      "ko": "레무르의 낫"
     },
     "29549": {
       "en": "Death Warrant",
@@ -4236,7 +4456,8 @@
       "zhHant": "斬首令",
       "ja": "デスワラント",
       "de": "Richtbefehl",
-      "fr": "Arrêt de mort"
+      "fr": "Arrêt de mort",
+      "ko": "사형 예고"
     },
     "29550": {
       "en": "Hell's Ingress",
@@ -4244,7 +4465,8 @@
       "zhHant": "地獄入境",
       "ja": "ヘルズイングレス",
       "de": "Höllischer Auftritt",
-      "fr": "Intrusion de l'enfer"
+      "fr": "Intrusion de l'enfer",
+      "ko": "지옥 입장"
     },
     "29551": {
       "zhHans": "回退",
@@ -4252,7 +4474,8 @@
       "en": "Regress",
       "ja": "リターン",
       "de": "Rückkehr",
-      "fr": "Repli"
+      "fr": "Repli",
+      "ko": "회귀"
     },
     "29552": {
       "en": "Arcane Crest",
@@ -4260,7 +4483,8 @@
       "zhHant": "神秘紋",
       "ja": "アルケインクレスト",
       "de": "Arkanes Wappen",
-      "fr": "Blason arcanique"
+      "fr": "Blason arcanique",
+      "ko": "신비의 문장"
     },
     "29553": {
       "en": "Tenebrae Lemurum",
@@ -4268,7 +4492,8 @@
       "zhHant": "暗夜遊魂",
       "ja": "レムール・テネブレー",
       "de": "Tenebrae Lemurum",
-      "fr": "Ténèbres du lémure"
+      "fr": "Ténèbres du lémure",
+      "ko": "레무르 테네브레"
     },
     "29554": {
       "en": "Communio",
@@ -4276,7 +4501,8 @@
       "zhHant": "團契",
       "ja": "コムニオ",
       "de": "Communio",
-      "fr": "Communio"
+      "fr": "Communio",
+      "ko": "합일"
     },
     "29555": {
       "zhHans": "重力加农炮",
@@ -4300,7 +4526,8 @@
       "zhHant": "連續劍",
       "ja": "連続剣",
       "de": "Multi",
-      "fr": "Multi-taillade"
+      "fr": "Multi-taillade",
+      "ko": "연속검"
     },
     "29558": {
       "zhHans": "刃舞",
@@ -4308,7 +4535,8 @@
       "zhHant": "刃舞",
       "ja": "刃の舞い",
       "de": "Klingentanz",
-      "fr": "Danse tranchante"
+      "fr": "Danse tranchante",
+      "ko": "칼춤"
     },
     "29559": {
       "zhHans": "幻影野槌",
@@ -4316,7 +4544,8 @@
       "en": "Hollow Nozuchi",
       "ja": "幻影野槌",
       "de": "Nozuchi-Schemen",
-      "fr": "Nozuchi spectral"
+      "fr": "Nozuchi spectral",
+      "ko": "환영 토석룡"
     },
     "29561": {
       "zhHans": "算命魂葬",
@@ -4604,7 +4833,8 @@
       "zhHant": "斬首令",
       "ja": "デスワラント",
       "de": "Richtbefehl",
-      "fr": "Arrêt de mort"
+      "fr": "Arrêt de mort",
+      "ko": "사형 예고"
     },
     "29604": {
       "zhHans": "生浪死环之择",
@@ -4724,7 +4954,8 @@
       "en": "Heavy Swing",
       "ja": "ヘヴィスイング",
       "de": "Gewaltiger Hieb",
-      "fr": "Swing violent"
+      "fr": "Swing violent",
+      "ko": "육중한 일격"
     },
     "29621": {
       "zhHans": "重魂爆",
@@ -4924,7 +5155,8 @@
       "en": "Fire",
       "ja": "ファイア",
       "de": "Feuer",
-      "fr": "Feu"
+      "fr": "Feu",
+      "ko": "파이어"
     },
     "29650": {
       "zhHans": "炽炎",
@@ -4932,7 +5164,8 @@
       "en": "Fire IV",
       "ja": "ファイジャ",
       "de": "Feuka",
-      "fr": "Giga Feu"
+      "fr": "Giga Feu",
+      "ko": "파이쟈"
     },
     "29651": {
       "zhHans": "核爆",
@@ -4940,7 +5173,8 @@
       "zhHant": "火光",
       "ja": "フレア",
       "de": "Flare",
-      "fr": "Brasier"
+      "fr": "Brasier",
+      "ko": "플레어"
     },
     "29652": {
       "zhHans": "核爆",
@@ -4948,7 +5182,8 @@
       "en": "Flare",
       "ja": "フレア",
       "de": "Flare",
-      "fr": "Brasier"
+      "fr": "Brasier",
+      "ko": "플레어"
     },
     "29653": {
       "zhHans": "冰结",
@@ -4956,7 +5191,8 @@
       "zhHant": "暴雪",
       "ja": "ブリザド",
       "de": "Eis",
-      "fr": "Glace"
+      "fr": "Glace",
+      "ko": "블리자드"
     },
     "29654": {
       "zhHans": "冰澈",
@@ -4964,7 +5200,8 @@
       "en": "Blizzard IV",
       "ja": "ブリザジャ",
       "de": "Eiska",
-      "fr": "Giga glace"
+      "fr": "Giga glace",
+      "ko": "블리자쟈"
     },
     "29655": {
       "zhHans": "玄冰",
@@ -4972,7 +5209,8 @@
       "zhHant": "冰寒",
       "ja": "フリーズ",
       "de": "Einfrieren",
-      "fr": "Gel"
+      "fr": "Gel",
+      "ko": "프리즈"
     },
     "29656": {
       "zhHans": "玄冰",
@@ -4980,7 +5218,8 @@
       "en": "Freeze",
       "ja": "フリーズ",
       "de": "Einfrieren",
-      "fr": "Gel"
+      "fr": "Gel",
+      "ko": "프리즈"
     },
     "29657": {
       "zhHans": "磁暴",
@@ -4988,7 +5227,8 @@
       "zhHant": "爆發技",
       "ja": "バースト",
       "de": "Schub",
-      "fr": "Bouillonnement"
+      "fr": "Bouillonnement",
+      "ko": "버스트"
     },
     "29658": {
       "zhHans": "异言",
@@ -4996,7 +5236,8 @@
       "zhHant": "異言",
       "ja": "ゼノグロシー",
       "de": "Xenoglossie",
-      "fr": "Xénoglossie"
+      "fr": "Xénoglossie",
+      "ko": "미지의 언어"
     },
     "29659": {
       "zhHans": "夜翼",
@@ -5012,7 +5253,8 @@
       "en": "Aetherial Manipulation",
       "ja": "エーテリアルステップ",
       "de": "Äthermanipulation",
-      "fr": "Manipulation de l'éther"
+      "fr": "Manipulation de l'éther",
+      "ko": "에테르 촉진"
     },
     "29661": {
       "zhHans": "热震荡",
@@ -5028,7 +5270,8 @@
       "zhHant": "靈魂共鳴",
       "ja": "ソウルレゾナンス",
       "de": "Seelenresonanz",
-      "fr": "Résonance de l'âme"
+      "fr": "Résonance de l'âme",
+      "ko": "영혼 공명"
     },
     "29663": {
       "zhHans": "悖论",
@@ -5036,7 +5279,8 @@
       "en": "Paradox",
       "ja": "パラドックス",
       "de": "Paradox",
-      "fr": "Paradoxe"
+      "fr": "Paradoxe",
+      "ko": "역설"
     },
     "29664": {
       "zhHans": "毁荡",
@@ -5044,7 +5288,8 @@
       "en": "Ruin III",
       "ja": "ルインガ",
       "de": "Ruinga",
-      "fr": "Méga Ruine"
+      "fr": "Méga Ruine",
+      "ko": "루인가"
     },
     "29665": {
       "zhHans": "星极脉冲",
@@ -5052,7 +5297,8 @@
       "en": "Astral Impulse",
       "ja": "アストラルインパルス",
       "de": "Lichtimpuls",
-      "fr": "Pulsar astral"
+      "fr": "Pulsar astral",
+      "ko": "천상의 충격"
     },
     "29666": {
       "zhHans": "灵泉之炎",
@@ -5060,7 +5306,8 @@
       "en": "Fountain of Fire",
       "ja": "霊泉の炎",
       "de": "Quell des Feuers",
-      "fr": "Flamme de la vie"
+      "fr": "Flamme de la vie",
+      "ko": "영검의 불꽃"
     },
     "29667": {
       "zhHans": "深红旋风",
@@ -5068,7 +5315,8 @@
       "zhHant": "深紅旋風",
       "ja": "クリムゾンサイクロン",
       "de": "Zinnober-Zyklon",
-      "fr": "Cyclone écarlate"
+      "fr": "Cyclone écarlate",
+      "ko": "진홍 회오리"
     },
     "29668": {
       "zhHans": "深红强袭",
@@ -5076,7 +5324,8 @@
       "zhHant": "深紅強襲",
       "ja": "クリムゾンストライク",
       "de": "Zinnober-Schlag",
-      "fr": "Assaut écarlate"
+      "fr": "Assaut écarlate",
+      "ko": "진홍빛 일격"
     },
     "29669": {
       "zhHans": "螺旋气流",
@@ -5084,7 +5333,8 @@
       "zhHant": "螺旋氣流",
       "ja": "スリップストリーム",
       "de": "Wirbelströmung",
-      "fr": "Sillage"
+      "fr": "Sillage",
+      "ko": "반동 기류"
     },
     "29670": {
       "zhHans": "守护之光",
@@ -5092,7 +5342,8 @@
       "zhHant": "守護之光",
       "ja": "守りの光",
       "de": "Schimmerschild",
-      "fr": "Égide rayonnante"
+      "fr": "Égide rayonnante",
+      "ko": "수호의 빛"
     },
     "29671": {
       "zhHans": "山崩",
@@ -5100,7 +5351,8 @@
       "zhHant": "山崩",
       "ja": "マウンテンバスター",
       "de": "Bergsprenger",
-      "fr": "Casse-montagnes"
+      "fr": "Casse-montagnes",
+      "ko": "산 쪼개기"
     },
     "29672": {
       "zhHans": "溃烂爆发",
@@ -5116,7 +5368,8 @@
       "zhHant": "龍神召喚",
       "ja": "サモン・バハムート",
       "de": "Bahamut-Beschwörung",
-      "fr": "Invocation Bahamut"
+      "fr": "Invocation Bahamut",
+      "ko": "바하무트 소환"
     },
     "29674": {
       "zhHans": "龙神迸发",
@@ -5132,7 +5385,8 @@
       "en": "Megaflare",
       "ja": "メガフレア",
       "de": "Megaflare",
-      "fr": "MégaBrasier"
+      "fr": "MégaBrasier",
+      "ko": "메가플레어"
     },
     "29676": {
       "zhHans": "真龙波",
@@ -5140,7 +5394,8 @@
       "en": "Wyrmwave",
       "ja": "ウィルムウェーブ",
       "de": "Drachenwelle",
-      "fr": "Onde draconique"
+      "fr": "Onde draconique",
+      "ko": "비룡파"
     },
     "29677": {
       "zhHans": "死亡轮回",
@@ -5156,7 +5411,8 @@
       "en": "Summon Phoenix",
       "ja": "サモン・フェニックス",
       "de": "Phönix-Beschwörung",
-      "fr": "Invocation Phénix"
+      "fr": "Invocation Phénix",
+      "ko": "피닉스 소환"
     },
     "29679": {
       "zhHans": "不死鸟迸发",
@@ -5172,7 +5428,8 @@
       "en": "Everlasting Flight",
       "ja": "不死鳥の翼",
       "de": "Schwingen der Unsterblichkeit",
-      "fr": "Vol éternel"
+      "fr": "Vol éternel",
+      "ko": "불사조의 날개"
     },
     "29681": {
       "zhHans": "赤焰",
@@ -5180,7 +5437,8 @@
       "en": "Scarlet Flame",
       "ja": "火焔",
       "de": "Scharlachflamme",
-      "fr": "Flamme écarlate"
+      "fr": "Flamme écarlate",
+      "ko": "화염"
     },
     "29682": {
       "zhHans": "天启",
@@ -5244,7 +5502,8 @@
       "en": "Enchanted Riposte",
       "ja": "エンリポスト",
       "de": "Magische Riposte",
-      "fr": "Riposte enchantée"
+      "fr": "Riposte enchantée",
+      "ko": "인리포스트"
     },
     "29690": {
       "zhHans": "魔交击斩",
@@ -5252,7 +5511,8 @@
       "en": "Enchanted Zwerchhau",
       "ja": "エンツヴェルクハウ",
       "de": "Magischer Zwerchhau",
-      "fr": "Zwerchhau enchanté"
+      "fr": "Zwerchhau enchanté",
+      "ko": "인츠베르크하우"
     },
     "29691": {
       "zhHans": "魔连攻",
@@ -5260,7 +5520,8 @@
       "en": "Enchanted Redoublement",
       "ja": "エンルドゥブルマン",
       "de": "Magisches Redoublement",
-      "fr": "Redoublement enchanté"
+      "fr": "Redoublement enchanté",
+      "ko": "인르두블망"
     },
     "29692": {
       "zhHans": "魔回刺",
@@ -5268,7 +5529,8 @@
       "en": "Enchanted Riposte",
       "ja": "エンリポスト",
       "de": "Magische Riposte",
-      "fr": "Riposte enchantée"
+      "fr": "Riposte enchantée",
+      "ko": "인리포스트"
     },
     "29693": {
       "zhHans": "魔交击斩",
@@ -5276,7 +5538,8 @@
       "en": "Enchanted Zwerchhau",
       "ja": "エンツヴェルクハウ",
       "de": "Magischer Zwerchhau",
-      "fr": "Zwerchhau enchanté"
+      "fr": "Zwerchhau enchanté",
+      "ko": "인츠베르크하우"
     },
     "29694": {
       "zhHans": "魔连攻",
@@ -5284,7 +5547,8 @@
       "en": "Enchanted Redoublement",
       "ja": "エンルドゥブルマン",
       "de": "Magisches Redoublement",
-      "fr": "Redoublement enchanté"
+      "fr": "Redoublement enchanté",
+      "ko": "인르두블망"
     },
     "29695": {
       "zhHans": "决断",
@@ -5292,7 +5556,8 @@
       "en": "Resolution",
       "ja": "レゾリューション",
       "de": "Entschlossenheit",
-      "fr": "Résolution"
+      "fr": "Résolution",
+      "ko": "단호한 결단"
     },
     "29696": {
       "zhHans": "决断",
@@ -5300,7 +5565,8 @@
       "en": "Resolution",
       "ja": "レゾリューション",
       "de": "Entschlossenheit",
-      "fr": "Résolution"
+      "fr": "Résolution",
+      "ko": "단호한 결단"
     },
     "29697": {
       "zhHans": "抗死",
@@ -5324,7 +5590,8 @@
       "zhHant": "短兵相接",
       "ja": "コル・ア・コル",
       "de": "Corps-a-corps",
-      "fr": "Corps-à-corps"
+      "fr": "Corps-à-corps",
+      "ko": "코르 아 코르"
     },
     "29700": {
       "zhHans": "移转",
@@ -5332,7 +5599,8 @@
       "en": "Displacement",
       "ja": "デプラスマン",
       "de": "Körperparade",
-      "fr": "Déplacement"
+      "fr": "Déplacement",
+      "ko": "데플라스망"
     },
     "29701": {
       "zhHans": "●フレッシュ",
@@ -5364,7 +5632,8 @@
       "en": "Southern Cross",
       "ja": "サザンクロス",
       "de": "Kreuz des Südens",
-      "fr": "Croix du sud"
+      "fr": "Croix du sud",
+      "ko": "남십자성"
     },
     "29705": {
       "zhHans": "南天十字",
@@ -5372,7 +5641,8 @@
       "en": "Southern Cross",
       "ja": "サザンクロス",
       "de": "Kreuz des Südens",
-      "fr": "Croix du sud"
+      "fr": "Croix du sud",
+      "ko": "남십자성"
     },
     "29706": {
       "zhHans": "魂灵风息",
@@ -5380,7 +5650,8 @@
       "zhHant": "魂靈風息",
       "ja": "プネウマ",
       "de": "Pneuma",
-      "fr": "Pneuma"
+      "fr": "Pneuma",
+      "ko": "프네우마"
     },
     "29707": {
       "zhHans": "月影雷兽牙",
@@ -5388,7 +5659,8 @@
       "en": "Fleeting Raiju",
       "ja": "月影雷獣牙",
       "de": "Brüllendes Raiju",
-      "fr": "Croc de Raijû"
+      "fr": "Croc de Raijû",
+      "ko": "월영뇌수아"
     },
     "29708": {
       "zhHans": "月影雷兽牙",
@@ -5396,7 +5668,8 @@
       "en": "Fleeting Raiju",
       "ja": "月影雷獣牙",
       "de": "Brüllendes Raiju",
-      "fr": "Croc de Raijû"
+      "fr": "Croc de Raijû",
+      "ko": "월영뇌수아"
     },
     "29709": {
       "zhHans": "恐怖视线",
@@ -5420,7 +5693,8 @@
       "zhHant": "自癒",
       "ja": "快気",
       "de": "Genesung",
-      "fr": "Rétablissement"
+      "fr": "Rétablissement",
+      "ko": "활기"
     },
     "29712": {
       "zhHans": "狰狞光环",
@@ -5452,7 +5726,8 @@
       "zhHant": "連環計",
       "ja": "連環計",
       "de": "Kritische Strategie",
-      "fr": "Stratagèmes entrelacés"
+      "fr": "Stratagèmes entrelacés",
+      "ko": "연환계"
     },
     "29717": {
       "zhHans": "隐秘之风",
@@ -5604,7 +5879,8 @@
       "en": "Guard",
       "ja": "防御",
       "de": "Wehr",
-      "fr": "Garde"
+      "fr": "Garde",
+      "ko": "방어"
     },
     "29736": {
       "zhHans": "混沌旋风",
@@ -5612,7 +5888,8 @@
       "zhHant": "混沌旋風",
       "ja": "カオティックサイクロン",
       "de": "Chaosklinge",
-      "fr": "Cyclone chaotique"
+      "fr": "Cyclone chaotique",
+      "ko": "혼돈 회오리"
     },
     "29737": {
       "zhHans": "寂灭",
@@ -5628,7 +5905,8 @@
       "zhHant": "暗影使者",
       "ja": "シャドウブリンガー",
       "de": "Schattenbringer",
-      "fr": "Porteur d'ombre"
+      "fr": "Porteur d'ombre",
+      "ko": "칠흑 도래"
     },
     "29739": {
       "zhHans": "复仇之炎",
@@ -5668,7 +5946,8 @@
       "en": "Blizzard",
       "ja": "ブリザド",
       "de": "Eis",
-      "fr": "Glace"
+      "fr": "Glace",
+      "ko": "블리자드"
     },
     "29752": {
       "zhHans": "异史终结",
@@ -5764,7 +6043,8 @@
       "en": "Heavy Swing",
       "ja": "ヘヴィスウィング",
       "de": "Gewaltiger Hieb",
-      "fr": "Coup puissant"
+      "fr": "Coup puissant",
+      "ko": "육중한 일격"
     },
     "29765": {
       "zhHans": "凶残裂",
@@ -5772,7 +6052,8 @@
       "en": "Maim",
       "ja": "メイム",
       "de": "Verstümmelung",
-      "fr": "Mutilation"
+      "fr": "Mutilation",
+      "ko": "관절 파괴"
     },
     "29768": {
       "zhHans": "暴风斩",
@@ -5780,7 +6061,8 @@
       "en": "Storm's Path",
       "ja": "シュトルムヴィント",
       "de": "Sturmkeil",
-      "fr": "Couperet de justice"
+      "fr": "Couperet de justice",
+      "ko": "폭풍 쐐기"
     },
     "29769": {
       "zhHans": "精准刺",
@@ -5931,7 +6213,8 @@
       "en": "Blizzard",
       "ja": "ブリザド",
       "de": "Eis",
-      "fr": "Glace"
+      "fr": "Glace",
+      "ko": "블리자드"
     },
     "29794": {
       "zhHans": "巨盾戍卫",
@@ -5987,7 +6270,8 @@
       "en": "Fire III",
       "ja": "ファイガ",
       "de": "Feuga",
-      "fr": "Méga Feu"
+      "fr": "Méga Feu",
+      "ko": "파이가"
     },
     "30897": {
       "zhHans": "冰封",
@@ -5995,7 +6279,8 @@
       "zhHant": "大暴雪",
       "ja": "ブリザガ",
       "de": "Eisga",
-      "fr": "Méga Glace"
+      "fr": "Méga Glace",
+      "ko": "블리자가"
     },
     "31117": {
       "zhHans": "跃动舞步！",
@@ -6416,7 +6701,8 @@
       "en": "Steel Fangs",
       "ja": "壱の牙【咬創】",
       "de": "Tödliche Fänge",
-      "fr": "Crochets d'acier"
+      "fr": "Crochets d'acier",
+      "ko": "송곳니 하나: 교상"
     },
     "39158": {
       "zhHans": "切割尖齿",
@@ -6424,7 +6710,8 @@
       "en": "Piercing Fangs",
       "ja": "壱の牙【切創】",
       "de": "Scharfe Fänge",
-      "fr": "Crochets acérés"
+      "fr": "Crochets acérés",
+      "ko": "송곳니 하나: 절상"
     },
     "39159": {
       "zhHans": "猛袭利齿",
@@ -6432,7 +6719,8 @@
       "en": "Hunter's Sting",
       "ja": "弐の牙【猛襲】",
       "de": "Blutige Fänge",
-      "fr": "Ponction prédatrice"
+      "fr": "Ponction prédatrice",
+      "ko": "송곳니 둘: 맹습"
     },
     "39160": {
       "zhHans": "疾速利齿",
@@ -6440,7 +6728,8 @@
       "en": "Swiftskin's Sting",
       "ja": "弐の牙【疾速】",
       "de": "Flinke Fänge",
-      "fr": "Ponction véloce"
+      "fr": "Ponction véloce",
+      "ko": "송곳니 둘: 질주"
     },
     "39161": {
       "zhHans": "咬击獠齿",
@@ -6448,7 +6737,8 @@
       "en": "Barbarous Bite",
       "ja": "参の牙【咬撃】",
       "de": "Harte Fänge",
-      "fr": "Saignée prédatrice"
+      "fr": "Saignée prédatrice",
+      "ko": "송곳니 셋: 교격"
     },
     "39162": {
       "zhHans": "参の牙【咬裂】",
@@ -6464,7 +6754,8 @@
       "en": "Ravenous Bite",
       "ja": "参の牙【噛砕】",
       "de": "Fassende Fänge",
-      "fr": "Saignée véloce"
+      "fr": "Saignée véloce",
+      "ko": "송곳니 셋: 교쇄"
     },
     "39164": {
       "zhHans": "参の牙【噛殺】",
@@ -6488,7 +6779,8 @@
       "zhHant": "壹之蛇【血宴】",
       "ja": "壱の蛇【血宴】",
       "de": "Labender Otterngriff",
-      "fr": "Anneaux du saigneur"
+      "fr": "Anneaux du saigneur",
+      "ko": "뱀 하나: 흡혈"
     },
     "39167": {
       "zhHans": "血宴盘蛇",
@@ -6496,7 +6788,8 @@
       "en": "Sanguine Feast",
       "ja": "弐の蛇【血宴】",
       "de": "Maßloser Otterngriff",
-      "fr": "Anneaux du bourreau"
+      "fr": "Anneaux du bourreau",
+      "ko": "뱀 둘: 흡혈"
     },
     "39168": {
       "zhHans": "飞蛇之尾",
@@ -6504,7 +6797,8 @@
       "zhHant": "飛蛇之尾",
       "ja": "飛蛇の尾",
       "de": "Schlangenschwinge",
-      "fr": "Assaut ophidien"
+      "fr": "Assaut ophidien",
+      "ko": "날뱀의 꼬리"
     },
     "39169": {
       "zhHans": "祖灵之牙一式",
@@ -6512,7 +6806,8 @@
       "en": "First Generation",
       "ja": "祖霊の牙【壱】",
       "de": "Erstes Blut",
-      "fr": "Première ère"
+      "fr": "Première ère",
+      "ko": "조상령의 송곳니 1"
     },
     "39170": {
       "zhHans": "祖灵之牙二式",
@@ -6520,7 +6815,8 @@
       "en": "Second Generation",
       "ja": "祖霊の牙【弐】",
       "de": "Zweites Blut",
-      "fr": "Deuxième ère"
+      "fr": "Deuxième ère",
+      "ko": "조상령의 송곳니 2"
     },
     "39171": {
       "zhHans": "祖灵之牙三式",
@@ -6528,7 +6824,8 @@
       "en": "Third Generation",
       "ja": "祖霊の牙【参】",
       "de": "Drittes Blut",
-      "fr": "Troisième ère"
+      "fr": "Troisième ère",
+      "ko": "조상령의 송곳니 3"
     },
     "39172": {
       "zhHans": "祖灵之牙四式",
@@ -6536,7 +6833,8 @@
       "en": "Fourth Generation",
       "ja": "祖霊の牙【肆】",
       "de": "Viertes Blut",
-      "fr": "Quatrième ère"
+      "fr": "Quatrième ère",
+      "ko": "조상령의 송곳니 4"
     },
     "39173": {
       "zhHans": "祖灵大蛇牙",
@@ -6544,7 +6842,8 @@
       "en": "Ouroboros",
       "ja": "祖霊の大蛇牙",
       "de": "Ouroboros",
-      "fr": "Esprit du Serpent-Monde"
+      "fr": "Esprit du Serpent-Monde",
+      "ko": "조상령의 큰송곳니"
     },
     "39174": {
       "zhHans": "蛇尾击",
@@ -6552,7 +6851,8 @@
       "en": "Death Rattle",
       "ja": "蛇尾撃",
       "de": "Todesrasseln",
-      "fr": "Cascabelle mortelle"
+      "fr": "Cascabelle mortelle",
+      "ko": "뱀꼬리 일격"
     },
     "39175": {
       "zhHans": "双牙连击",
@@ -6560,7 +6860,8 @@
       "zhHant": "雙牙連擊",
       "ja": "双牙連撃",
       "de": "Biss der Zwillingsfänge",
-      "fr": "Morsure vicieuse"
+      "fr": "Morsure vicieuse",
+      "ko": "쌍아연격"
     },
     "39176": {
       "zhHans": "双牙乱击",
@@ -6568,7 +6869,8 @@
       "en": "Twinblood Bite",
       "ja": "双牙乱撃",
       "de": "Biss der Zwillingsschuppen",
-      "fr": "Morsure frénétique"
+      "fr": "Morsure frénétique",
+      "ko": "쌍아난격"
     },
     "39177": {
       "zhHans": "飞蛇连尾击",
@@ -6576,7 +6878,8 @@
       "zhHant": "飛蛇連尾擊",
       "ja": "飛蛇連尾撃",
       "de": "Flug der Zwillingsfänge",
-      "fr": "Assaut vicieux"
+      "fr": "Assaut vicieux",
+      "ko": "날뱀 연미격"
     },
     "39178": {
       "zhHans": "飞蛇乱尾击",
@@ -6584,7 +6887,8 @@
       "zhHant": "飛蛇亂尾擊",
       "ja": "飛蛇乱尾撃",
       "de": "Flug der Zwillingsschuppen",
-      "fr": "Assaut frénétique"
+      "fr": "Assaut frénétique",
+      "ko": "날뱀 난미격"
     },
     "39179": {
       "zhHans": "祖灵之蛇一式",
@@ -6592,7 +6896,8 @@
       "en": "First Legacy",
       "ja": "祖霊の蛇【壱】",
       "de": "Erstes Erbe",
-      "fr": "Premier cycle"
+      "fr": "Premier cycle",
+      "ko": "조상령의 뱀 1"
     },
     "39180": {
       "zhHans": "祖灵之蛇二式",
@@ -6600,7 +6905,8 @@
       "en": "Second Legacy",
       "ja": "祖霊の蛇【弐】",
       "de": "Zweites Erbe",
-      "fr": "Deuxième cycle"
+      "fr": "Deuxième cycle",
+      "ko": "조상령의 뱀 2"
     },
     "39181": {
       "zhHans": "祖灵之蛇三式",
@@ -6608,7 +6914,8 @@
       "en": "Third Legacy",
       "ja": "祖霊の蛇【参】",
       "de": "Drittes Erbe",
-      "fr": "Troisième cycle"
+      "fr": "Troisième cycle",
+      "ko": "조상령의 뱀 3"
     },
     "39182": {
       "zhHans": "祖灵之蛇四式",
@@ -6616,7 +6923,8 @@
       "en": "Fourth Legacy",
       "ja": "祖霊の蛇【肆】",
       "de": "Viertes Erbe",
-      "fr": "Quatrième cycle"
+      "fr": "Quatrième cycle",
+      "ko": "조상령의 뱀 4"
     },
     "39183": {
       "zhHans": "追击之牙",
@@ -6624,7 +6932,8 @@
       "en": "Serpent's Tail",
       "ja": "追の牙",
       "de": "Serpentiner Geist",
-      "fr": "Acharnement serpentin"
+      "fr": "Acharnement serpentin",
+      "ko": "송곳니 추격"
     },
     "39184": {
       "zhHans": "蛇行",
@@ -6632,7 +6941,8 @@
       "zhHant": "蛇行",
       "ja": "蛇行",
       "de": "Schuppensprung",
-      "fr": "Reptation"
+      "fr": "Reptation",
+      "ko": "뱀걸음"
     },
     "39185": {
       "zhHans": "蛇鳞术",
@@ -6640,7 +6950,8 @@
       "zhHant": "蛇鱗術",
       "ja": "蛇鱗術",
       "de": "Hornplatten",
-      "fr": "Écailles inflexibles"
+      "fr": "Écailles inflexibles",
+      "ko": "뱀비늘"
     },
     "39186": {
       "zhHans": "蛇鳞击",
@@ -6648,7 +6959,8 @@
       "en": "Backlash",
       "ja": "蛇鱗撃",
       "de": "Blutschuppen",
-      "fr": "Écailles vampiriques"
+      "fr": "Écailles vampiriques",
+      "ko": "뱀비늘 공격"
     },
     "39187": {
       "zhHans": "蛇鳞击",
@@ -6656,7 +6968,8 @@
       "zhHant": "蛇鱗擊",
       "ja": "蛇鱗撃",
       "de": "Blutschuppen",
-      "fr": "Écailles vampiriques"
+      "fr": "Écailles vampiriques",
+      "ko": "뱀비늘 공격"
     },
     "39188": {
       "zhHans": "血气蛇鳞击",
@@ -6672,7 +6985,8 @@
       "zhHant": "飛蛇之魂",
       "ja": "飛蛇の魂",
       "de": "Schlangenseele",
-      "fr": "Âme ophidienne"
+      "fr": "Âme ophidienne",
+      "ko": "날뱀의 영혼"
     },
     "39190": {
       "zhHans": "吞天巨蛇",
@@ -6680,7 +6994,8 @@
       "zhHant": "吞天巨蛇",
       "ja": "大空喰らう蛇",
       "de": "Himmelsverschlinger",
-      "fr": "Dévoreur des cieux"
+      "fr": "Dévoreur des cieux",
+      "ko": "하늘을 삼키는 뱀"
     },
     "39191": {
       "zhHans": "火炎之红",
@@ -6688,7 +7003,8 @@
       "en": "Fire in Red",
       "ja": "レッドファイア",
       "de": "Feuer in Rot",
-      "fr": "Feu en rouge"
+      "fr": "Feu en rouge",
+      "ko": "레드 파이어"
     },
     "39192": {
       "zhHans": "疾风之绿",
@@ -6696,7 +7012,8 @@
       "en": "Aero in Green",
       "ja": "グリーンエアロ",
       "de": "Wind in Grün",
-      "fr": "Vent en vert"
+      "fr": "Vent en vert",
+      "ko": "그린 에어로"
     },
     "39193": {
       "zhHans": "流水之蓝",
@@ -6704,7 +7021,8 @@
       "en": "Water in Blue",
       "ja": "ブルーウォータ",
       "de": "Aqua in Blau",
-      "fr": "Eau en bleu"
+      "fr": "Eau en bleu",
+      "ko": "블루 워터"
     },
     "39194": {
       "zhHans": "冰结之蓝青",
@@ -6712,7 +7030,8 @@
       "en": "Blizzard in Cyan",
       "ja": "シアンブリザド",
       "de": "Eis in Cyan",
-      "fr": "Glace en cyan"
+      "fr": "Glace en cyan",
+      "ko": "시안 블리자드"
     },
     "39195": {
       "zhHans": "飞石之纯黄",
@@ -6720,7 +7039,8 @@
       "en": "Stone in Yellow",
       "ja": "イエローストーン",
       "de": "Stein in Gelb",
-      "fr": "Terre en jaune"
+      "fr": "Terre en jaune",
+      "ko": "옐로 스톤"
     },
     "39196": {
       "zhHans": "闪雷之品红",
@@ -6728,7 +7048,8 @@
       "en": "Thunder in Magenta",
       "ja": "マゼンタサンダー",
       "de": "Blitz in Magenta",
-      "fr": "Foudre en magenta"
+      "fr": "Foudre en magenta",
+      "ko": "마젠타 선더"
     },
     "39197": {
       "zhHans": "●虹色魔法",
@@ -6744,7 +7065,8 @@
       "zhHant": "神聖之白",
       "ja": "ホワイトホーリー",
       "de": "Sanctus in Weiß",
-      "fr": "Miracle en blanc"
+      "fr": "Miracle en blanc",
+      "ko": "화이트 홀리"
     },
     "39199": {
       "zhHans": "彗星之黑",
@@ -6752,7 +7074,8 @@
       "zhHant": "隕星之黑",
       "ja": "ブラックコメット",
       "de": "Komet in Schwarz",
-      "fr": "Comète en noir"
+      "fr": "Comète en noir",
+      "ko": "블랙 코멧"
     },
     "39200": {
       "zhHans": "绒球彩绘",
@@ -6760,7 +7083,8 @@
       "zhHant": "絨球彩繪",
       "ja": "ピクトポンポン",
       "de": "Pikto-Bommel",
-      "fr": "Picto Pompon"
+      "fr": "Picto Pompon",
+      "ko": "폼폼 그림"
     },
     "39201": {
       "zhHans": "翅膀彩绘",
@@ -6768,7 +7092,8 @@
       "zhHant": "翅膀彩繪",
       "ja": "ピクトウィング",
       "de": "Pikto-Schwingen",
-      "fr": "Picto Ailes"
+      "fr": "Picto Ailes",
+      "ko": "날개 그림"
     },
     "39202": {
       "zhHans": "兽爪彩绘",
@@ -6776,7 +7101,8 @@
       "zhHant": "獸爪彩繪",
       "ja": "ピクトクロー",
       "de": "Pikto-Klaue",
-      "fr": "Picto Griffes"
+      "fr": "Picto Griffes",
+      "ko": "발톱 그림"
     },
     "39203": {
       "zhHans": "尖牙彩绘",
@@ -6784,7 +7110,8 @@
       "en": "Maw Motif",
       "ja": "ピクトファング",
       "de": "Pikto-Hauer",
-      "fr": "Picto Crocs"
+      "fr": "Picto Crocs",
+      "ko": "송곳니 그림"
     },
     "39204": {
       "zhHans": "动物彩绘",
@@ -6792,7 +7119,8 @@
       "en": "Creature Motif",
       "ja": "ピクトアニマル",
       "de": "Pikto-Kreatur",
-      "fr": "Picto Animal"
+      "fr": "Picto Animal",
+      "ko": "동물 그림"
     },
     "39205": {
       "zhHans": "绒球构想",
@@ -6800,7 +7128,8 @@
       "zhHant": "絨球構想",
       "ja": "イマジンポンポン",
       "de": "Muse mit Bommel",
-      "fr": "Imagi Pompon"
+      "fr": "Imagi Pompon",
+      "ko": "폼폼 구현"
     },
     "39206": {
       "zhHans": "翅膀构想",
@@ -6808,7 +7137,8 @@
       "zhHant": "翅膀構想",
       "ja": "イマジンウィング",
       "de": "Beschwingte Muse",
-      "fr": "Imagi Ailes"
+      "fr": "Imagi Ailes",
+      "ko": "날개 구현"
     },
     "39207": {
       "zhHans": "兽爪构想",
@@ -6816,7 +7146,8 @@
       "zhHant": "獸爪構想",
       "ja": "イマジンクロー",
       "de": "Kratzende Muse",
-      "fr": "Imagi Griffes"
+      "fr": "Imagi Griffes",
+      "ko": "발톱 구현"
     },
     "39208": {
       "zhHans": "尖牙构想",
@@ -6824,7 +7155,8 @@
       "zhHant": "尖牙構想",
       "ja": "イマジンファング",
       "de": "Beißende Muse",
-      "fr": "Imagi Crocs"
+      "fr": "Imagi Crocs",
+      "ko": "송곳니 구현"
     },
     "39209": {
       "zhHans": "动物构想",
@@ -6832,7 +7164,8 @@
       "en": "Living Muse",
       "ja": "イマジンアニマル",
       "de": "Lebende Muse",
-      "fr": "Imagi Animal"
+      "fr": "Imagi Animal",
+      "ko": "동물 구현"
     },
     "39210": {
       "zhHans": "速涂",
@@ -6840,7 +7173,8 @@
       "zhHant": "速塗",
       "ja": "スマッジ",
       "de": "Schmierschritt",
-      "fr": "Barbouillage"
+      "fr": "Barbouillage",
+      "ko": "붓번짐"
     },
     "39211": {
       "zhHans": "坦培拉涂层",
@@ -6848,7 +7182,8 @@
       "zhHant": "坦培拉塗層",
       "ja": "テンペラコート",
       "de": "Tempera-Schicht",
-      "fr": "Enduit a tempera"
+      "fr": "Enduit a tempera",
+      "ko": "템페라 밑칠"
     },
     "39212": {
       "zhHans": "油性坦培拉涂层",
@@ -6856,7 +7191,8 @@
       "zhHant": "油性坦培拉塗層",
       "ja": "テンペラグラッサ",
       "de": "Fette Tempera",
-      "fr": "Tempera grassa"
+      "fr": "Tempera grassa",
+      "ko": "템페라 덧칠"
     },
     "39213": {
       "zhHans": "减色混合",
@@ -6864,7 +7200,8 @@
       "en": "Subtractive Palette",
       "ja": "サブトラクティブパレット",
       "de": "Subtraktive Palette",
-      "fr": "Palette soustractive"
+      "fr": "Palette soustractive",
+      "ko": "색빼기"
     },
     "39214": {
       "zhHans": "解除减色混合",
@@ -6880,7 +7217,8 @@
       "en": "Advent of Chocobastion",
       "ja": "ウォール・オブ・ファット",
       "de": "Mächtige Moppelmauer",
-      "fr": "Mur de gras"
+      "fr": "Mur de gras",
+      "ko": "뚱보초코보 방벽"
     },
     "39216": {
       "zhHans": "天星棱光",
@@ -6888,7 +7226,8 @@
       "en": "Star Prism",
       "ja": "スタープリズム",
       "de": "Sternenprisma",
-      "fr": "Prisme d'étoiles"
+      "fr": "Prisme d'étoiles",
+      "ko": "별무리 프리즘"
     },
     "39217": {
       "zhHans": "天星棱光",
@@ -6896,7 +7235,8 @@
       "en": "Star Prism",
       "ja": "スタープリズム",
       "de": "Sternenprisma",
-      "fr": "Prisme d'étoiles"
+      "fr": "Prisme d'étoiles",
+      "ko": "별무리 프리즘"
     },
     "39218": {
       "zhHans": "仙人扇",
@@ -8127,7 +8467,8 @@
       "zhHant": "莫古利激流",
       "ja": "モーグリストリーム",
       "de": "Opus Mognum",
-      "fr": "Mognum opus"
+      "fr": "Mognum opus",
+      "ko": "모그리 격류"
     },
     "39783": {
       "zhHans": "马蒂恩惩罚",
@@ -8135,7 +8476,8 @@
       "en": "Retribution of the Madeen",
       "ja": "マディーンレトリビューション",
       "de": "Vergeltung der Madhin",
-      "fr": "Rétribution de Marthym"
+      "fr": "Rétribution de Marthym",
+      "ko": "마딘의 응징"
     },
     "39785": {
       "zhHans": "古树之杖",
@@ -8247,7 +8589,8 @@
       "en": "Fire IV",
       "ja": "ファイジャ",
       "de": "Feuka",
-      "fr": "Giga Feu"
+      "fr": "Giga Feu",
+      "ko": "파이쟈"
     },
     "39801": {
       "zhHans": "冰澈",
@@ -8255,7 +8598,8 @@
       "en": "Blizzard IV",
       "ja": "ブリザジャ",
       "de": "Eiska",
-      "fr": "Extra Glace"
+      "fr": "Extra Glace",
+      "ko": "블리자쟈"
     },
     "39802": {
       "zhHans": "炽炎",
@@ -8263,7 +8607,8 @@
       "en": "Fire IV",
       "ja": "ファイジャ",
       "de": "Feuka",
-      "fr": "Giga Feu"
+      "fr": "Giga Feu",
+      "ko": "파이쟈"
     },
     "39803": {
       "zhHans": "冰澈",
@@ -8271,7 +8616,8 @@
       "en": "Blizzard IV",
       "ja": "ブリザジャ",
       "de": "Eiska",
-      "fr": "Extra Glace"
+      "fr": "Extra Glace",
+      "ko": "블리자쟈"
     },
     "39805": {
       "zhHans": "求爱",
@@ -8447,7 +8793,8 @@
       "en": "Fire IV",
       "ja": "ファイジャ",
       "de": "Feuka",
-      "fr": "Giga Feu"
+      "fr": "Giga Feu",
+      "ko": "파이쟈"
     },
     "39830": {
       "zhHans": "冰澈",
@@ -8455,7 +8802,8 @@
       "en": "Blizzard IV",
       "ja": "ブリザジャ",
       "de": "Eiska",
-      "fr": "Giga Glace"
+      "fr": "Giga Glace",
+      "ko": "블리자쟈"
     },
     "39831": {
       "zhHans": "ファイジャ",
@@ -8479,7 +8827,8 @@
       "en": "Tempera Grassa",
       "ja": "テンペラグラッサ",
       "de": "Fette Tempera",
-      "fr": "Tempera grassa"
+      "fr": "Tempera grassa",
+      "ko": "템페라 덧칠"
     },
     "39834": {
       "zhHans": "ソウルレスストリーム",
@@ -8503,7 +8852,8 @@
       "en": "Fire IV",
       "ja": "ファイジャ",
       "de": "Feuka",
-      "fr": "Giga Feu"
+      "fr": "Giga Feu",
+      "ko": "파이쟈"
     },
     "39838": {
       "zhHans": "冰澈",
@@ -8511,7 +8861,8 @@
       "en": "Blizzard IV",
       "ja": "ブリザジャ",
       "de": "Eiska",
-      "fr": "Giga Glace"
+      "fr": "Giga Glace",
+      "ko": "블리자쟈"
     },
     "39839": {
       "zhHans": "热能支配",
@@ -8853,7 +9204,8 @@
       "en": "Supplication",
       "ja": "ゲベート",
       "de": "Anflehung",
-      "fr": "Oraison"
+      "fr": "Oraison",
+      "ko": "염원의 검"
     },
     "41429": {
       "zhHans": "葬送剑",
@@ -8861,7 +9213,8 @@
       "en": "Sepulchre",
       "ja": "グラブカッマー",
       "de": "Heilige Grabstätte",
-      "fr": "Sépulcre"
+      "fr": "Sépulcre",
+      "ko": "장송의 검"
     },
     "41430": {
       "zhHans": "强盾猛击",
@@ -8869,7 +9222,8 @@
       "zhHant": "強盾猛擊",
       "ja": "シールドスマイト",
       "de": "Schildhieb",
-      "fr": "Frappe de bouclier"
+      "fr": "Frappe de bouclier",
+      "ko": "방패 강타"
     },
     "41431": {
       "zhHans": "绝对统治",
@@ -8877,7 +9231,8 @@
       "zhHant": "絕對統治",
       "ja": "インペラトル",
       "de": "Imperator",
-      "fr": "Imperator"
+      "fr": "Imperator",
+      "ko": "제왕의 명령"
     },
     "41432": {
       "zhHans": "尽毁",
@@ -8885,7 +9240,8 @@
       "zhHant": "盡毀",
       "ja": "ルイネーター",
       "de": "Ruinator",
-      "fr": "Dévastateur"
+      "fr": "Dévastateur",
+      "ko": "원초적 파멸"
     },
     "41433": {
       "zhHans": "原初的怒震",
@@ -8893,7 +9249,8 @@
       "en": "Primal Wrath",
       "ja": "原初の激震",
       "de": "Urbeben",
-      "fr": "Trépidation bestiale"
+      "fr": "Trépidation bestiale",
+      "ko": "원초의 격진"
     },
     "41434": {
       "zhHans": "血红乱",
@@ -8901,7 +9258,8 @@
       "zhHant": "血紅亂",
       "ja": "レッドデリリアム",
       "de": "Rotes Delirium",
-      "fr": "Delirium écarlate"
+      "fr": "Delirium écarlate",
+      "ko": "붉은 열광"
     },
     "41435": {
       "zhHans": "报应",
@@ -8909,7 +9267,8 @@
       "en": "Comeuppance",
       "ja": "カマパンス",
       "de": "Blutrache",
-      "fr": "Punition réciproque"
+      "fr": "Punition réciproque",
+      "ko": "업보"
     },
     "41436": {
       "zhHans": "戮山",
@@ -8917,7 +9276,8 @@
       "en": "Torcleaver",
       "ja": "トアクリーバー",
       "de": "Torspalter",
-      "fr": "Brise-montagne"
+      "fr": "Brise-montagne",
+      "ko": "도륙검"
     },
     "41437": {
       "zhHans": "掠影的蔑视",
@@ -8925,7 +9285,8 @@
       "en": "Disesteem",
       "ja": "ディセスティーム",
       "de": "Antiheld",
-      "fr": "Sillon de morgue"
+      "fr": "Sillon de morgue",
+      "ko": "경멸"
     },
     "41438": {
       "zhHans": "刺穿",
@@ -8933,7 +9294,8 @@
       "zhHant": "刺穿",
       "ja": "インペイルメント",
       "de": "Blutige Pfählung",
-      "fr": "Empalement sanglant"
+      "fr": "Empalement sanglant",
+      "ko": "관통형"
     },
     "41439": {
       "zhHans": "ライズ・オブ・ハート",
@@ -8965,7 +9327,8 @@
       "zhHant": "命運之印",
       "ja": "フェイテッドブランド",
       "de": "Schicksalszeichen",
-      "fr": "Insigne fatidique"
+      "fr": "Insigne fatidique",
+      "ko": "운명의 낙인"
     },
     "41443": {
       "en": "Heart of Corundum",
@@ -8973,7 +9336,8 @@
       "zhHant": "剛玉之心",
       "ja": "ハート・オブ・コランダム",
       "de": "Herz des Korunds",
-      "fr": "Cœur de corindon"
+      "fr": "Cœur de corindon",
+      "ko": "강옥의 심장"
     },
     "41444": {
       "zhHans": "猿舞连击",
@@ -8981,7 +9345,8 @@
       "en": "Leaping Opo",
       "ja": "猿舞連撃",
       "de": "Affenprankenhieb",
-      "fr": "Bond de l'opo-opo"
+      "fr": "Bond de l'opo-opo",
+      "ko": "원무연격"
     },
     "41445": {
       "zhHans": "龙颚正拳",
@@ -8989,7 +9354,8 @@
       "en": "Rising Raptor",
       "ja": "竜頷正拳撃",
       "de": "Drachenkieferschlag",
-      "fr": "Percée du raptor"
+      "fr": "Percée du raptor",
+      "ko": "용함정권격"
     },
     "41446": {
       "zhHans": "豹袭崩拳",
@@ -8997,7 +9363,8 @@
       "en": "Pouncing Coeurl",
       "ja": "虎襲崩拳",
       "de": "Tigerpeitschenhieb",
-      "fr": "Plongeon du coeurl"
+      "fr": "Plongeon du coeurl",
+      "ko": "호습붕권"
     },
     "41447": {
       "zhHans": "斗气弹",
@@ -9013,7 +9380,8 @@
       "zhHant": "乾坤鬥氣彈",
       "ja": "乾坤闘気弾",
       "de": "Himmel und Erde",
-      "fr": "Réaction du feu"
+      "fr": "Réaction du feu",
+      "ko": "건곤투기탄"
     },
     "41449": {
       "zhHans": "云蒸龙变",
@@ -9021,7 +9389,8 @@
       "en": "Drakesbane",
       "ja": "雲蒸竜変",
       "de": "Drachenhort",
-      "fr": "Fléau du dragon"
+      "fr": "Fléau du dragon",
+      "ko": "운증용변"
     },
     "41450": {
       "zhHans": "渡星冲",
@@ -9029,7 +9398,8 @@
       "zhHant": "渡星衝",
       "ja": "スタークロッサー",
       "de": "Sternenkreuz",
-      "fr": "Traversée céleste"
+      "fr": "Traversée céleste",
+      "ko": "천체 관통"
     },
     "41451": {
       "zhHans": "介毒之术",
@@ -9037,7 +9407,8 @@
       "zhHant": "介毒之術",
       "ja": "毒盛の術",
       "de": "Dokumori",
-      "fr": "Dokumori"
+      "fr": "Dokumori",
+      "ko": "강탈"
     },
     "41452": {
       "zhHans": "是生灭法",
@@ -9045,7 +9416,8 @@
       "zhHant": "是生滅法",
       "ja": "是生滅法",
       "de": "Zesho Meppo",
-      "fr": "Zeshô Meppô"
+      "fr": "Zeshô Meppô",
+      "ko": "시생멸법"
     },
     "41453": {
       "zhHans": "是生灭法",
@@ -9053,7 +9425,8 @@
       "en": "Zesho Meppo",
       "ja": "是生滅法",
       "de": "Zesho Meppo",
-      "fr": "Zeshô Meppô"
+      "fr": "Zeshô Meppô",
+      "ko": "시생멸법"
     },
     "41454": {
       "zhHans": "天道雪月花",
@@ -9061,7 +9434,8 @@
       "en": "Tendo Setsugekka",
       "ja": "天道雪月花",
       "de": "Tendo Setsugekka",
-      "fr": "Tendô Setsugekka"
+      "fr": "Tendô Setsugekka",
+      "ko": "천도설월화"
     },
     "41455": {
       "zhHans": "天道回返雪月花",
@@ -9069,7 +9443,8 @@
       "en": "Tendo Kaeshi Setsugekka",
       "ja": "天道返し雪月花",
       "de": "Tendo Kaeshi Setsugekka",
-      "fr": "Tendô Kaeshi Setsugekka"
+      "fr": "Tendô Kaeshi Setsugekka",
+      "ko": "천도반전설월화"
     },
     "41456": {
       "en": "Executioner's Guillotine",
@@ -9077,7 +9452,8 @@
       "zhHant": "斷首處刑",
       "ja": "エクスギロティン",
       "de": "Henkersguillotine",
-      "fr": "Guillotine tortionnaire"
+      "fr": "Guillotine tortionnaire",
+      "ko": "참수형 집행"
     },
     "41457": {
       "zhHans": "命运既定",
@@ -9085,7 +9461,8 @@
       "en": "Fate Sealed",
       "ja": "フェイトシール",
       "de": "Schicksalssiegel",
-      "fr": "Sceau de fatalité"
+      "fr": "Sceau de fatalité",
+      "ko": "운명 봉인"
     },
     "41458": {
       "en": "Perfectio",
@@ -9093,7 +9470,8 @@
       "zhHant": "完人",
       "ja": "ペルフェクティオ",
       "de": "Perfectio",
-      "fr": "Perfectio"
+      "fr": "Perfectio",
+      "ko": "완전체"
     },
     "41459": {
       "zhHans": "壱の大蛇【惨毒】",
@@ -9141,7 +9519,8 @@
       "zhHant": "和弦箭",
       "ja": "ハーモニックアロー",
       "de": "Harmonischer Pfeil",
-      "fr": "Flèche harmonique"
+      "fr": "Flèche harmonique",
+      "ko": "조화의 화살"
     },
     "41465": {
       "zhHans": "和弦箭",
@@ -9149,7 +9528,8 @@
       "zhHant": "和弦箭",
       "ja": "ハーモニックアロー",
       "de": "Harmonischer Pfeil",
-      "fr": "Flèche harmonique"
+      "fr": "Flèche harmonique",
+      "ko": "조화의 화살"
     },
     "41466": {
       "zhHans": "和弦箭",
@@ -9157,7 +9537,8 @@
       "en": "Harmonic Arrow",
       "ja": "ハーモニックアロー",
       "de": "Harmonischer Pfeil",
-      "fr": "Flèche harmonique"
+      "fr": "Flèche harmonique",
+      "ko": "조화의 화살"
     },
     "41467": {
       "zhHans": "英雄的返场余音",
@@ -9165,7 +9546,8 @@
       "zhHant": "英雄的返場餘音",
       "ja": "英雄のアンコール",
       "de": "Zugabe des Helden",
-      "fr": "Rappel héroïque"
+      "fr": "Rappel héroïque",
+      "ko": "영웅의 앙코르"
     },
     "41468": {
       "zhHans": "烈焰弹",
@@ -9173,7 +9555,8 @@
       "zhHant": "烈焰彈",
       "ja": "ブレイズショット",
       "de": "Brandschuss",
-      "fr": "Tir ardent"
+      "fr": "Tir ardent",
+      "ko": "맹염탄"
     },
     "41469": {
       "zhHans": "全金属爆发",
@@ -9181,7 +9564,8 @@
       "zhHant": "全金屬爆發",
       "ja": "フルメタルバースト",
       "de": "Aus allen Rohren",
-      "fr": "Rafale de métal"
+      "fr": "Rafale de métal",
+      "ko": "전탄발사"
     },
     "41470": {
       "zhHans": "起爆",
@@ -9189,7 +9573,8 @@
       "en": "Detonator",
       "ja": "デトネーター",
       "de": "Detonator",
-      "fr": "Détonateur"
+      "fr": "Détonateur",
+      "ko": "기폭"
     },
     "41471": {
       "zhHans": "ラストダンス",
@@ -9205,7 +9590,8 @@
       "en": "Dance of the Dawn",
       "ja": "暁の舞い",
       "de": "Dämmertanz",
-      "fr": "Danse de l'aurore"
+      "fr": "Danse de l'aurore",
+      "ko": "새벽의 춤"
     },
     "41473": {
       "zhHans": "高烈炎",
@@ -9213,7 +9599,8 @@
       "en": "High Fire II",
       "ja": "ハイファイラ",
       "de": "Hohes Feura",
-      "fr": "Extra Feu majeur"
+      "fr": "Extra Feu majeur",
+      "ko": "하이 파이라"
     },
     "41474": {
       "zhHans": "高冰冻",
@@ -9221,7 +9608,8 @@
       "zhHant": "高階中暴雪",
       "ja": "ハイブリザラ",
       "de": "Hohes Eisra",
-      "fr": "Extra Glace majeure"
+      "fr": "Extra Glace majeure",
+      "ko": "하이 블리자라"
     },
     "41475": {
       "zhHans": "元素天赋",
@@ -9229,7 +9617,8 @@
       "en": "Elemental Weave",
       "ja": "エレメントギフト",
       "de": "Elementarfluss",
-      "fr": "Tissage élémentaire"
+      "fr": "Tissage élémentaire",
+      "ko": "원소의 선물"
     },
     "41476": {
       "zhHans": "烈火环",
@@ -9237,7 +9626,8 @@
       "en": "Wreath of Fire",
       "ja": "リース・オブ・ファイア",
       "de": "Kranz des Feuers",
-      "fr": "Couronne de feu"
+      "fr": "Couronne de feu",
+      "ko": "화염 왕관"
     },
     "41477": {
       "zhHans": "烈火环",
@@ -9245,7 +9635,8 @@
       "zhHant": "烈火環",
       "ja": "リース・オブ・ファイア",
       "de": "Kranz des Feuers",
-      "fr": "Couronne de feu"
+      "fr": "Couronne de feu",
+      "ko": "화염 왕관"
     },
     "41478": {
       "zhHans": "寒冰环",
@@ -9253,7 +9644,8 @@
       "zhHant": "寒冰環",
       "ja": "リース・オブ・アイス",
       "de": "Kranz des Eises",
-      "fr": "Couronne de glace"
+      "fr": "Couronne de glace",
+      "ko": "냉기 왕관"
     },
     "41480": {
       "zhHans": "耀星",
@@ -9261,7 +9653,8 @@
       "en": "Flare Star",
       "ja": "フレアスター",
       "de": "Flare-Stern",
-      "fr": "Astre flamboyant"
+      "fr": "Astre flamboyant",
+      "ko": "타오르는 별"
     },
     "41481": {
       "zhHans": "霜星",
@@ -9269,7 +9662,8 @@
       "zhHant": "霜星",
       "ja": "グレイシャルスター",
       "de": "Frost-Stern",
-      "fr": "Astre givrant"
+      "fr": "Astre givrant",
+      "ko": "얼어붙는 별"
     },
     "41482": {
       "zhHans": "毁绝",
@@ -9277,7 +9671,8 @@
       "zhHant": "超毀滅",
       "ja": "ルインジャ",
       "de": "Ruinka",
-      "fr": "Giga Ruine"
+      "fr": "Giga Ruine",
+      "ko": "루인쟈"
     },
     "41483": {
       "zhHans": "坏死爆发",
@@ -9285,7 +9680,8 @@
       "zhHant": "壞死爆發",
       "ja": "ミアズマノヴァ",
       "de": "Miasma-Nova",
-      "fr": "Nécrose"
+      "fr": "Nécrose",
+      "ko": "미아즈마 노바"
     },
     "41484": {
       "zhHans": "死星核爆",
@@ -9293,7 +9689,8 @@
       "zhHant": "死星火光",
       "ja": "デスフレア",
       "de": "Todesflamme",
-      "fr": "Brasier de mort"
+      "fr": "Brasier de mort",
+      "ko": "데스플레어"
     },
     "41485": {
       "zhHans": "炼狱之炎",
@@ -9301,7 +9698,8 @@
       "en": "Brand of Purgatory",
       "ja": "煉獄の炎",
       "de": "Zeichen der Läuterung",
-      "fr": "Tison du purgatoire"
+      "fr": "Tison du purgatoire",
+      "ko": "연옥의 불꽃"
     },
     "41486": {
       "zhHans": "激荡",
@@ -9309,7 +9707,8 @@
       "zhHant": "激盪",
       "ja": "ジョルガ",
       "de": "Stoß III",
-      "fr": "Méga À-coup"
+      "fr": "Méga À-coup",
+      "ko": "졸트가"
     },
     "41487": {
       "zhHans": "显贵冲击",
@@ -9317,7 +9716,8 @@
       "zhHant": "顯貴衝擊",
       "ja": "ノーブルインパクト",
       "de": "Nobler Impakt",
-      "fr": "Impact majestueux"
+      "fr": "Impact majestueux",
+      "ko": "노블 임팩트"
     },
     "41488": {
       "zhHans": "魔回刺",
@@ -9325,7 +9725,8 @@
       "zhHant": "魔回刺",
       "ja": "エンリポスト",
       "de": "Magische Riposte",
-      "fr": "Riposte enchantée"
+      "fr": "Riposte enchantée",
+      "ko": "인리포스트"
     },
     "41489": {
       "zhHans": "魔交击斩",
@@ -9333,7 +9734,8 @@
       "en": "Enchanted Zwerchhau",
       "ja": "エンツヴェルクハウ",
       "de": "Magischer Zwerchhau",
-      "fr": "Zwerchhau enchanté"
+      "fr": "Zwerchhau enchanté",
+      "ko": "인츠베르크하우"
     },
     "41490": {
       "zhHans": "魔连攻",
@@ -9341,7 +9743,8 @@
       "en": "Enchanted Redoublement",
       "ja": "エンルドゥブルマン",
       "de": "Magisches Redoublement",
-      "fr": "Redoublement enchanté"
+      "fr": "Redoublement enchanté",
+      "ko": "인르두블망"
     },
     "41491": {
       "zhHans": "焦热",
@@ -9349,7 +9752,8 @@
       "en": "Scorch",
       "ja": "スコーチ",
       "de": "Versengung",
-      "fr": "Calcination"
+      "fr": "Calcination",
+      "ko": "작열화"
     },
     "41492": {
       "zhHans": "决断",
@@ -9357,7 +9761,8 @@
       "zhHant": "決斷",
       "ja": "レゾリューション",
       "de": "Entschlossenheit",
-      "fr": "Résolution"
+      "fr": "Résolution",
+      "ko": "단호한 결단"
     },
     "41493": {
       "zhHans": "荆棘环绕",
@@ -9365,7 +9770,8 @@
       "zhHant": "荊棘環繞",
       "ja": "ブライヤー・クロゼ",
       "de": "Blüte des Mutes",
-      "fr": "Épine croisée"
+      "fr": "Épine croisée",
+      "ko": "회오리 찔레"
     },
     "41494": {
       "zhHans": "鼓励",
@@ -9373,7 +9779,8 @@
       "zhHant": "鼓勵",
       "ja": "エンボルデン",
       "de": "Ermutigen",
-      "fr": "Enhardissement"
+      "fr": "Enhardissement",
+      "ko": "성원"
     },
     "41495": {
       "zhHans": "光芒四射",
@@ -9381,7 +9788,8 @@
       "zhHant": "光芒四射",
       "ja": "プリフルジェンス",
       "de": "Kristallglanz",
-      "fr": "Syncristallisation"
+      "fr": "Syncristallisation",
+      "ko": "적색 광채"
     },
     "41496": {
       "zhHans": "剑身强部",
@@ -9389,7 +9797,8 @@
       "zhHant": "劍身強部",
       "ja": "フォルテ",
       "de": "Forte",
-      "fr": "Fortius"
+      "fr": "Fortius",
+      "ko": "포르테"
     },
     "41497": {
       "zhHans": "アンガジェマン",
@@ -9405,7 +9814,8 @@
       "zhHant": "南天十字",
       "ja": "サザンクロス",
       "de": "Kreuz des Südens",
-      "fr": "Croix du sud"
+      "fr": "Croix du sud",
+      "ko": "남십자성"
     },
     "41499": {
       "zhHans": "闪飒",
@@ -9413,7 +9823,8 @@
       "zhHant": "閃颯",
       "ja": "グレアジャ",
       "de": "Blendka",
-      "fr": "Giga Chatoiement"
+      "fr": "Giga Chatoiement",
+      "ko": "글레어쟈"
     },
     "41500": {
       "zhHans": "炽天的光环",
@@ -9421,7 +9832,8 @@
       "zhHant": "熾天的光環",
       "ja": "セラフィックヘイロー",
       "de": "Seraphenschein",
-      "fr": "Halo séraphique"
+      "fr": "Halo séraphique",
+      "ko": "세라핌의 광환"
     },
     "41501": {
       "zhHans": "降临之章",
@@ -9429,7 +9841,8 @@
       "zhHant": "降臨之章",
       "ja": "アクセッション",
       "de": "Höchstes Gut",
-      "fr": "Accession"
+      "fr": "Accession",
+      "ko": "강림"
     },
     "41502": {
       "zhHans": "炽天附体",
@@ -9437,7 +9850,8 @@
       "zhHant": "熾天附體",
       "ja": "セラフィズム",
       "de": "Seraphenlehre",
-      "fr": "Séraphisme"
+      "fr": "Séraphisme",
+      "ko": "세라피즘"
     },
     "41503": {
       "zhHans": "小奥秘卡",
@@ -9445,7 +9859,8 @@
       "zhHant": "小奧秘卡",
       "ja": "マイナーアルカナ",
       "de": "Kleine Arkana",
-      "fr": "Arcane mineur"
+      "fr": "Arcane mineur",
+      "ko": "소 아르카나"
     },
     "41504": {
       "zhHans": "王冠之贵妇",
@@ -9453,7 +9868,8 @@
       "zhHant": "王冠之貴婦",
       "ja": "クラウンレディ",
       "de": "Königin der Kronen",
-      "fr": "Reine des couronnes"
+      "fr": "Reine des couronnes",
+      "ko": "여왕의 날개"
     },
     "41505": {
       "zhHans": "王冠之领主",
@@ -9461,7 +9877,8 @@
       "zhHant": "王冠之領主",
       "ja": "クラウンロード",
       "de": "König der Kronen",
-      "fr": "Roi des couronnes"
+      "fr": "Roi des couronnes",
+      "ko": "왕의 검"
     },
     "41506": {
       "zhHans": "本轮",
@@ -9469,7 +9886,8 @@
       "zhHant": "本輪",
       "ja": "エピサイクル",
       "de": "Epizykel",
-      "fr": "Épicycle"
+      "fr": "Épicycle",
+      "ko": "주전원"
     },
     "41507": {
       "zhHans": "逆行",
@@ -9477,7 +9895,8 @@
       "en": "Retrograde",
       "ja": "レトログレード",
       "de": "Rücklauf",
-      "fr": "Rétrogradation"
+      "fr": "Rétrogradation",
+      "ko": "역행"
     },
     "41508": {
       "zhHans": "神谕",
@@ -9485,7 +9904,8 @@
       "en": "Oracle",
       "ja": "オラクル",
       "de": "Orakel",
-      "fr": "Oracle"
+      "fr": "Oracle",
+      "ko": "신탁"
     },
     "41509": {
       "en": "Wind's Reply",
@@ -9493,7 +9913,8 @@
       "zhHant": "絕空拳",
       "ja": "絶空拳",
       "de": "Himmelbrecher",
-      "fr": "Réaction du vent"
+      "fr": "Réaction du vent",
+      "ko": "절공권"
     },
     "41510": {
       "zhHans": "昏沉",
@@ -9501,7 +9922,8 @@
       "zhHant": "昏沉",
       "ja": "レサージー",
       "de": "Lethargie",
-      "fr": "Léthargie"
+      "fr": "Léthargie",
+      "ko": "무력화"
     },
     "41511": {
       "en": "Fated Circle",
@@ -9509,7 +9931,8 @@
       "zhHant": "命運之環",
       "ja": "フェイテッドサークル",
       "de": "Schicksalszirkel",
-      "fr": "Tourbillon fatidique"
+      "fr": "Tourbillon fatidique",
+      "ko": "운명의 고리"
     },
     "41512": {
       "zhHans": "平原震裂",
@@ -9644,7 +10067,8 @@
       "en": "Burst",
       "ja": "爆発",
       "de": "Explosion",
-      "fr": "Explosion"
+      "fr": "Explosion",
+      "ko": "버스트"
     },
     "41532": {
       "zhHans": "新星爆发",
@@ -9971,7 +10395,8 @@
       "zhHant": "殘心",
       "ja": "残心",
       "de": "Zanshin",
-      "fr": "Zanshin"
+      "fr": "Zanshin",
+      "ko": "잔심"
     },
     "41578": {
       "zhHans": "砂砾雨",
@@ -10163,7 +10588,8 @@
       "en": "Mineuchi",
       "ja": "みねうち",
       "de": "Mineuchi",
-      "fr": "Mineuchi"
+      "fr": "Mineuchi",
+      "ko": "칼등치기"
     },
     "41604": {
       "zhHans": "空手接白刃",
@@ -10603,7 +11029,8 @@
       "zhHant": "心神風息",
       "ja": "プシュケー",
       "de": "Psyche",
-      "fr": "Psyché"
+      "fr": "Psyché",
+      "ko": "프시케"
     },
     "41659": {
       "zhHans": "蛛网",
@@ -11336,7 +11763,8 @@
       "zhHant": "和弦箭",
       "ja": "ハーモニックアロー",
       "de": "Harmonischer Pfeil",
-      "fr": "Flèche harmonique"
+      "fr": "Flèche harmonique",
+      "ko": "조화의 화살"
     },
     "41965": {
       "zhHans": "风爆",
@@ -11840,7 +12268,8 @@
       "en": "Rampart",
       "ja": "ランパート",
       "de": "Schutzwall",
-      "fr": "Rempart"
+      "fr": "Rempart",
+      "ko": "철벽 방어"
     },
     "42032": {
       "zhHans": "暗影环",
@@ -11926,7 +12355,8 @@
       "en": "Burst",
       "ja": "爆発",
       "de": "Explosion",
-      "fr": "Explosion"
+      "fr": "Explosion",
+      "ko": "버스트"
     },
     "42051": {
       "zhHans": "大爆炸",
@@ -12283,7 +12713,8 @@
       "zhHant": "悔罪",
       "ja": "コンフィテオル",
       "de": "Confiteor",
-      "fr": "Confiteor"
+      "fr": "Confiteor",
+      "ko": "고백 기도"
     },
     "43200": {
       "zhHans": "王国神圣",
@@ -12627,7 +13058,8 @@
       "zhHant": "暴怒",
       "ja": "ランページ",
       "de": "Amok",
-      "fr": "Ravage"
+      "fr": "Ravage",
+      "ko": "광분"
     },
     "43244": {
       "zhHans": "铁壁",
@@ -12635,7 +13067,8 @@
       "zhHant": "鐵壁",
       "ja": "ランパート",
       "de": "Schutzwall",
-      "fr": "Rempart"
+      "fr": "Rempart",
+      "ko": "철벽 방어"
     },
     "43245": {
       "zhHans": "全力挥打",
@@ -12643,7 +13076,8 @@
       "en": "Full Swing",
       "ja": "フルスイング",
       "de": "Voller Schwinger",
-      "fr": "Plein élan"
+      "fr": "Plein élan",
+      "ko": "전력 강타"
     },
     "43246": {
       "zhHans": "浴血",
@@ -12651,7 +13085,8 @@
       "zhHant": "浴血",
       "ja": "ブラッドバス",
       "de": "Blutbad",
-      "fr": "Bain de sang"
+      "fr": "Bain de sang",
+      "ko": "피의 갈증"
     },
     "43247": {
       "zhHans": "敏捷",
@@ -12659,7 +13094,8 @@
       "zhHant": "敏捷",
       "ja": "スウィフト",
       "de": "Eile",
-      "fr": "Vélocité"
+      "fr": "Vélocité",
+      "ko": "쾌속 질주"
     },
     "43248": {
       "zhHans": "猛击",
@@ -12667,7 +13103,8 @@
       "zhHant": "猛擊",
       "ja": "スマイト",
       "de": "Zerschlagung",
-      "fr": "Châtiment"
+      "fr": "Châtiment",
+      "ko": "강타"
     },
     "43249": {
       "zhHans": "速度之星",
@@ -12675,7 +13112,8 @@
       "en": "Dervish",
       "ja": "スピードスター",
       "de": "Derwisch",
-      "fr": "Célérité extrême"
+      "fr": "Célérité extrême",
+      "ko": "속도광"
     },
     "43250": {
       "zhHans": "勇气",
@@ -12683,7 +13121,8 @@
       "zhHant": "勇氣",
       "ja": "ブレイブ",
       "de": "Courage",
-      "fr": "Courage"
+      "fr": "Courage",
+      "ko": "브레이브"
     },
     "43251": {
       "zhHans": "锐眼追击",
@@ -12691,7 +13130,8 @@
       "zhHant": "銳眼追擊",
       "ja": "イーグルアイ",
       "de": "Adlerauge",
-      "fr": "Œil d'aigle"
+      "fr": "Œil d'aigle",
+      "ko": "독수리의 눈"
     },
     "43252": {
       "zhHans": "彗星",
@@ -12699,7 +13139,8 @@
       "zhHant": "隕星",
       "ja": "コメット",
       "de": "Komet",
-      "fr": "Comète"
+      "fr": "Comète",
+      "ko": "혜성"
     },
     "43253": {
       "zhHans": "バリア",
@@ -12715,7 +13156,8 @@
       "zhHant": "武裝削弱",
       "ja": "ダルウェポン",
       "de": "Stumpfe Klinge",
-      "fr": "Émoussement"
+      "fr": "Émoussement",
+      "ko": "무기 약화"
     },
     "43255": {
       "zhHans": "疗愈",
@@ -12723,7 +13165,8 @@
       "en": "Haelan",
       "ja": "ヒール",
       "de": "Heilung",
-      "fr": "Soin"
+      "fr": "Soin",
+      "ko": "치유"
     },
     "43256": {
       "zhHans": "坚石肤",
@@ -12731,7 +13174,8 @@
       "zhHant": "堅石膚",
       "ja": "ストンラスキン",
       "de": "Steinrahaut",
-      "fr": "Extra Cuirasse"
+      "fr": "Extra Cuirasse",
+      "ko": "스톤라스킨"
     },
     "43257": {
       "zhHans": "溃破",
@@ -12739,7 +13183,8 @@
       "zhHant": "潰破",
       "ja": "ディアブロシス",
       "de": "Diablose",
-      "fr": "Diabrosis"
+      "fr": "Diabrosis",
+      "ko": "부식증"
     },
     "43259": {
       "zhHans": "对战专用职能技能",
@@ -12946,7 +13391,8 @@
       "en": "Double Cast",
       "ja": "ダブルキャスト",
       "de": "Zweifacher Zauber",
-      "fr": "Double incantation"
+      "fr": "Double incantation",
+      "ko": "이중 마술"
     },
     "43287": {
       "zhHans": "垒石III",
@@ -12982,7 +13428,8 @@
       "zhHant": "幻影彈",
       "ja": "ファントムダート",
       "de": "Phantompfeil",
-      "fr": "Projectile fantôme"
+      "fr": "Projectile fantôme",
+      "ko": "유령 쐐기"
     },
     "43292": {
       "zhHans": "価値暴落の波動",
@@ -13439,5 +13886,6 @@
       "fr": "Sautiller"
     }
   },
-  "sourceDeFr": "XIVAPI v2 global-client sheets (de/fr)"
+  "sourceDeFr": "XIVAPI v2 global-client sheets (de/fr)",
+  "sourceKo": "Official Korean FFXIV PvP job guide snapshot, aligned with the official English job guide by job and action order"
 }

@@ -42,7 +42,7 @@ internal sealed class MainWindow : Window
     private readonly Dictionary<uint, ISharedImmediateTexture> actionIcons = new();
     private readonly Action saveConfiguration;
     private readonly Action<LocalMatchAnalysis> openDetailedAnalysis;
-    private readonly Action openLiveCombat;
+    private readonly Action<LiveCombatPage> openLivePage;
     private readonly string captureDirectory;
     private readonly string importDirectory;
     private string CaptureDirectory(string mode) => Path.Combine(captureDirectory, mode);
@@ -89,7 +89,7 @@ internal sealed class MainWindow : Window
     public MainWindow(Configuration configuration, MatchRepository repository, UploadService uploads,
         IDataManager dataManager, ITextureProvider textureProvider,
         Action saveConfiguration, Func<CollectorUiState> state,
-        Action<LocalMatchAnalysis> openDetailedAnalysis, Action openLiveCombat,
+        Action<LocalMatchAnalysis> openDetailedAnalysis, Action<LiveCombatPage> openLivePage,
         string captureDirectory, string importDirectory, PvpRotationCalendar rotationCalendar,
         CrystallineRankHistory crystallineRankHistory, CrystallineMatchHistory crystallineMatchHistory,
         CrystallineActReplayArchive crystallineActReplayArchive)
@@ -104,7 +104,7 @@ internal sealed class MainWindow : Window
         this.saveConfiguration = saveConfiguration;
         this.state = state;
         this.openDetailedAnalysis = openDetailedAnalysis;
-        this.openLiveCombat = openLiveCombat;
+        this.openLivePage = openLivePage;
         this.captureDirectory = captureDirectory;
         this.importDirectory = importDirectory;
         foreach (var mode in new[] { "frontline", "crystalline-conflict", "rival-wings" })
@@ -133,7 +133,7 @@ internal sealed class MainWindow : Window
     {
         selectFrontlineTab = GameLayout.IsFrontlineDuty(dutyId);
         selectCrystallineTab = GameLayout.IsCrystallineDuty(dutyId);
-        selectRivalWingsTab = false;
+        selectRivalWingsTab = GameLayout.IsRivalWingsDuty(dutyId);
     }
 
     public override void Draw()
@@ -1772,8 +1772,35 @@ internal sealed class MainWindow : Window
         ImGui.TextWrapped(value.Capturing
             ? $"{T("matchId")}：{value.MatchUid}\n{T("file")}：{value.OutputPath}"
             : T("waitingHelp"));
-        if (ImGui.Button(T("openLiveCombat"))) openLiveCombat();
-        ImGui.SameLine(); ImGui.TextDisabled(T("liveCombatHint"));
+        if (LiveCombatPageContract.ShowManualLaunchers)
+        {
+            ImGui.TextColored(BattlefieldUiTheme.Accent(configuration.UiTheme), T("livePageLaunchers"));
+            if (ImGui.Button(T("liveCombatSlice") + "##open-live-slice"))
+                openLivePage(LiveCombatPage.CombatSlice);
+            ImGui.SameLine();
+            if (ImGui.Button(T("liveMarkerMap") + "##open-live-map"))
+                openLivePage(LiveCombatPage.MarkerMap);
+            ImGui.SameLine();
+            if (ImGui.Button(T("liveTendencyCandidates") + "##open-live-tendency"))
+                openLivePage(LiveCombatPage.TendencyCandidates);
+            ImGui.SameLine();
+            if (ImGui.Button(T("liveObservedKda") + "##open-live-kda"))
+                openLivePage(LiveCombatPage.ObservedKda);
+            var transparentMap = configuration.TransparentLiveMarkerMap;
+            if (ImGui.Checkbox(T("liveMarkerOverlay") + "##status-marker-overlay", ref transparentMap))
+            {
+                configuration.TransparentLiveMarkerMap = transparentMap;
+                saveConfiguration();
+            }
+            ImGui.SameLine(); ImGui.TextDisabled(T("liveMarkerOverlayStatusHelp"));
+            var autoOpenLiveSlice = configuration.AutoOpenLiveSliceOnMatchStart;
+            if (ImGui.Checkbox(T("autoOpenLiveSlice") + "##status-auto-live-slice", ref autoOpenLiveSlice))
+            {
+                configuration.AutoOpenLiveSliceOnMatchStart = autoOpenLiveSlice;
+                saveConfiguration();
+            }
+            ImGui.TextDisabled(T("livePageLaunchersHelp"));
+        }
         if (!string.IsNullOrWhiteSpace(value.OutputPath) && ImGui.Button(T("openFolder")))
             OpenFolder(Path.GetDirectoryName(value.OutputPath)!);
     }
@@ -2685,9 +2712,11 @@ internal sealed class MainWindow : Window
     private string UploadErrorText(string error) => error switch
     {
         "missing_token" => T("missingToken"),
+        "credential_expired" => T("credentialExpired"),
         "invalid_token" => T("invalidToken"),
         "network_error" => T("networkError"),
         "analysis_timeout" => T("analysisTimeout"),
+        "client_upgrade_required" => T("clientUpgradeRequired"),
         "server_action_required" => T("transferActionRequired"),
         _ => error
     };
@@ -2701,6 +2730,7 @@ internal sealed class MainWindow : Window
                code.StartsWith("zh-HK", StringComparison.OrdinalIgnoreCase) ? "zh-TW"
             : code.StartsWith("zh", StringComparison.OrdinalIgnoreCase) ? "zh-CN"
             : code.StartsWith("ja", StringComparison.OrdinalIgnoreCase) ? "ja-JP"
+            : code.StartsWith("ko", StringComparison.OrdinalIgnoreCase) ? "ko-KR"
             : code.StartsWith("de", StringComparison.OrdinalIgnoreCase) ? "de-DE"
             : code.StartsWith("fr", StringComparison.OrdinalIgnoreCase) ? "fr-FR"
             : code.StartsWith("th", StringComparison.OrdinalIgnoreCase) ? "th-TH"

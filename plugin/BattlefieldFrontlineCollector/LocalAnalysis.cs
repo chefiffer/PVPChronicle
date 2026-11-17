@@ -158,7 +158,7 @@ internal sealed record DetailedAnalysis(string Schema, IReadOnlyList<ScorePoint>
     IReadOnlyList<DetailedStatusChange>? StatusTimeline = null,
     IReadOnlyList<string>? CaptureFeatures = null,
     IReadOnlyList<BehaviorGroupCandidate>? BehaviorGroups = null,
-    string? BehaviorModel = null, double FourSmallDisplayThreshold = 60,
+    string? BehaviorModel = null, double FourSmallDisplayThreshold = 50,
     IReadOnlyList<AnomalyCandidate>? AnomalyCandidates = null,
     AnomalyCoverage? AnomalyCoverage = null, string? AnomalyModel = null,
     IReadOnlyList<TargetMarkerTimelineEvent>? TargetMarkers = null,
@@ -197,7 +197,8 @@ internal sealed record LocalMatchAnalysis(
     IReadOnlyDictionary<string, RemoteScore>? RemoteScores,
     IReadOnlyDictionary<string, IReadOnlyList<BehaviorTendency>>? BehaviorTable,
     DetailedAnalysis? Detail, string? DetailError,
-    string EvidenceNotice, string? RemoteMatchUid = null);
+    string EvidenceNotice, string? RemoteMatchUid = null,
+    bool DetailAutoFetchPending = false);
 
 internal static class LocalMatchAnalyzer
 {
@@ -352,7 +353,8 @@ internal sealed class MatchRepository
                 RemoteMatchUid = response.MatchUid,
                 RemoteScores = response.PlayerScores,
                 BehaviorTable = response.BehaviorTable,
-                EvidenceNotice = response.EvidenceNotice ?? current.EvidenceNotice
+                EvidenceNotice = response.EvidenceNotice ?? current.EvidenceNotice,
+                DetailAutoFetchPending = current.Detail == null
             };
             matches[index] = merged;
             RefreshSnapshot();
@@ -397,7 +399,12 @@ internal sealed class MatchRepository
         {
             var index = matches.FindIndex(x => x.MatchUid == matchUid);
             if (index < 0) return;
-            var updated = matches[index] with { Detail = detail, DetailError = null };
+            var updated = matches[index] with
+            {
+                Detail = detail,
+                DetailError = null,
+                DetailAutoFetchPending = false
+            };
             matches[index] = updated;
             RefreshSnapshot();
             if (compactPayload != null)
@@ -418,7 +425,13 @@ internal sealed class MatchRepository
         {
             var index = matches.FindIndex(x => x.MatchUid == matchUid);
             if (index < 0) return;
-            var updated = matches[index] with { DetailError = error };
+            var current = matches[index];
+            var updated = current with
+            {
+                DetailError = error,
+                DetailAutoFetchPending = error == null
+                    ? current.DetailAutoFetchPending : false
+            };
             matches[index] = updated;
             RefreshSnapshot();
             Persist(updated);

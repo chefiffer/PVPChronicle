@@ -75,6 +75,7 @@ public sealed unsafe class Plugin : IDalamudPlugin
     private readonly LiveScoreProjectionTracker liveScoreProjection = new();
     private readonly LiveMarkerState liveMarkers = new();
     private readonly LiveCombatWindow liveCombatWindow;
+    private readonly Dictionary<LiveCombatPage, LiveCombatWindow> liveCombatWindows = new();
     private readonly Stopwatch elapsed = new();
     private readonly ConcurrentDictionary<uint, ActionActorIdentity> actorIdentityCache = new();
     private readonly MovementAnomalyTracker movementAnomaly;
@@ -94,6 +95,7 @@ public sealed unsafe class Plugin : IDalamudPlugin
     private volatile string gameAccountBindingId = string.Empty;
     private long nextRealmRefreshAt;
     private long nextCrystallineRankSampleAt;
+    private ulong lastUnsupportedPvpAreaSignature;
     private DateTime startedAtUtc;
     private uint dutyId;
     private uint territoryId;
@@ -180,15 +182,26 @@ public sealed unsafe class Plugin : IDalamudPlugin
         actionMetadata = BuildActionMetadataCatalog(assetRoot);
         detailWindow = new MatchDetailWindow(configuration, repository, uploads, DataManager, TextureProvider,
             assetRoot);
-        liveCombatWindow = new LiveCombatWindow(configuration, liveCombat, liveMarkers, UiState, DataManager, TextureProvider,
-            TryTargetVisiblePlayer, assetRoot);
+        void OpenLivePage(LiveCombatPage page)
+        {
+            if (liveCombatWindows.TryGetValue(page, out var window))
+                window.IsOpen = true;
+        }
+        foreach (var page in Enum.GetValues<LiveCombatPage>())
+        {
+            var window = new LiveCombatWindow(configuration, page,
+                liveCombat, liveMarkers, UiState, DataManager, TextureProvider,
+                TryTargetVisiblePlayer, assetRoot);
+            liveCombatWindows[page] = window;
+        }
+        liveCombatWindow = liveCombatWindows[LiveCombatPage.CombatSlice];
         mainWindow = new MainWindow(configuration, repository, uploads, DataManager, TextureProvider,
-            SaveConfiguration, UiState, OpenDetailedAnalysis, () => liveCombatWindow.IsOpen = true,
+            SaveConfiguration, UiState, OpenDetailedAnalysis, OpenLivePage,
             captureDirectory, importDirectory, rotationCalendar, crystallineRankHistory,
             crystallineMatchHistory, crystallineActReplayArchive);
         windows.AddWindow(mainWindow);
         windows.AddWindow(detailWindow);
-        windows.AddWindow(liveCombatWindow);
+        foreach (var window in liveCombatWindows.Values) windows.AddWindow(window);
 
         Interop.InitializeFromAttributes(this);
         resultHook.Enable();
@@ -202,7 +215,11 @@ public sealed unsafe class Plugin : IDalamudPlugin
                 liveCombat.Add(value, state);
                 movementAnomaly.ObserveAction(value);
                 ObserveActionObjective(value);
-            }, markerAttribution.Observe, liveCombat.AddDeath);
+            }, markerAttribution.Observe, death =>
+            {
+                liveCombat.AddDeath(death);
+                movementAnomaly.ObserveDeath(death);
+            });
         localActionIntegrity = new LocalActionIntegrityCapture(Interop, ObjectTable, output,
             () => (matchUid, elapsed.ElapsedMilliseconds), Log);
         localFieldMarkerCapture = new LocalFieldMarkerCommandCapture(Interop,
@@ -231,6 +248,12 @@ public sealed unsafe class Plugin : IDalamudPlugin
         { HelpMessage = "打开最近 15–60 秒实时战斗切片 / Open rolling live combat slice." });
         Commands.AddHandler("/bfslice", new CommandInfo((_, _) => liveCombatWindow.IsOpen = true)
         { HelpMessage = "打开即时战斗切片 / Open the live combat slice." });
+        Commands.AddHandler("/bfmarkers", new CommandInfo((_, _) => OpenLivePage(LiveCombatPage.MarkerMap))
+        { HelpMessage = "打开独立实时标点地图 / Open the standalone live marker map." });
+        Commands.AddHandler("/bfkda", new CommandInfo((_, _) => OpenLivePage(LiveCombatPage.ObservedKda))
+        { HelpMessage = "打开独立实时 KDA 页面 / Open the standalone live KDA page." });
+        Commands.AddHandler("/bftendency", new CommandInfo((_, _) => OpenLivePage(LiveCombatPage.TendencyCandidates))
+        { HelpMessage = "打开独立实时倾向页面 / Open the standalone live tendency page." });
         Commands.AddHandler("/bfcache", new CommandInfo((_, _) => OpenDirectory(captureDirectory))
         { HelpMessage = "打开本地战局缓存 / Open the local match cache." });
         Commands.AddHandler("/bfimport", new CommandInfo((_, _) => OpenDirectory(importDirectory))
@@ -258,13 +281,21 @@ public sealed unsafe class Plugin : IDalamudPlugin
 
     private static IFontHandle? BuildUiFont(string assetRoot)
     {
-        var path = Path.Combine(assetRoot, "Assets", "fonts", "NotoSansThai-Variable.ttf");
-        if (!File.Exists(path)) path = Path.Combine(assetRoot, "assets", "fonts", "NotoSansThai-Variable.ttf");
-        if (!File.Exists(path)) return null;
+        string? FontPath(string filename)
+        {
+            var candidate = Path.Combine(assetRoot, "Assets", "fonts", filename);
+            if (File.Exists(candidate)) return candidate;
+            candidate = Path.Combine(assetRoot, "assets", "fonts", filename);
+            return File.Exists(candidate) ? candidate : null;
+        }
+
+        var thaiPath = FontPath("NotoSansThai-Variable.ttf");
+        var koreanPath = FontPath("NotoSansKR-Variable.ttf");
+        if (thaiPath == null && koreanPath == null) return null;
         return PluginInterface.UiBuilder.FontAtlas.NewDelegateFontHandle(step => step.OnPreBuild(toolkit =>
         {
             var baseFont = toolkit.AddDalamudDefaultFont(-1);
-            var config = new SafeFontConfig
+            if (thaiPath != null) toolkit.AddFontFromFile(thaiPath, new SafeFontConfig
             {
                 // SafeFontConfig does not accept Dalamud's -1 "use default"
                 // sentinel.  Keep the Thai merge font at the atlas base size;
@@ -272,8 +303,21 @@ public sealed unsafe class Plugin : IDalamudPlugin
                 SizePx = 17f,
                 MergeFont = baseFont,
                 GlyphRanges = [0x0E00, 0x0E7F, 0],
-            };
-            toolkit.AddFontFromFile(path, config);
+            });
+            if (koreanPath != null) toolkit.AddFontFromFile(koreanPath, new SafeFontConfig
+            {
+                SizePx = 17f,
+                MergeFont = baseFont,
+                GlyphRanges =
+                [
+                    0x1100, 0x11FF,
+                    0x3130, 0x318F,
+                    0xA960, 0xA97F,
+                    0xAC00, 0xD7A3,
+                    0xD7B0, 0xD7FF,
+                    0
+                ],
+            });
             toolkit.Font = baseFont;
         }));
     }
@@ -319,17 +363,37 @@ public sealed unsafe class Plugin : IDalamudPlugin
     private static uint CurrentDutyId() => GameMain.Instance() == null
         ? 0u : (uint)GameMain.Instance()->CurrentContentFinderConditionId;
 
-    private void OnTerritoryChanged(uint _)
+    private void OnTerritoryChanged(uint newTerritoryId)
     {
-        if (!GameLayout.IsSupportedDuty(CurrentDutyId())) waitForDutyExit = false;
-        if (matchUid != null && !GameLayout.IsSupportedDuty(CurrentDutyId())) EndIncompleteMatch("territory_changed");
+        // TerritoryChanged fires before the new native duty is always ready.
+        // The territory is authoritative for leaving; starting waits until the
+        // territory/duty pair agrees on a later framework frame.
+        if (!GameLayout.IsKnownPvpTerritory(newTerritoryId)) waitForDutyExit = false;
+        if (matchUid != null && newTerritoryId != territoryId)
+            EndIncompleteMatch("territory_changed");
         TryStartMatch();
     }
 
     private void TryStartMatch()
     {
         var currentDuty = CurrentDutyId();
-        if (matchUid != null || waitForDutyExit || !GameLayout.IsSupportedDuty(currentDuty)) return;
+        var currentTerritory = (uint)ClientState.TerritoryType;
+        if (matchUid != null || waitForDutyExit || !ClientState.IsPvPExcludingDen) return;
+        if (!GameLayout.IsSupportedArea(currentTerritory, currentDuty))
+        {
+            // A zero duty is the ordinary loading state. A stable non-zero
+            // mismatch is actionable evidence that a game update added or
+            // changed a PvP row, so report it once per pair without spamming.
+            var signature = ((ulong)currentTerritory << 32) | currentDuty;
+            if (currentDuty != 0 && signature != lastUnsupportedPvpAreaSignature)
+            {
+                lastUnsupportedPvpAreaSignature = signature;
+                Log.Warning("PvP area is not in the recorder catalog: territory {TerritoryId}, duty {DutyId}",
+                    currentTerritory, currentDuty);
+            }
+            return;
+        }
+        lastUnsupportedPvpAreaSignature = 0;
         // TerritoryChanged can fire before the local player object and home world are ready.
         // Wait a few frames instead of writing an identity-less match header that can never
         // be associated with the uploader's personal Logs later.
@@ -338,7 +402,7 @@ public sealed unsafe class Plugin : IDalamudPlugin
         if (localPlayer == null || string.IsNullOrWhiteSpace(localPlayer.Name.TextValue) ||
             localPlayer.HomeWorld.RowId == 0) return;
         dutyId = currentDuty;
-        territoryId = (uint)ClientState.TerritoryType;
+        territoryId = currentTerritory;
         matchUid = Guid.NewGuid().ToString("N");
         localPlayerName = localPlayer.Name.TextValue;
         matchRealm = ResolveRealmFromLocalPlayer();
@@ -370,9 +434,10 @@ public sealed unsafe class Plugin : IDalamudPlugin
         liveScoreProjection.Reset();
         liveMarkers.Reset();
         movementAnomaly.Reset();
-        var mode = GameLayout.IsCrystallineDuty(dutyId) ? "crystalline_conflict" : "frontline";
+        var mode = GameLayout.CaptureMode(dutyId);
         output.Start(matchUid, dutyId, territoryId, localPlayerName, matchRealm, mode);
-        if (configuration.AutoOpenLiveSliceOnMatchStart)
+        if (configuration.AutoOpenLiveSliceOnMatchStart &&
+            LiveCombatPageContract.ShouldAutoOpenLivePages(true, territoryId, dutyId))
             liveCombatWindow.IsOpen = true;
         Log.Information("{Mode} capture started: {MatchUid}, duty {DutyId}", mode, matchUid, dutyId);
     }
@@ -422,7 +487,14 @@ public sealed unsafe class Plugin : IDalamudPlugin
             ObserveCrystallineRankProfile();
         }
         if (matchUid == null) { TryStartMatch(); return; }
-        if (!GameLayout.IsSupportedDuty(CurrentDutyId())) { EndIncompleteMatch("duty_left"); return; }
+        // Do not kill a valid capture when CurrentContentFinderConditionId is
+        // briefly zero. A real departure always changes TerritoryType; the
+        // TerritoryChanged callback also closes the capture immediately.
+        if ((uint)ClientState.TerritoryType != territoryId)
+        {
+            EndIncompleteMatch("duty_left");
+            return;
+        }
         var elapsedMs = elapsed.ElapsedMilliseconds;
         (short, short, short, byte)? frontlineScore = null;
         if (GameLayout.IsFrontlineDuty(dutyId))
@@ -462,10 +534,12 @@ public sealed unsafe class Plugin : IDalamudPlugin
         {
             lastIdentitySampleMs = elapsedMs;
             RefreshActorIdentityCache();
+            CaptureLivePlayerMapState();
             foreach (var observation in movementAnomaly.ObserveForcedMovement(
                          Schema, matchUid, elapsedMs, ObjectTable.PlayerObjects))
                 output.Write(observation);
-            foreach (var candidate in movementAnomaly.Observe(Schema, matchUid, elapsedMs, ObjectTable.PlayerObjects))
+            foreach (var candidate in movementAnomaly.Observe(Schema, matchUid, elapsedMs,
+                         ObjectTable.PlayerObjects, ObjectTable.LocalPlayer?.Position))
                 output.Write(candidate);
         }
 
@@ -650,6 +724,37 @@ public sealed unsafe class Plugin : IDalamudPlugin
         if (address == IntPtr.Zero) return 255;
         var value = ((NativeBattleChara*)address)->Battalion;
         return value <= 2 ? value : (byte)255;
+    }
+
+    private void CaptureLivePlayerMapState()
+    {
+        try
+        {
+            var localEntityId = ObjectTable.LocalPlayer?.EntityId ?? 0;
+            var current = new List<LivePlayerMarker>();
+            foreach (var player in ObjectTable.PlayerObjects)
+            {
+                try
+                {
+                    if (player.EntityId == 0) continue;
+                    actorIdentityCache.TryGetValue(player.EntityId, out var identity);
+                    var battle = (Dalamud.Game.ClientState.Objects.Types.IBattleChara)player;
+                    var playerCharacter = player as IPlayerCharacter;
+                    var battalion = identity?.Battalion <= 2
+                        ? identity.Battalion : ReadBattalion(player.Address);
+                    current.Add(new LivePlayerMarker(player.EntityId,
+                        identity?.Name ?? player.Name.TextValue,
+                        identity?.WorldId ?? (ushort)(playerCharacter?.HomeWorld.RowId ?? 0),
+                        identity?.ClassJobId ?? player.ClassJob.RowId,
+                        battalion, player.Position.X, player.Position.Y, player.Position.Z,
+                        player.Rotation, player.EntityId == localEntityId,
+                        battle.MaxHp == 0 || battle.CurrentHp > 0));
+                }
+                catch (Exception ex) { Log.Verbose(ex, "Skipped one invalid live-map player."); }
+            }
+            liveMarkers.ReplacePlayers(current);
+        }
+        catch (Exception ex) { Log.Verbose(ex, "Skipped this optional live-map player sample."); }
     }
 
     private void CaptureMarkerChanges(long elapsedMs)
@@ -1843,6 +1948,9 @@ public sealed unsafe class Plugin : IDalamudPlugin
         Commands.RemoveHandler("/bflog");
         Commands.RemoveHandler("/bflive");
         Commands.RemoveHandler("/bfslice");
+        Commands.RemoveHandler("/bfmarkers");
+        Commands.RemoveHandler("/bfkda");
+        Commands.RemoveHandler("/bftendency");
         Commands.RemoveHandler("/bfcache");
         Commands.RemoveHandler("/bfimport");
         resultHook.Dispose();

@@ -86,3 +86,8 @@ SOFTWARE.
 The Thai glyph fallback is Noto Sans Thai, Copyright 2022 The Noto Project
 Authors. It is distributed under the SIL Open Font License 1.1. The complete
 license is packaged beside the font as `Assets/fonts/OFL-NotoSansThai.txt`.
+
+The Korean glyph fallback is Noto Sans KR, Copyright 2014-2021 Adobe and the
+Noto Project Authors. It is distributed under the SIL Open Font License 1.1.
+The complete license is packaged beside the font as
+`Assets/fonts/OFL-NotoSansKR.txt`.

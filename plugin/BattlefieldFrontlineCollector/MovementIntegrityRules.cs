@@ -16,9 +16,11 @@ namespace BattlefieldFrontlineCollector;
 internal static class MovementIntegrityRules
 {
     internal const string CatalogVersion = "pvp-movement-status-2026-10-v4";
-    internal const string DisplacementCatalogVersion = "pvp-displacement-2026-10-v2";
+    internal const string DisplacementCatalogVersion = "pvp-displacement-2026-11-v3";
     internal const string CnGameVersion = "2026.10.06.0000.0000";
     internal const string GlobalGameVersion = "2026.10.16.0000.0000";
+    internal const double ObserverRadiusYalms = 200.0;
+    internal const long ObserverStabilizationMs = 2_000;
 
     internal sealed record PositiveSpeedRule(
         uint StatusId,
@@ -95,6 +97,20 @@ internal static class MovementIntegrityRules
     private static readonly IReadOnlyDictionary<byte, JobMovementRule> RulesByJob =
         JobMovementRules.ToDictionary(rule => rule.ClassJobId);
 
+    // Legal PvP actions that move their caster. Lumina's AffectsPosition flag
+    // remains the primary source, while this versioned fallback covers actions
+    // whose current resource row or packet metadata is incomplete. In
+    // particular, Thunderclap, Shukuchi, Aetherial Manipulation and Smudge are
+    // animation-driven relocation, not ordinary ground running.
+    // 合法的本人位移目录。资源表标记缺失时也必须排除轻身步法、缩地、魔纹步和疾速涂鸦。
+    private static readonly IReadOnlySet<uint> CasterDisplacementActions = new HashSet<uint>
+    {
+        29065, 29079, 29092, 29123, 29229, 29261, 29430, 29479, 29484,
+        29494, 29510, 29513, 29522, 29532, 29550, 29660, 29689, 29692,
+        29699, 29700, 29707, 29708, 39148, 39153, 39184, 39210, 41488,
+        41581, 41646, 41654, 41942, 42039
+    };
+
     internal static bool SupportsGameVersion(string version)
     {
         var normalized = version.Trim();
@@ -119,6 +135,38 @@ internal static class MovementIntegrityRules
     internal static bool IsActiveMovement(double distanceYalm, double durationSeconds) =>
         durationSeconds is >= .10 and <= .50 &&
         distanceYalm >= Math.Max(.20, 3.5 * durationSeconds);
+
+    internal static bool IsCasterDisplacementAction(uint actionId) =>
+        CasterDisplacementActions.Contains(actionId);
+
+    /// <summary>
+    /// Exact speed evidence is limited to ordinary ground locomotion. A large
+    /// vertical component is characteristic of elevators, launch pads, falls
+    /// and scripted transport; it remains visible in replay but cannot be
+    /// compared with the six-yalm-per-second running baseline.
+    /// 精确移速只比较贴地行走；电梯、弹射、坠落和场景运输不进入跑速样本。
+    /// </summary>
+    internal static bool IsGroundLocomotionInterval(double horizontalDistanceYalm,
+        double verticalDistanceYalm, double durationSeconds) =>
+        IsActiveMovement(horizontalDistanceYalm, durationSeconds) &&
+        verticalDistanceYalm <= Math.Max(.35, 3.0 * durationSeconds);
+
+    internal static bool IsInsideObserverRadius(double observerX, double observerY,
+        double observerZ, double actorX, double actorY, double actorZ) =>
+        Math.Sqrt(Math.Pow(actorX - observerX, 2) + Math.Pow(actorY - observerY, 2) +
+                  Math.Pow(actorZ - observerZ, 2)) <= ObserverRadiusYalms;
+
+    /// <summary>
+    /// A negative start means that the actor is outside the trusted observer
+    /// window. Re-entry always starts a new two-second stabilization period;
+    /// no coordinate before that period can be joined to the new segment.
+    /// 负值表示已断轨；重新进入两百 yalm 后必须重新连续稳定两秒。
+    /// </summary>
+    internal static long NextStableWindowStart(long previousStartMs, bool inside, long elapsedMs) =>
+        !inside ? -1 : previousStartMs < 0 ? elapsedMs : previousStartMs;
+
+    internal static bool IsStableObserverWindow(long startMs, long elapsedMs) =>
+        startMs >= 0 && elapsedMs - startMs >= ObserverStabilizationMs;
 
     /// <summary>
     /// Type 32 is an explicit target-side displacement effect. Wind's Reply

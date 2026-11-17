@@ -21,6 +21,13 @@ internal static class CombatUiPrimitives
         return shield == 0 ? $"{currentHp:N0}/{maxHp:N0}" : $"{currentHp:N0}/{maxHp:N0} (+{shield:N0})";
     }
 
+    private static string CompactNumber(uint value) => value switch
+    {
+        >= 1_000_000 => $"{value / 1_000_000d:0.#}m",
+        >= 1_000 => $"{value / 1_000d:0.#}k",
+        _ => value.ToString()
+    };
+
     public static void DrawHpShieldBar(ImDrawListPtr draw, Vector2 origin, Vector2 size,
         uint currentHp, uint maxHp, byte shieldPercent, bool showText)
     {
@@ -44,6 +51,19 @@ internal static class CombatUiPrimitives
         if (!showText) return;
         var text = FormatHpShield(currentHp, maxHp, shieldPercent);
         var extent = ImGui.CalcTextSize(text);
+        if (extent.X > size.X - 4 && maxHp > 0)
+        {
+            text = shieldPercent == 0
+                ? $"{CompactNumber(currentHp)}/{CompactNumber(maxHp)}"
+                : $"{CompactNumber(currentHp)}/{CompactNumber(maxHp)} +{shieldPercent}%";
+            extent = ImGui.CalcTextSize(text);
+        }
+        if (extent.X > size.X - 4 && maxHp > 0)
+        {
+            text = CompactNumber(currentHp);
+            extent = ImGui.CalcTextSize(text);
+        }
+        if (extent.X > size.X - 4) return;
         draw.AddText(origin + new Vector2(Math.Max(2, (size.X - extent.X) / 2),
                 Math.Max(0, (size.Y - extent.Y) / 2)),
             ImGui.ColorConvertFloat4ToU32(Vector4.One), text);

@@ -14,25 +14,6 @@ using FFXIVClientStructs.FFXIV.Common.Math;
 
 namespace BattlefieldFrontlineCollector;
 
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
-internal unsafe struct AddStatusEffectPacket
-{
-    public uint Unknown1, RelatedActionSequence, ActorId, CurrentHp, MaxHp;
-    public ushort CurrentMp, Unknown3;
-    public byte DamageShield, EffectCount;
-    public ushort Unknown6;
-    public fixed byte Effects[64];
-}
-
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
-internal struct StatusEffectAddEntryPacket
-{
-    public byte EffectIndex, Unknown1;
-    public ushort EffectId, StackCount, Unknown3;
-    public float Duration;
-    public uint SourceActorId;
-}
-
 /// <summary>
 /// Captures the client events actually received in the uploader's loaded area.
 /// The hot detours only copy primitive values into the bounded background writer;
@@ -60,7 +41,7 @@ internal sealed unsafe class CombatEventCapture : IDisposable
     private delegate void ActorControlDelegate(uint category, uint eventId, uint param1, uint param2,
         uint param3, uint param4, uint param5, uint param6, uint param7, uint param8,
         ulong targetId, byte param9);
-    private delegate void EffectResultDelegate(uint targetId, IntPtr actionIntegrityData, byte isReplay);
+    private delegate void EffectResultDelegate(uint entityId, IntPtr effectResultPacket, byte isReplay);
 
     private readonly Hook<ActionEffectDelegate> actionEffectHook;
     [Signature("E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64", DetourName = nameof(ActorControlDetour))]
@@ -194,24 +175,21 @@ internal sealed unsafe class CombatEventCapture : IDisposable
         catch (Exception exception) { log.Verbose(exception, "Skipped malformed actor-control packet."); }
     }
 
-    private void EffectResultDetour(uint targetId, IntPtr actionIntegrityData, byte isReplay)
+    private void EffectResultDetour(uint entityId, IntPtr effectResultPacket, byte isReplay)
     {
-        effectResultHook.Original(targetId, actionIntegrityData, isReplay);
+        effectResultHook.Original(entityId, effectResultPacket, isReplay);
         try
         {
             var (matchUid, elapsedMs) = context();
-            if (matchUid == null || actionIntegrityData == IntPtr.Zero) return;
-            var message = (AddStatusEffectPacket*)actionIntegrityData;
-            var effects = (StatusEffectAddEntryPacket*)message->Effects;
-            var count = Math.Min(message->EffectCount, 4u);
-            for (uint index = 0; index < count; index++)
+            if (matchUid == null || effectResultPacket == IntPtr.Zero) return;
+            var packet = new ReadOnlySpan<byte>((void*)effectResultPacket,
+                EffectResultPacketReader.PacketSize);
+            foreach (var effect in EffectResultPacketReader.Decode(packet))
             {
-                var effect = effects[index];
-                if (effect.EffectId == 0) continue;
                 output.Write(new StatusChangeEvent(Schema, "status_change", matchUid,
-                    DateTime.UtcNow, elapsedMs, targetId, effect.SourceActorId,
-                    effect.EffectId, effect.StackCount, effect.Duration,
-                    effect.Duration < 0 ? "remove" : "apply"));
+                    DateTime.UtcNow, elapsedMs, effect.TargetEntityId, effect.SourceEntityId,
+                    effect.StatusId, effect.Parameter, effect.RemainingSeconds,
+                    effect.RemainingSeconds < 0 ? "remove" : "apply"));
             }
         }
         catch (Exception exception) { log.Verbose(exception, "Skipped malformed status-effect packet."); }

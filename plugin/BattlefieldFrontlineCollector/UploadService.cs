@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -48,6 +49,8 @@ internal sealed record PluginRegistrationClaimResponse(bool Ok, string? Status, 
 internal sealed record CollectorMetaResponse(string? ServerVersion,
     IReadOnlyList<string>? ApiVersions, IReadOnlyList<int>? AcceptedCaptureSchemas,
     int DatabaseSchema, int RequiredDatabaseSchema, string? AnalysisVersion,
+    IReadOnlyList<int>? AcceptedUploadProtocols = null,
+    int MinimumUploadProtocol = 0,
     IReadOnlyList<string>? AcceptedPackageEncodings = null,
     IReadOnlyList<string>? DetailFormats = null,
     IReadOnlyList<CollectorPublicCodebook>? PublicCodebooks = null,
@@ -70,8 +73,10 @@ internal sealed class UploadService : IDisposable
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private const string IntegritySnapshotSchema = "battlefield-integrity-reference-snapshot/v2";
-    internal const string CurrentIntegrityDistributionModel = "observer-bounded-integrity-distributions-v16";
-    internal const string CurrentAnomalyModel = "observer-bounded-anomaly-evidence-v15";
+    private static readonly string PluginVersion = ResolvePluginVersion();
+    internal const string CurrentIntegrityDistributionModel = "observer-bounded-integrity-distributions-v18";
+    internal const string CurrentAnomalyModel = "observer-bounded-anomaly-evidence-v18";
+    internal const string CurrentBehaviorModel = "observer-bounded-behavior-v7";
     private readonly Configuration configuration;
     private readonly MatchRepository repository;
     private readonly IPluginLog log;
@@ -135,8 +140,24 @@ internal sealed class UploadService : IDisposable
         // Cloudflare Browser Integrity rejects an empty/default .NET signature
         // with error 1010. A stable product identifier also makes legitimate
         // collector traffic auditable without exposing player information.
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("BattlefieldFrontlineCollector/0.8.128");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd(
+            $"BattlefieldFrontlineCollector/{PluginVersion}");
+        client.DefaultRequestHeaders.TryAddWithoutValidation(
+            "X-PvPChronicle-Client-Version", PluginVersion);
+        client.DefaultRequestHeaders.TryAddWithoutValidation(
+            UploadProtocolContract.HeaderName, UploadProtocolContract.Current.ToString());
         return client;
+    }
+
+    private static string ResolvePluginVersion()
+    {
+        var assembly = typeof(UploadService).Assembly;
+        var informational = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion?.Split('+', 2)[0];
+        if (Version.TryParse(informational, out var parsedInformational))
+            return $"{parsedInformational.Major}.{parsedInformational.Minor}.{parsedInformational.Build}";
+        var version = assembly.GetName().Version;
+        return version == null ? "0.0.0" : $"{version.Major}.{version.Minor}.{version.Build}";
     }
 
     private HttpClient PrimaryClientFor(Uri? uri) => directClient;
@@ -439,9 +460,19 @@ internal sealed class UploadService : IDisposable
 
     public void ResumePending()
     {
-        if (!configuration.AutoUpload) return;
         foreach (var match in repository.Snapshot())
         {
+            if (UploadRecoveryPolicy.ShouldAutoFetchDetail(
+                    match.UploadState, match.Detail != null,
+                    match.DetailAutoFetchPending))
+            {
+                EnqueueDetails(match.MatchUid,
+                    match.RemoteMatchUid ?? match.MatchUid,
+                    string.IsNullOrWhiteSpace(match.Realm)
+                        ? configuration.Realm : match.Realm);
+                continue;
+            }
+            if (!configuration.AutoUpload) continue;
             if (match.UploadState is "ready" or "complete") continue;
             if (match.UploadState is "received" or "processing" &&
                 !string.IsNullOrWhiteSpace(match.RemoteMatchUid))
@@ -480,6 +511,13 @@ internal sealed class UploadService : IDisposable
             {
                 serverCompatibility = new(true, false, false, "server_incompatible",
                     meta?.ServerVersion);
+                return;
+            }
+            if (!UploadProtocolContract.ServerAccepts(
+                    meta.AcceptedUploadProtocols, meta.MinimumUploadProtocol))
+            {
+                serverCompatibility = new(true, false, false,
+                    "client_upgrade_required", meta.ServerVersion);
                 return;
             }
             serverSupportsBfcap = meta.AcceptedPackageEncodings?.Contains(
@@ -550,7 +588,9 @@ internal sealed class UploadService : IDisposable
                 try { completed = await UploadOneAsync(item.MatchUid, item.Path, item.Realm); }
                 finally { pending.TryRemove(item.MatchUid, out _); }
                 if (completed) retryAttempts.TryRemove(item.MatchUid, out _);
-                else if (configuration.AutoUpload && File.Exists(item.Path) &&
+                else if (UploadProtocolContract.ShouldRetryAutomatically(
+                             serverCompatibility.Code) &&
+                         configuration.AutoUpload && File.Exists(item.Path) &&
                          !string.IsNullOrWhiteSpace(CollectorToken))
                     ScheduleRetry(item.MatchUid, item.Path, item.Realm);
             }
@@ -1234,6 +1274,12 @@ internal sealed class UploadService : IDisposable
             throw new RateLimitException(retryAfter,
                 HttpResponseTrace.Append($"HTTP 429: {body}", responseTrace));
         }
+        if (response.StatusCode == HttpStatusCode.UpgradeRequired)
+        {
+            serverCompatibility = new(true, false, false,
+                UploadProtocolContract.UpgradeRequiredCode, serverCompatibility.ServerVersion);
+            throw new InvalidOperationException(UploadProtocolContract.UpgradeRequiredCode);
+        }
         if (!response.IsSuccessStatusCode)
             throw new InvalidOperationException(HttpResponseTrace.Append(
                 $"HTTP {(int)response.StatusCode}: {body}", responseTrace));
@@ -1285,9 +1331,10 @@ internal sealed class UploadService : IDisposable
 
     private static string UploadErrorCode(Exception exception)
     {
-        if (exception.Message == "missing_token") return "missing_token";
-        if (exception.Message.Contains("401", StringComparison.OrdinalIgnoreCase) ||
-            exception.Message.Contains("invalid token", StringComparison.OrdinalIgnoreCase)) return "invalid_token";
+        // New servers return a stable JSON code.  The policy also retains the
+        // old textual wording so rolling server/plugin updates remain clear.
+        if (UploadRecoveryPolicy.CredentialErrorCode(exception.Message) is { } credentialError)
+            return credentialError;
         if (exception is HttpRequestException) return "network_error";
         if (exception is TimeoutException) return "analysis_timeout";
         return exception.Message.Length <= 240 ? exception.Message : exception.Message[..240];
@@ -1336,6 +1383,15 @@ internal sealed class UploadService : IDisposable
             if (publicState == "ready")
             {
                 repository.MergeRemote(matchUid, result);
+                var local=repository.Snapshot()
+                    .FirstOrDefault(match => match.MatchUid == matchUid);
+                if (local != null && UploadRecoveryPolicy.ShouldAutoFetchDetail(
+                        local.UploadState, local.Detail != null,
+                        local.DetailAutoFetchPending))
+                    EnqueueDetails(local.MatchUid,
+                        local.RemoteMatchUid ?? result.MatchUid,
+                        string.IsNullOrWhiteSpace(local.Realm)
+                            ? configuration.Realm : local.Realm);
                 return;
             }
             if (publicState == "action_required")

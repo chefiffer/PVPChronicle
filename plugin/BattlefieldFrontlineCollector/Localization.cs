@@ -9,8 +9,8 @@ namespace BattlefieldFrontlineCollector;
 /// <summary>Small built-in UI dictionary; capture files remain language-neutral.</summary>
 internal static class I18n
 {
-    public static readonly string[] Codes = ["auto", "zh-CN", "zh-TW", "en", "ja", "de", "fr", "th", "vi"];
-    public static readonly string[] Names = ["自動 / Auto", "简体中文", "繁體中文", "English", "日本語", "Deutsch", "Français", "ไทย", "Tiếng Việt"];
+    public static readonly string[] Codes = ["auto", "zh-CN", "zh-TW", "en", "ja", "ko", "de", "fr", "th", "vi"];
+    public static readonly string[] Names = ["自動 / Auto", "简体中文", "繁體中文", "English", "日本語", "한국어", "Deutsch", "Français", "ไทย", "Tiếng Việt"];
     private static IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Extended =
         new Dictionary<string, IReadOnlyDictionary<string, string>>();
 
@@ -383,7 +383,9 @@ internal static class I18n
             ["uploadFailedStage"] = ["上传失败", "上傳失敗", "Upload failed", "アップロード失敗"],
             ["failed"] = ["失败", "失敗", "Failed", "失敗"],
             ["uploadError"] = ["上传失败原因", "上傳失敗原因", "Upload failure", "アップロード失敗理由"],
+            ["clientUpgradeRequired"] = ["当前插件的上传协议过旧。请先更新插件；本地战局不会丢失。", "目前外掛程式的上傳協定過舊。請先更新外掛程式；本機戰局不會遺失。", "This plugin uses an obsolete upload protocol. Update the plugin first; local matches are preserved.", "アップロードプロトコルが古いため、先にプラグインを更新してください。ローカルの試合データは保持されます。"],
             ["missingToken"] = ["尚未填写上传令牌", "尚未填寫上傳權杖", "Upload token is empty", "アップロードトークンが未入力です"],
+            ["credentialExpired"] = ["上传凭证已过期，请重新注册", "上傳憑證已過期，請重新註冊", "The upload credential has expired. Please register again.", "アップロード認証情報の有効期限が切れました。再登録してください"],
             ["invalidToken"] = ["上传令牌不正确", "上傳權杖不正確", "Upload token is invalid", "アップロードトークンが正しくありません"],
             ["networkError"] = ["无法连接服务器", "無法連線伺服器", "Cannot reach the server", "サーバーに接続できません"],
             ["analysisTimeout"] = ["服务器分析超时，可稍后重试", "伺服器分析逾時，可稍後重試", "Server analysis timed out; retry later", "サーバー解析がタイムアウトしました。後で再試行してください"],
@@ -439,7 +441,15 @@ internal static class I18n
             ["markerNearbyDisclaimer"] = ["“脚下邻近”只表示标点出现时坐标接近该玩家，不代表该玩家下令，也不证明标点以其为目标。", "「腳下鄰近」僅表示標點出現時座標接近該玩家，不代表該玩家下令，也不證明標點以其為目標。", "Near-feet means only spatial proximity at observation time; it neither identifies the command actor nor proves the player was targeted.", "足元近接は観測時の座標が近いことだけを示し、操作人物や対象指定を証明しません。"],
             ["liveCombatSlice"] = ["即时战斗切片", "即時戰鬥切片", "Live combat slice", "リアルタイム戦闘スライス"],
             ["liveMarkerMap"] = ["实时标点地图", "即時標點地圖", "Live marker map", "リアルタイムマーカーマップ"],
-            ["liveMarkerMapHelp"] = ["显示当前客户端可见的场景标点与人头标点。右键拖动，滚轮缩放，双击右键复位。", "顯示目前用戶端可見的場景標點與頭上標記。右鍵拖曳、滾輪縮放、雙擊右鍵復位。", "Shows field and target markers currently visible to this client. Right-drag to pan, wheel to zoom, double-right-click to reset.", "クライアントから現在見えるフィールド／ターゲットマーカーを表示します。右ドラッグで移動、ホイールで拡大縮小、右ダブルクリックでリセットします。"],
+            ["liveMarkerMapHelp"] = ["显示当前客户端可见的场景标点、人头标点及敌我玩家；本人为青色、己方为绿色、敌方为红色方向三角。右键拖动，滚轮缩放，双击右键复位。", "顯示目前用戶端可見的場景標點、頭上標記及敵我玩家；本人為青色、己方為綠色、敵方為紅色方向三角。右鍵拖曳、滾輪縮放、雙擊右鍵復位。", "Shows visible field/target markers and loaded players: cyan for you, green allies and red enemies. Right-drag to pan, wheel to zoom, double-right-click to reset.", "現在見えるフィールド／ターゲットマーカーと選手を表示します。自分は水色、味方は緑、敵は赤の方向三角です。右ドラッグで移動、ホイールでズーム、右ダブルクリックでリセットします。"],
+            ["liveMarkerOverlay"] = ["透明无边框覆盖层", "透明無邊框覆蓋層", "Transparent borderless overlay", "透明ボーダーレスオーバーレイ"],
+            ["liveMarkerOverlayHelp"] = ["隐藏窗口底板、地图底图和网格，只保留实时标点；鼠标输入会直接穿过覆盖层。", "隱藏視窗底板、地圖底圖和網格，只保留即時標點；滑鼠輸入會直接穿過覆蓋層。", "Hides the window panel, map texture and grid, leaving live markers with full mouse passthrough.", "ウィンドウ背景・地図画像・グリッドを隠してマーカーだけを表示し、マウス入力は完全に背面へ通過します。"],
+            ["liveMarkerOverlayStatusHelp"] = ["透明后鼠标会穿过地图；需要移动或缩放时，请在这里恢复普通窗口。", "透明後滑鼠會穿過地圖；需要移動或縮放時，請在這裡恢復一般視窗。", "Mouse input passes through the transparent map. Restore the normal window here to move or zoom it.", "透明時はマウス入力が地図を通過します。移動やズームを行うには、ここで通常表示に戻してください。"],
+            ["restoreMarkerWindow"] = ["恢复普通标点地图窗口", "恢復一般標點地圖視窗", "Restore the normal marker-map window", "通常のマーカーマップウィンドウに戻す"],
+            ["moveMarkerOverlay"] = ["按住并拖动覆盖层窗口", "按住並拖曳覆蓋層視窗", "Hold and drag the overlay window", "押したままオーバーレイを移動"],
+            ["livePageLaunchers"] = ["实时页面", "即時頁面", "Live pages", "リアルタイムページ"],
+            ["livePageLaunchersHelp"] = ["四个页面各自独立；场外也可打开并调整位置，只有进入支持的 PvP 战局才会自动打开和采集。", "四個頁面各自獨立；場外也可開啟並調整位置，只有進入支援的 PvP 戰局才會自動開啟和收集。", "The four pages are independent and can be positioned outside a match; automatic opening and capture occur only in supported PvP duties.", "4つのページは独立しています。試合外でも配置を調整でき、自動表示と記録は対応PvPコンテンツ内だけで行われます。"],
+            ["liveTendencyUnavailableCrystalline"] = ["水晶冲突不使用纷争前线的三方倾向候选页面。", "水晶衝突不使用紛爭前線的三方傾向候選頁面。", "Crystalline Conflict does not use the Frontline three-faction tendency page.", "クリスタルコンフリクトではフロントライン用の三勢力傾向ページを使用しません。"],
             ["playersAndLogs"] = ["玩家与 Logs", "玩家與 Logs", "Players and Logs", "プレイヤーとLogs"],
             ["behaviorCandidates"] = ["行为倾向", "行為傾向", "Behavior candidates", "行動傾向"],
             ["battlefieldFlow"] = ["战场人流与接战区域", "戰場人流與接戰區域", "Battlefield flow and engagement", "戦場動線と交戦域"],
@@ -803,6 +813,7 @@ internal static class I18n
         var code = configuredCode == "auto" ? CultureInfo.CurrentUICulture.Name : configuredCode;
         var normalized = code.StartsWith("de", StringComparison.OrdinalIgnoreCase) ? "de"
             : code.StartsWith("fr", StringComparison.OrdinalIgnoreCase) ? "fr"
+            : code.StartsWith("ko", StringComparison.OrdinalIgnoreCase) ? "ko"
             : code.StartsWith("th", StringComparison.OrdinalIgnoreCase) ? "th"
             : code.StartsWith("vi", StringComparison.OrdinalIgnoreCase) ? "vi" : string.Empty;
         if (normalized.Length > 0 && Extended.TryGetValue(key, out var translated) &&

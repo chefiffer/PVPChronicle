@@ -39,6 +39,7 @@ internal sealed class MatchDetailWindow : Window
     private readonly Dictionary<byte, ISharedImmediateTexture> jobIcons = new();
     private readonly Dictionary<uint, ISharedImmediateTexture> actionIcons = new();
     private readonly Dictionary<long, ISharedImmediateTexture> statusIcons = new();
+    private readonly Dictionary<long, bool> objectiveStatusEligibility = new();
     private readonly Dictionary<uint, ISharedImmediateTexture> mapTextures = new();
     private readonly Dictionary<uint, ISharedImmediateTexture> markerIcons = new();
     private readonly Dictionary<string, byte[]> copyTextBuffers = new(StringComparer.Ordinal);
@@ -139,14 +140,9 @@ internal sealed class MatchDetailWindow : Window
         scrollToSelectedAnomaly = false;
         scrollIntegrityToTop = false;
         requestedIntegrityCohorts.Clear();
-        // Old cached details use the former coarse latency bins. They cannot be overlaid
-        // honestly on the current 30 ms anonymous reference. Refresh the selected match
-        // once from its already uploaded raw package instead of silently hiding gray bars
-        // or inventing precision by splitting old coarse bins.
-        if (match.UploadState is "ready" or "complete" &&
-            match.Detail?.AnomalyModel != UploadService.CurrentAnomalyModel)
-            uploads.EnqueueDetails(match.MatchUid, match.RemoteMatchUid ?? match.MatchUid,
-                string.IsNullOrWhiteSpace(match.Realm) ? configuration.Realm : match.Realm);
+        // Opening a replay is a local operation. A cached BFDetail remains
+        // viewable after credential expiry and must never trigger network IO.
+        // Users can still choose the explicit refresh action in the match list.
         IsOpen = true;
     }
 
@@ -1306,7 +1302,9 @@ internal sealed class MatchDetailWindow : Window
         var objectiveActions = actions
             .Where(row => objectiveIds.Contains(row.TargetEntityId) && row.Damage > 0).ToArray();
         var objectiveStatuses = (detail.StatusTimeline ?? [])
-            .Where(row => objectiveIds.Contains(row.TargetEntityId)).ToArray();
+            .Where(row => objectiveIds.Contains(row.TargetEntityId) &&
+                (match.DutyId != ShatterObjectiveCatalog.DutyId ||
+                 IsDisplayableObjectiveStatus(row.StatusId))).ToArray();
 
         ImGui.TextColored(Cyan, T("mechanismAnalysis"));
         ImGui.TextWrapped(T("mechanismEvidenceBoundary"));
@@ -1743,9 +1741,9 @@ internal sealed class MatchDetailWindow : Window
         // a thin context line; CrystalPosition above is the actual cart path
         // that can retreat through zero as possession changes.
         DrawGauge("cc_astra_progress", ownAstra ? 1d : -1d,
-            MapTeamColor(match, 0) with { W = .48f }, true);
+            MapTeamColor(match, 0) with { W = .48f }, false);
         DrawGauge("cc_umbra_progress", ownAstra ? -1d : 1d,
-            MapTeamColor(match, 1) with { W = .48f }, true);
+            MapTeamColor(match, 1) with { W = .48f }, false);
         DrawGauge("cc_astra_checkpoint", ownAstra ? 1d : -1d,
             new Vector4(1f, .76f, .20f, 1f), true);
         DrawGauge("cc_umbra_checkpoint", ownAstra ? -1d : 1d,
@@ -1762,16 +1760,17 @@ internal sealed class MatchDetailWindow : Window
             ImGui.ColorConvertFloat4ToU32(MapTeamColor(match, enemyTeam)), enemy);
         ImGui.Dummy(Vector2.Zero);
 
-        void DrawGauge(string label, double sign, Vector4 color, bool checkpoint)
+        void DrawGauge(string label, double sign, Vector4 color, bool stepped)
         {
             var series = rows.Where(row => row.Label == label && row.ProgressPercent.HasValue).ToArray();
             if (series.Length == 0) return;
             var packed = ImGui.ColorConvertFloat4ToU32(color);
-            for (var i = 1; i < series.Length; i++)
+            var samples = series.Select(row => new CrystallineRouteOverlay.GaugePoint(
+                row.ElapsedMs, sign * row.ProgressPercent!.Value)).ToArray();
+            foreach (var segment in CrystallineRouteOverlay.BuildGaugeSegments(samples, stepped))
             {
-                var from = Plot(series[i - 1].ElapsedMs, sign * series[i - 1].ProgressPercent!.Value);
-                var to = Plot(series[i].ElapsedMs, sign * series[i].ProgressPercent!.Value);
-                if (!checkpoint || i % 2 == 0) draw.AddLine(from, to, packed, checkpoint ? 2f : 3f);
+                draw.AddLine(Plot(segment.From.ElapsedMs, segment.From.Value),
+                    Plot(segment.To.ElapsedMs, segment.To.Value), packed, stepped ? 2.2f : 1.8f);
             }
         }
 
@@ -1786,8 +1785,13 @@ internal sealed class MatchDetailWindow : Window
                 var color = (fromValue + toValue) / 2d >= 0
                     ? MapTeamColor(match, localTeam)
                     : MapTeamColor(match, localTeam == 0 ? (byte)1 : (byte)0);
-                draw.AddLine(Plot(series[i - 1].ElapsedMs, fromValue),
-                    Plot(series[i].ElapsedMs, toValue), ImGui.ColorConvertFloat4ToU32(color), 4f);
+                var from = Plot(series[i - 1].ElapsedMs, fromValue);
+                var to = Plot(series[i].ElapsedMs, toValue);
+                // A dark under-stroke keeps the actual cart path continuous and
+                // legible when it crosses grid lines or the preparation region.
+                draw.AddLine(from, to, ImGui.ColorConvertFloat4ToU32(
+                    new Vector4(.02f, .025f, .03f, .72f)), 6f);
+                draw.AddLine(from, to, ImGui.ColorConvertFloat4ToU32(color), 3.6f);
             }
         }
     }
@@ -1889,6 +1893,8 @@ internal sealed class MatchDetailWindow : Window
             draw.AddLine(new Vector2(origin.X, y), new Vector2(origin.X + size.X, y), grid);
         }
         var now = (long)selectedMs;
+        if (match.Schema == LocalMatchAnalyzer.CrystallineSchema)
+            DrawCrystallineRouteProgressOverlay(draw, match, detail, now, Point);
         DrawCrystallineCrystalTrail(draw, detail, now, Point);
         if (match.DutyId == WorqorWeatherMechanics.DutyId)
             DrawWorqorWeatherTelegraphs(draw, detail, now, Point);
@@ -2268,8 +2274,8 @@ internal sealed class MatchDetailWindow : Window
                 .Where(row => Math.Abs(row.X - objective.X) <= 3 && Math.Abs(row.Z - objective.Z) <= 3)
                 .OrderByDescending(row => row.ElapsedMs).FirstOrDefault();
             var isCrystal = IsCrystallineCrystal(objective);
-            if (isCrystal && match.TerritoryId is 1034 or 1060)
-                DrawCloudNineCheckpointPie(draw, match, detail, now, point);
+            if (isCrystal && match.Schema == LocalMatchAnalyzer.CrystallineSchema)
+                DrawCrystallineCheckpointPie(draw, match, detail, now, point);
             // Tactical crystal has no HP. Only a percentage decoded from the
             // PvP map UI is allowed to describe push/checkpoint progress.
             var mapUiPercent = rendered.Progress ?? nearbyMetadata?.ProgressPercent ??
@@ -2662,6 +2668,102 @@ internal sealed class MatchDetailWindow : Window
         }
     }
 
+    /// <summary>
+    /// Draws the replay route as a readable band and maps director percentages
+    /// back to positions that the tactical crystal was directly observed at.
+    /// The complete post-match trajectory supplies geometry; the selected
+    /// replay time supplies each team's achieved progress. Unobserved 50/100%
+    /// coordinates are deliberately omitted instead of extrapolated.
+    /// </summary>
+    private void DrawCrystallineRouteProgressOverlay(ImDrawListPtr draw,
+        LocalMatchAnalysis match, DetailedAnalysis detail, long now,
+        Func<double, double, Vector2> point)
+    {
+        var route = CrystallineRouteOverlay.Build(detail.ObjectiveTimeline);
+        if (route.Count < 2) return;
+        var shadow = ImGui.ColorConvertFloat4ToU32(
+            BattlefieldUiTheme.ChartBackground(configuration.UiTheme) with { W = .72f });
+        for (var index = 1; index < route.Count; index++)
+        {
+            var left = route[index - 1]; var right = route[index];
+            var team = right.SignedPercent < 0 ? (byte)1 : (byte)0;
+            var color = MapTeamColor(match, team) with { W = .24f };
+            var from = point(left.X, left.Z); var to = point(right.X, right.Z);
+            draw.AddLine(from, to, shadow, 10f);
+            draw.AddLine(from, to, ImGui.ColorConvertFloat4ToU32(color), 6f);
+        }
+
+        var astra = CrystallineRouteOverlay.ProgressAt(detail.ObjectiveTimeline,
+            CrystallineRouteOverlay.AstraProgressLabel, now);
+        var umbra = CrystallineRouteOverlay.ProgressAt(detail.ObjectiveTimeline,
+            CrystallineRouteOverlay.UmbraProgressLabel, now);
+        DrawAchieved(0, astra, astra);
+        DrawAchieved(1, -umbra, umbra);
+        DrawMilestone(0, 50, 50, false);
+        DrawMilestone(0, 100, 100, true);
+        DrawMilestone(1, -50, 50, false);
+        DrawMilestone(1, -100, 100, true);
+        if (CrystallineRouteOverlay.TryInterpolate(route, 0, out var center))
+        {
+            var at = point(center.X, center.Z);
+            var muted = ImGui.ColorConvertFloat4ToU32(Muted);
+            draw.AddCircleFilled(at, 4f, muted, 16);
+            DrawRouteText(at + new Vector2(7, -17), "0%", Muted);
+        }
+
+        void DrawAchieved(byte team, double signedProgress, double displayedProgress)
+        {
+            if (displayedProgress <= 0 ||
+                !CrystallineRouteOverlay.TryInterpolate(route, 0, out var start) ||
+                !CrystallineRouteOverlay.TryInterpolate(route, signedProgress, out var end)) return;
+            var low = Math.Min(0, signedProgress); var high = Math.Max(0, signedProgress);
+            var points = new List<CrystallineRouteOverlay.RoutePoint> { start };
+            points.AddRange(route.Where(row => row.SignedPercent > low &&
+                                                row.SignedPercent < high));
+            points.Add(end);
+            points = (signedProgress < 0
+                    ? points.OrderByDescending(row => row.SignedPercent)
+                    : points.OrderBy(row => row.SignedPercent)).ToList();
+            var color = MapTeamColor(match, team);
+            var packed = ImGui.ColorConvertFloat4ToU32(color with { W = .88f });
+            for (var index = 1; index < points.Count; index++)
+                draw.AddLine(point(points[index - 1].X, points[index - 1].Z),
+                    point(points[index].X, points[index].Z), packed, 6f);
+            var at = point(end.X, end.Z);
+            draw.AddCircleFilled(at, 5.5f, packed, 20);
+            DrawRouteText(at + new Vector2(8, 7), $"{displayedProgress:0.#}%", color);
+        }
+
+        void DrawMilestone(byte team, double signedPercent, int label, bool goal)
+        {
+            if (!CrystallineRouteOverlay.TryInterpolate(route, signedPercent, out var row)) return;
+            var at = point(row.X, row.Z); var color = MapTeamColor(match, team);
+            var packed = ImGui.ColorConvertFloat4ToU32(color);
+            if (goal)
+            {
+                draw.AddCircleFilled(at, 8f,
+                    ImGui.ColorConvertFloat4ToU32(color with { W = .22f }), 24);
+                draw.AddCircle(at, 8f, packed, 24, 2.2f);
+            }
+            else
+            {
+                var vertical = new Vector2(0, 8); var horizontal = new Vector2(8, 0);
+                draw.AddQuadFilled(at - vertical, at + horizontal, at + vertical,
+                    at - horizontal, ImGui.ColorConvertFloat4ToU32(color with { W = .30f }));
+                draw.AddQuad(at - vertical, at + horizontal, at + vertical,
+                    at - horizontal, packed, 2.2f);
+            }
+            DrawRouteText(at + new Vector2(10, -17), $"{label}%", color);
+        }
+
+        void DrawRouteText(Vector2 at, string text, Vector4 color)
+        {
+            draw.AddText(at + new Vector2(1, 1),
+                ImGui.ColorConvertFloat4ToU32(new Vector4(0, 0, 0, .86f)), text);
+            draw.AddText(at, ImGui.ColorConvertFloat4ToU32(color), text);
+        }
+    }
+
     private void DrawObservedCrystallineSpeedZones(ImDrawListPtr draw, LocalMatchAnalysis match,
         DetailedAnalysis detail,
         long now, Func<double, double, Vector2> point)
@@ -2778,10 +2880,10 @@ internal sealed class MatchDetailWindow : Window
     /// is shown, so a previously completed 100% checkpoint cannot mask the
     /// opposing team's later checkpoint attempt.
     /// </summary>
-    private void DrawCloudNineCheckpointPie(ImDrawListPtr draw, LocalMatchAnalysis match,
+    private void DrawCrystallineCheckpointPie(ImDrawListPtr draw, LocalMatchAnalysis match,
         DetailedAnalysis detail, long now, Vector2 center)
     {
-        var progress = CurrentCloudNineCheckpointProgress(detail, now);
+        var progress = CurrentCrystallineCheckpointProgress(detail, now);
         if (progress == null) return;
         const int segments = 32;
         const float radius = 12f;
@@ -2804,7 +2906,7 @@ internal sealed class MatchDetailWindow : Window
         draw.AddText(at, ImGui.ColorConvertFloat4ToU32(Vector4.One), text);
     }
 
-    private static (byte Team, double Percent)? CurrentCloudNineCheckpointProgress(
+    private static (byte Team, double Percent)? CurrentCrystallineCheckpointProgress(
         DetailedAnalysis detail, long now)
     {
         var candidates = new List<(byte Team, double Percent, long ChangedAt)>();
@@ -3005,16 +3107,17 @@ internal sealed class MatchDetailWindow : Window
             return;
         }
         if (match.TerritoryId is not (1033 or 1059)) return;
-        foreach (var action in (detail.Actions ?? []).Where(row =>
-                     row.ActionId == CrystallineMechanismCatalog.VolcanicBombExplosionActionId &&
-                     row.SourceX.HasValue && row.SourceZ.HasValue &&
-                     Math.Abs(row.ElapsedMs - now) <= 1_200))
+        foreach (var telegraph in VolcanicBombMechanics.BuildTelegraphs(
+                     detail.ObjectiveDiscovery ?? [], detail.Actions ?? [])
+                 .Where(row => row.IsVisibleAt(now)))
         {
-            var x = action.SourceX!.Value;
-            var z = action.SourceZ!.Value;
+            var x = telegraph.X;
+            var z = telegraph.Z;
             var arm = CrystallineMechanismCatalog.VolcanicBombCrossArmYalms;
             var half = CrystallineMechanismCatalog.VolcanicBombCrossHalfWidthYalms;
-            var fill = ImGui.ColorConvertFloat4ToU32(new Vector4(1f, .18f, .06f, .22f));
+            var beforeImpact = now < telegraph.DetonatedAtMs;
+            var fill = ImGui.ColorConvertFloat4ToU32(new Vector4(1f, .18f, .06f,
+                beforeImpact ? .16f : .26f));
             var edge = ImGui.ColorConvertFloat4ToU32(new Vector4(1f, .32f, .12f, .92f));
             DrawWorldRect(x - arm, z - half, x + arm, z + half);
             DrawWorldRect(x - half, z - arm, x + half, z + arm);
@@ -4271,7 +4374,8 @@ internal sealed class MatchDetailWindow : Window
             catalog.Add(("enemy_ice_raider", "enemy_ice_raider", false, false));
         if (match.DutyId == 127)
             catalog.Add(("lower_node_controller", "lower_node_controller", false, false));
-        catalog.Add(("edge_displacement_fisher", "edge_displacement_fisher", false, false));
+        if (match.DutyId == 127)
+            catalog.Add(("edge_displacement_fisher", "edge_displacement_fisher", false, false));
         var width = Math.Max(360, (ImGui.GetContentRegionAvail().X - 10) / 2);
         for (var index = 0; index < catalog.Count; index++)
         {
@@ -5906,6 +6010,18 @@ internal sealed class MatchDetailWindow : Window
         }
         return statusNames[key] = string.IsNullOrWhiteSpace(value) ? $"{T("status")} #{id}" : value;
     }
+    private bool IsDisplayableObjectiveStatus(long statusId)
+    {
+        if (objectiveStatusEligibility.TryGetValue(statusId, out var eligible)) return eligible;
+        try
+        {
+            var status = dataManager.GetExcelSheet<StatusSheet>(SheetLanguage()).GetRow((uint)statusId);
+            eligible = ObjectiveStatusClassifier.IsDisplayable(status.StatusCategory,
+                status.Icon, status.Name.ToString());
+        }
+        catch { eligible = false; }
+        return objectiveStatusEligibility[statusId] = eligible;
+    }
     private void DrawJobIcon(byte classJobId)
     {
         try
@@ -6040,7 +6156,8 @@ internal sealed class MatchDetailWindow : Window
            CultureInfo.CurrentUICulture.Name.StartsWith("zh-TW", StringComparison.OrdinalIgnoreCase) ||
            CultureInfo.CurrentUICulture.Name.StartsWith("zh-HK", StringComparison.OrdinalIgnoreCase) ? "zh-TW"
           : CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase) ? "zh-CN"
-          : CultureInfo.CurrentUICulture.Name.StartsWith("ja", StringComparison.OrdinalIgnoreCase) ? "ja" : "en")
+          : CultureInfo.CurrentUICulture.Name.StartsWith("ja", StringComparison.OrdinalIgnoreCase) ? "ja"
+          : CultureInfo.CurrentUICulture.Name.StartsWith("ko", StringComparison.OrdinalIgnoreCase) ? "ko" : "en")
         : configuration.Language;
     private string ActionName(uint actionId, string fallbackName)
     {
@@ -6067,22 +6184,33 @@ internal sealed class MatchDetailWindow : Window
     private void DrawActionGlyph(uint actionId, float size = 22)
     {
         if (actionId == 0) { ImGui.Dummy(new Vector2(size, size)); return; }
+        var tooltip = ActionName(actionId, $"#{actionId}");
         try
         {
             var action = dataManager.GetExcelSheet<ActionSheet>(SheetLanguage()).GetRow(actionId);
-            if (!actionIcons.TryGetValue(actionId, out var shared))
-                actionIcons[actionId] = shared = textureProvider.GetFromGameIcon(
-                    new GameIconLookup(action.Icon, hiRes: true));
-            var wrap = shared.GetWrapOrDefault();
-            if (wrap != null)
+            switch (ActionIconPresentation.Classify(actionId, action.Icon))
             {
-                ImGui.Image(wrap.Handle, new Vector2(size, size));
-                if (ImGui.IsItemHovered()) ImGui.SetTooltip(ActionName(actionId, $"#{actionId}"));
-                return;
+                case ActionIconPresentation.Kind.Official:
+                    if (!actionIcons.TryGetValue(actionId, out var shared))
+                        actionIcons[actionId] = shared = textureProvider.GetFromGameIcon(
+                            new GameIconLookup(action.Icon, hiRes: true));
+                    var wrap = shared.GetWrapOrDefault();
+                    if (wrap != null) ImGui.Image(wrap.Handle, new Vector2(size, size));
+                    else DrawActionBadge(size, pending: true);
+                    break;
+                case ActionIconPresentation.Kind.Mechanism:
+                    DrawActionBadge(size, mechanism: true);
+                    break;
+                default:
+                    DrawActionBadge(size);
+                    break;
             }
+            if (ImGui.IsItemHovered()) ImGui.SetTooltip(tooltip);
+            return;
         }
         catch { /* Keep layout stable when the icon sheet is unavailable. */ }
-        ImGui.TextDisabled("?");
+        DrawActionBadge(size);
+        if (ImGui.IsItemHovered()) ImGui.SetTooltip(tooltip);
     }
 
     private void DrawActionIcon(uint actionId, string fallbackName, byte actionType = 1,
@@ -6108,16 +6236,56 @@ internal sealed class MatchDetailWindow : Window
         var name = ActionName(actionId, fallbackName);
         try
         {
-            if (actionType != 1) throw new InvalidOperationException("The event is not an Action-sheet action.");
+            _ = actionType;
             var action = dataManager.GetExcelSheet<ActionSheet>(SheetLanguage()).GetRow(actionId);
-            if (!actionIcons.TryGetValue(actionId, out var shared))
-                actionIcons[actionId] = shared = textureProvider.GetFromGameIcon(
-                    new GameIconLookup(action.Icon, hiRes: true));
-            var wrap = shared.GetWrapOrDefault();
-            if (wrap != null) ImGui.Image(wrap.Handle, new Vector2(22, 22));
+            switch (ActionIconPresentation.Classify(actionId, action.Icon))
+            {
+                case ActionIconPresentation.Kind.Official:
+                    if (!actionIcons.TryGetValue(actionId, out var shared))
+                        actionIcons[actionId] = shared = textureProvider.GetFromGameIcon(
+                            new GameIconLookup(action.Icon, hiRes: true));
+                    var wrap = shared.GetWrapOrDefault();
+                    if (wrap != null) ImGui.Image(wrap.Handle, new Vector2(22, 22));
+                    else DrawActionBadge(22, pending: true);
+                    break;
+                case ActionIconPresentation.Kind.Mechanism:
+                    DrawActionBadge(22, mechanism: true);
+                    break;
+                default:
+                    DrawActionBadge(22);
+                    break;
+            }
         }
-        catch { /* The action name and ID remain visible when an icon is unavailable. */ }
+        catch { DrawActionBadge(22); }
         ImGui.SameLine(0, 5); DrawCopyableText(string.IsNullOrWhiteSpace(name) ? $"#{actionId}" : name);
+    }
+    private void DrawActionBadge(float size, bool mechanism = false, bool pending = false)
+    {
+        var origin = ImGui.GetCursorScreenPos();
+        ImGui.Dummy(new Vector2(size, size));
+        var draw = ImGui.GetWindowDrawList();
+        var color = ImGui.ColorConvertFloat4ToU32(mechanism
+            ? new Vector4(1f, .72f, .24f, .95f)
+            : Muted with { W = pending ? .48f : .9f });
+        var center = origin + new Vector2(size * .5f);
+        var radius = size * .34f;
+        draw.AddRect(origin + new Vector2(1), origin + new Vector2(size - 1), color, 3, 0, 1.2f);
+        if (mechanism)
+        {
+            var top = center + new Vector2(0, -radius);
+            var right = center + new Vector2(radius, 0);
+            var bottom = center + new Vector2(0, radius);
+            var left = center + new Vector2(-radius, 0);
+            draw.AddLine(top, right, color, 1.8f); draw.AddLine(right, bottom, color, 1.8f);
+            draw.AddLine(bottom, left, color, 1.8f); draw.AddLine(left, top, color, 1.8f);
+            draw.AddCircleFilled(center, Math.Max(1.5f, size * .08f), color);
+        }
+        else if (!pending)
+        {
+            var mark = "?";
+            var textSize = ImGui.CalcTextSize(mark);
+            draw.AddText(center - textSize * .5f, color, mark);
+        }
     }
     private void DrawStatusIcon(long statusId)
     {

@@ -16,6 +16,7 @@ internal sealed record PvpRotationSlot(string Key, uint DutyId, DateTime StartUt
                code.StartsWith("zh-HK", StringComparison.OrdinalIgnoreCase) ? "zh-TW"
             : code.StartsWith("zh", StringComparison.OrdinalIgnoreCase) ? "zh-CN"
             : code.StartsWith("ja", StringComparison.OrdinalIgnoreCase) ? "ja"
+            : code.StartsWith("ko", StringComparison.OrdinalIgnoreCase) ? "ko"
             : code.StartsWith("de", StringComparison.OrdinalIgnoreCase) ? "de"
             : code.StartsWith("fr", StringComparison.OrdinalIgnoreCase) ? "fr"
             : code.StartsWith("th", StringComparison.OrdinalIgnoreCase) ? "th"
