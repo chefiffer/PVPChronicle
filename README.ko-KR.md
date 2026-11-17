@@ -11,7 +11,7 @@ PvP Chronicle은 FINAL FANTASY XIV PvP 경기를 기록하고 검토하는 Dalam
 3. 다음 사용자 지정 플러그인 저장소 URL을 추가합니다.
 
    ```text
-   https://raw.githubusercontent.com/chefiffer/pvpchronicle/main/repo.json
+   https://raw.githubusercontent.com/chefiffer/dalamud-plugins/main/repo.json
    ```
 
 4. 플러그인 설치 관리자를 열고 **Battlefield Frontline Collector**를 검색한 뒤 **Install**을 선택합니다.

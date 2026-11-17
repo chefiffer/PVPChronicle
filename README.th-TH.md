@@ -11,7 +11,7 @@ PvP Chronicle เป็นปลั๊กอิน Dalamud สำหรับบ
 3. เพิ่ม URL คลังปลั๊กอินแบบกำหนดเองต่อไปนี้:
 
    ```text
-   https://raw.githubusercontent.com/chefiffer/pvpchronicle/main/repo.json
+   https://raw.githubusercontent.com/chefiffer/dalamud-plugins/main/repo.json
    ```
 
 4. เปิด Plugin Installer ค้นหา **Battlefield Frontline Collector** แล้วเลือก **Install**

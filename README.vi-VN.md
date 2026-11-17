@@ -11,7 +11,7 @@ PvP Chronicle là plugin Dalamud dùng để ghi lại và xem lại các trận
 3. Thêm URL kho plugin tùy chỉnh sau:
 
    ```text
-   https://raw.githubusercontent.com/chefiffer/pvpchronicle/main/repo.json
+   https://raw.githubusercontent.com/chefiffer/dalamud-plugins/main/repo.json
    ```
 
 4. Mở Plugin Installer, tìm **Battlefield Frontline Collector** rồi chọn **Install**.

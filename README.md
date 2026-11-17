@@ -13,7 +13,7 @@ map objectives, performance statistics, and evidence-bounded behavior review.
 3. Add this custom repository URL:
 
    ```text
-   https://raw.githubusercontent.com/chefiffer/pvpchronicle/main/repo.json
+   https://raw.githubusercontent.com/chefiffer/dalamud-plugins/main/repo.json
    ```
 
 4. Open the Plugin Installer, search for **Battlefield Frontline Collector**,

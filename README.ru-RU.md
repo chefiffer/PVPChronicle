@@ -11,7 +11,7 @@ PvP Chronicle — плагин Dalamud для записи и разбора PvP
 3. Добавьте следующий адрес пользовательского репозитория:
 
    ```text
-   https://raw.githubusercontent.com/chefiffer/pvpchronicle/main/repo.json
+   https://raw.githubusercontent.com/chefiffer/dalamud-plugins/main/repo.json
    ```
 
 4. Откройте установщик плагинов, найдите **Battlefield Frontline Collector** и выберите **Install**.

@@ -11,7 +11,7 @@ PvP Chronicle es un complemento de Dalamud para registrar y revisar partidas PvP
 3. Añade la siguiente URL de repositorio personalizado:
 
    ```text
-   https://raw.githubusercontent.com/chefiffer/pvpchronicle/main/repo.json
+   https://raw.githubusercontent.com/chefiffer/dalamud-plugins/main/repo.json
    ```
 
 4. Abre el instalador de complementos, busca **Battlefield Frontline Collector** y selecciona **Install**.

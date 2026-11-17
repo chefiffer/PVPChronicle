@@ -11,7 +11,7 @@ PvP Chronicle は、『ファイナルファンタジーXIV』の PvP 試合を�
 3. 次のカスタムリポジトリ URL を追加します。
 
    ```text
-   https://raw.githubusercontent.com/chefiffer/pvpchronicle/main/repo.json
+   https://raw.githubusercontent.com/chefiffer/dalamud-plugins/main/repo.json
    ```
 
 4. プラグインインストーラーを開き、**Battlefield Frontline Collector** を検索して **Install** を選択します。

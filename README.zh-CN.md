@@ -13,7 +13,7 @@ PvP Chronicle 是用于记录和复盘《最终幻想 XIV》PvP 战局的 Dalamu
 3. 添加下面的自定义插件仓库地址：
 
    ```text
-   https://raw.githubusercontent.com/chefiffer/pvpchronicle/main/repo.json
+   https://raw.githubusercontent.com/chefiffer/dalamud-plugins/main/repo.json
    ```
 
 4. 打开插件安装器，搜索 **Battlefield Frontline Collector** 并安装。
