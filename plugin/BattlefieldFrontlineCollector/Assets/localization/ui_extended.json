@@ -2403,6 +2403,13 @@
       "vi": "Plugin này dùng giao thức tải lên đã lỗi thời. Hãy cập nhật plugin trước; các trận đấu cục bộ vẫn được giữ lại.",
       "ko": "이 플러그인은 더 이상 지원되지 않는 업로드 프로토콜을 사용합니다. 먼저 플러그인을 업데이트하세요. 로컬 전투 기록은 보존됩니다."
     },
+    "serverUpgradeRequired": {
+      "de": "Der Server verwendet noch die alte Kompatibilitätsprüfung und kann diesen internen Build nicht erkennen. Aktualisiere zuerst den Server; lokale Kämpfe bleiben erhalten.",
+      "fr": "Le serveur utilise encore l’ancien contrôle de compatibilité et ne reconnaît pas cette version interne. Mettez d’abord le serveur à jour ; les matchs locaux sont conservés.",
+      "th": "เซิร์ฟเวอร์ยังใช้การตรวจสอบความเข้ากันได้แบบเก่าและไม่รู้จักบิลด์ภายในนี้ โปรดอัปเดตเซิร์ฟเวอร์ก่อน ข้อมูลการแข่งขันในเครื่องจะยังคงอยู่",
+      "vi": "Máy chủ vẫn dùng cơ chế kiểm tra tương thích cũ và không nhận ra bản dựng nội bộ này. Hãy cập nhật máy chủ trước; các trận đấu cục bộ vẫn được giữ lại.",
+      "ko": "서버가 아직 이전 호환성 검사를 사용하여 이 내부 빌드를 인식하지 못합니다. 서버를 먼저 업데이트하세요. 로컬 전투 기록은 보존됩니다."
+    },
     "missingToken": {
       "de": "Upload-Token ist leer",
       "fr": "Le jeton de chargement est vide",
@@ -2584,6 +2591,93 @@
       "th": "ตารางเวลาที่ปรับเปลี่ยนได้",
       "vi": "Thời gian thích nghi",
       "ko": "Adaptive 타임라인"
+    },
+    "recordingNotAttached": {
+      "de": "Keine lokale Aufnahme verknüpft",
+      "fr": "Aucun enregistrement local associé",
+      "th": "ยังไม่ได้เชื่อมโยงวิดีโอในเครื่อง",
+      "vi": "Chưa liên kết bản ghi cục bộ",
+      "ko": "연결된 로컬 녹화 없음"
+    },
+    "openRecordingAt": {
+      "de": "Video bei {0} öffnen",
+      "fr": "Ouvrir la vidéo à {0}",
+      "th": "เปิดวิดีโอที่ {0}",
+      "vi": "Mở video tại {0}",
+      "ko": "{0}에서 영상 열기"
+    },
+    "recordingReplay": {
+      "de": "Video-Replay",
+      "fr": "Replay vidéo",
+      "th": "วิดีโอย้อนหลัง",
+      "vi": "Phát lại video",
+      "ko": "녹화 다시보기"
+    },
+    "recordingAttachedHint": {
+      "de": "Aufnahme verknüpft · Video {0} · im Tab Video-Replay öffnen",
+      "fr": "Enregistrement lié · vidéo {0} · ouvrir l’onglet Replay vidéo",
+      "th": "เชื่อมโยงวิดีโอแล้ว · ตำแหน่ง {0} · เปิดแท็บวิดีโอย้อนหลัง",
+      "vi": "Đã liên kết bản ghi · video {0} · mở tab Phát lại video",
+      "ko": "녹화 연결됨 · 영상 {0} · 녹화 다시보기 탭에서 열기"
+    },
+    "recordingNotAttachedLong": {
+      "de": "Für dieses Match ist keine lokale Aufnahme verknüpft. Aktiviere PVP Chronicle Recorder und die automatische OBS-Aufnahme.",
+      "fr": "Aucun enregistrement local n’est lié à cette partie. Activez PVP Chronicle Recorder et l’enregistrement OBS automatique.",
+      "th": "แมตช์นี้ยังไม่มีวิดีโอในเครื่อง โปรดเปิด PVP Chronicle Recorder และการบันทึก OBS อัตโนมัติ",
+      "vi": "Trận này chưa có bản ghi cục bộ. Hãy bật PVP Chronicle Recorder và ghi OBS tự động.",
+      "ko": "이 경기에는 연결된 로컬 녹화가 없습니다. PVP Chronicle Recorder와 OBS 자동 녹화를 켜세요."
+    },
+    "recorderPluginUnavailable": {
+      "de": "PVP Chronicle Recorder ist nicht aktiviert; eingebettete Wiedergabe ist nicht verfügbar.",
+      "fr": "PVP Chronicle Recorder n’est pas activé ; la lecture intégrée est indisponible.",
+      "th": "ไม่ได้เปิด PVP Chronicle Recorder จึงไม่สามารถเล่นวิดีโอแบบฝังได้",
+      "vi": "PVP Chronicle Recorder chưa bật nên không thể phát video nhúng.",
+      "ko": "PVP Chronicle Recorder가 꺼져 있어 내장 재생을 사용할 수 없습니다."
+    },
+    "recordingOpening": {
+      "de": "Aufnahme wird mit Flyleaf geladen…",
+      "fr": "Chargement de l’enregistrement avec Flyleaf…",
+      "th": "กำลังโหลดวิดีโอด้วย Flyleaf…",
+      "vi": "Đang tải bản ghi bằng Flyleaf…",
+      "ko": "Flyleaf로 녹화를 불러오는 중…"
+    },
+    "recordingWaiting": {
+      "de": "Flyleaf wartet auf die Aufnahme.",
+      "fr": "Flyleaf attend l’enregistrement.",
+      "th": "Flyleaf กำลังรอวิดีโอ",
+      "vi": "Flyleaf đang chờ bản ghi.",
+      "ko": "Flyleaf가 녹화를 기다리는 중입니다."
+    },
+    "playRecording": { "de": "Abspielen", "fr": "Lire", "th": "เล่น", "vi": "Phát", "ko": "재생" },
+    "pauseRecording": { "de": "Pause", "fr": "Pause", "th": "หยุดชั่วคราว", "vi": "Tạm dừng", "ko": "일시정지" },
+    "recordingBack10": { "de": "10 Sekunden zurück", "fr": "Reculer de 10 secondes", "th": "ย้อนกลับ 10 วินาที", "vi": "Lùi 10 giây", "ko": "10초 뒤로" },
+    "recordingForward10": { "de": "10 Sekunden vor", "fr": "Avancer de 10 secondes", "th": "ไปข้างหน้า 10 วินาที", "vi": "Tiến 10 giây", "ko": "10초 앞으로" },
+    "seekRecordingToReplay": {
+      "de": "An Replay-Zeit ausrichten",
+      "fr": "Aligner sur le temps du replay",
+      "th": "จัดตำแหน่งตามเวลารีเพลย์",
+      "vi": "Căn theo thời gian phát lại",
+      "ko": "리플레이 시간에 맞추기"
+    },
+    "playbackSpeed": { "de": "Tempo", "fr": "Vitesse", "th": "ความเร็ว", "vi": "Tốc độ", "ko": "배속" },
+    "recordingQuality": { "de": "Qualität", "fr": "Qualité", "th": "คุณภาพ", "vi": "Chất lượng", "ko": "화질" },
+    "recordingQualitySmooth": { "de": "Flüssig", "fr": "Fluide", "th": "ลื่นไหล", "vi": "Mượt", "ko": "부드럽게" },
+    "recordingQualityHd": { "de": "HD", "fr": "HD", "th": "HD", "vi": "HD", "ko": "HD" },
+    "recordingQualityClear": { "de": "Scharf", "fr": "Net", "th": "คมชัด", "vi": "Rõ nét", "ko": "선명" },
+    "recordingQualityOriginal": { "de": "Original", "fr": "Original", "th": "ต้นฉบับ", "vi": "Gốc", "ko": "원본" },
+    "recordingMomentEvidence": {
+      "de": "Replay-Informationen zur aktuellen Videozeit",
+      "fr": "Informations du replay à l’instant vidéo actuel",
+      "th": "ข้อมูลรีเพลย์ ณ เวลาวิดีโอปัจจุบัน",
+      "vi": "Thông tin phát lại tại thời điểm video hiện tại",
+      "ko": "현재 영상 시점의 리플레이 정보"
+    },
+    "recordingNoNearbyEvidence": {
+      "de": "Keine erfassten Ziel-, Todes- oder Kampfereignisse in der Nähe.",
+      "fr": "Aucun objectif, décès ou événement de combat capturé à proximité.",
+      "th": "ไม่มีเหตุการณ์กลไก การตาย หรือการต่อสู้ที่บันทึกไว้ใกล้เวลานี้",
+      "vi": "Không có sự kiện mục tiêu, tử vong hoặc chiến đấu nào gần thời điểm này.",
+      "ko": "이 시간 근처에 수집된 기믹, 사망 또는 전투 이벤트가 없습니다."
     },
     "frameTime": {
       "de": "Rahmenzeit",
@@ -2803,11 +2897,43 @@
       "ko": "Live marker 지도"
     },
     "liveMarkerMapHelp": {
-      "de": "Zeigt sichtbare Feld-/Zielmarker und geladene Spieler: Sie in Cyan, Verbündete grün, Gegner rot. Rechts ziehen zum Schwenken, Rad zum Zoomen, Rechtsdoppelklick zum Zurücksetzen.",
-      "fr": "Affiche les marqueurs visibles et les joueurs chargés : vous en cyan, alliés en vert, ennemis en rouge. Glisser droit pour déplacer, molette pour zoomer, double-clic droit pour réinitialiser.",
-      "th": "แสดงเครื่องหมายและผู้เล่นที่ไคลเอนต์มองเห็น: ตัวคุณสีฟ้า พันธมิตรสีเขียว ศัตรูสีแดง ลากขวาเพื่อเลื่อน ใช้ล้อซูม และดับเบิลคลิกขวาเพื่อรีเซ็ต",
-      "vi": "Hiện dấu mốc và người chơi đang được tải: bạn màu lam, đồng minh xanh lá, địch đỏ. Kéo chuột phải để di chuyển, lăn để thu phóng, nhấp đúp phải để đặt lại.",
-      "ko": "현재 보이는 마커와 로드된 플레이어를 표시합니다. 본인은 청록색, 아군은 녹색, 적은 빨간색입니다. 우클릭 드래그로 이동하고 휠로 확대하며 우클릭 두 번으로 초기화합니다."
+      "de": "Zeigt sichtbare Feld-/Zielmarker und Spieler. Front verwendet rote, gelbe und blaue Fraktionsfarben mit A/B/C-Abstufungen; Crystalline Conflict nutzt Verbündeten-/Gegnerfarben. Rechts ziehen, Rad zum Zoomen, Rechtsdoppelklick zum Zurücksetzen.",
+      "fr": "Affiche les marqueurs et joueurs visibles. Le Front utilise les couleurs rouge, jaune et bleue avec des tons A/B/C ; Crystalline Conflict utilise les couleurs allié/ennemi. Glisser droit, molette pour zoomer, double-clic droit pour réinitialiser.",
+      "th": "แสดงเครื่องหมายและผู้เล่นที่มองเห็นได้ Frontline ใช้สีแดง เหลือง น้ำเงินพร้อมเฉด A/B/C ส่วน Crystalline Conflict ใช้สีฝ่ายเราและศัตรู ลากขวาเพื่อเลื่อน ใช้ล้อซูม และดับเบิลคลิกขวาเพื่อรีเซ็ต",
+      "vi": "Hiện dấu mốc và người chơi nhìn thấy. Frontline dùng màu phe đỏ, vàng, xanh với sắc độ A/B/C; Crystalline Conflict dùng màu đồng minh/địch. Kéo phải để di chuyển, lăn để thu phóng, nhấp đúp phải để đặt lại.",
+      "ko": "현재 보이는 표식과 플레이어를 표시합니다. 전장은 빨강, 노랑, 파랑 진영색과 A/B/C 명도를 사용하고 크리스탈라인 컨플릭트는 아군/적군 색을 사용합니다. 우클릭 드래그, 휠 확대, 우클릭 두 번으로 초기화합니다."
+    },
+    "liveMapLayerSettings": {
+      "de": "Ebenen der Live-Karte",
+      "fr": "Calques de la carte en direct",
+      "th": "การตั้งค่าเลเยอร์แผนที่สด",
+      "vi": "Cài đặt lớp bản đồ trực tiếp",
+      "ko": "실시간 지도 레이어 설정"
+    },
+    "liveMapLayerHelp": {
+      "de": "Fraktionen verwenden Rot, Gelb und Blau; beobachtete A/B/C-Gruppen erscheinen dunkel, mittel und hell. Unbekannte Gruppen behalten die Grundfarbe.",
+      "fr": "Les factions utilisent le rouge, le jaune et le bleu ; les groupes A/B/C observés utilisent des tons foncé, moyen et clair. Un groupe inconnu conserve la couleur de faction.",
+      "th": "ฝ่ายใช้สีแดง เหลือง และน้ำเงิน ส่วนกลุ่ม A/B/C ที่ตรวจพบใช้เฉดเข้ม กลาง และอ่อน หากไม่ทราบกลุ่มจะใช้สีหลักของฝ่าย",
+      "vi": "Các phe dùng màu đỏ, vàng và xanh; nhóm A/B/C quan sát được dùng sắc độ đậm, vừa và nhạt. Nhóm chưa biết giữ màu gốc của phe.",
+      "ko": "진영은 빨강, 노랑, 파랑을 사용하고 관측된 A/B/C 파티는 진함, 보통, 밝음으로 표시합니다. 파티를 알 수 없으면 진영 기본색을 유지합니다."
+    },
+    "liveMapPlayersLayer": {
+      "de": "Spielerebene", "fr": "Calque des joueurs", "th": "เลเยอร์ผู้เล่น", "vi": "Lớp người chơi", "ko": "플레이어 레이어"
+    },
+    "liveMapTargetMarkersLayer": {
+      "de": "Zielmarkerebene", "fr": "Calque des marqueurs de cible", "th": "เลเยอร์เครื่องหมายเป้าหมาย", "vi": "Lớp dấu mục tiêu", "ko": "대상 표식 레이어"
+    },
+    "liveMapFieldMarkersLayer": {
+      "de": "Feldmarkerebene", "fr": "Calque des marqueurs de terrain", "th": "เลเยอร์เครื่องหมายสนาม", "vi": "Lớp dấu hiện trường", "ko": "필드 마커 레이어"
+    },
+    "liveMapObjectivesLayer": {
+      "de": "Kartenmechanikebene", "fr": "Calque des mécaniques de carte", "th": "เลเยอร์กลไกแผนที่", "vi": "Lớp cơ chế bản đồ", "ko": "지도 기믹 레이어"
+    },
+    "liveMapDenseCallouts": {
+      "de": "45°-Hinweislinien in dichten Bereichen", "fr": "Repères à 45° dans les zones denses", "th": "ใช้เส้นชี้ 45° ในพื้นที่หนาแน่น", "vi": "Dùng đường dẫn 45° ở khu vực đông", "ko": "밀집 구역에서 45도 지시선 사용"
+    },
+    "liveMapOpacity": {
+      "de": "Deckkraft", "fr": "Opacité", "th": "ความทึบ", "vi": "Độ mờ", "ko": "불투명도"
     },
     "liveMarkerOverlay": {
       "de": "Transparente randlose Einblendung",
@@ -3692,18 +3818,18 @@
       "ko": "모든 것"
     },
     "liveOutgoing": {
-      "de": "Örtliche Ausgänge",
-      "fr": "Départ local",
-      "th": "การออกภายใน",
-      "vi": "Tiêu cục bộ",
-      "ko": "사이트 맵"
+      "de": "Ausgehend",
+      "fr": "Sortant",
+      "th": "ขาออก",
+      "vi": "Gây ra",
+      "ko": "가한 피해"
     },
     "liveIncoming": {
-      "de": "Lokaler Eingang",
-      "fr": "Entrée locale",
-      "th": "การเข้ามาภายใน",
-      "vi": "Gửi tới cục bộ",
-      "ko": "국가 선택"
+      "de": "Eingehend",
+      "fr": "Entrant",
+      "th": "ขาเข้า",
+      "vi": "Nhận vào",
+      "ko": "받은 피해"
     },
     "secondsBeforeEncounterEnd": {
       "de": "Vor dem Kampfende",
@@ -3720,18 +3846,18 @@
       "ko": "끝의 앞에"
     },
     "freezeBuffer": {
-      "de": "Freeze Fight Puffer",
-      "fr": "Geler le tampon de combat",
-      "th": "บัฟเฟอร์เพื่อหยุดการต่อสู้",
-      "vi": "Bộ đệm chiến đấu đông lạnh",
-      "ko": "Freeze 싸움 버퍼"
+      "de": "Sperren",
+      "fr": "Verrouiller",
+      "th": "ล็อก",
+      "vi": "Khóa",
+      "ko": "잠금"
     },
     "resumeBuffer": {
-      "de": "Updates fortsetzen",
-      "fr": "Reprendre les mises à jour",
-      "th": "อัปเดตต่อ",
-      "vi": "Tiếp tục cập nhật",
-      "ko": "이력서 업데이트"
+      "de": "Entsperren",
+      "fr": "Déverrouiller",
+      "th": "ปลดล็อก",
+      "vi": "Mở khóa",
+      "ko": "잠금 해제"
     },
     "bufferFrozen": {
       "de": "gefroren",

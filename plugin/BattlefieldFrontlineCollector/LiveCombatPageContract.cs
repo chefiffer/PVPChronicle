@@ -24,6 +24,10 @@ internal readonly record struct LiveSliceActorColumns(bool ShowSource, bool Show
 
 internal static class LiveCombatPageContract
 {
+    // Scoreboard presentation is red, blue, yellow while the capture model
+    // retains its historical red, yellow, blue team indexes.
+    public static System.ReadOnlySpan<byte> FrontlineScoreDisplayOrder => [0, 2, 1];
+
     public static readonly LiveCombatPage[] Pages =
     [
         LiveCombatPage.CombatSlice,

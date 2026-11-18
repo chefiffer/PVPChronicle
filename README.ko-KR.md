@@ -1,5 +1,4 @@
-# PvP Chronicle
-
+# PVP Chronicle
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | **한국어** | [Русский](README.ru-RU.md) | [Português (Brasil)](README.pt-BR.md) | [Español](README.es-ES.md) | [ไทย](README.th-TH.md) | [Tiếng Việt](README.vi-VN.md) | [日本語](README.ja-JP.md) | [Deutsch](README.de-DE.md) | [Français](README.fr-FR.md)
 
 PvP Chronicle은 FINAL FANTASY XIV PvP 경기를 기록하고 검토하는 Dalamud 플러그인입니다. 전장과 크리스탈라인 컨플릭트의 기록 및 리플레이, 지도 목표, 성과 통계, 그리고 관측 가능한 증거 범위 안에서만 수행되는 행동 무결성 검토를 지원합니다.
@@ -14,7 +13,7 @@ PvP Chronicle은 FINAL FANTASY XIV PvP 경기를 기록하고 검토하는 Dalam
    https://raw.githubusercontent.com/chefiffer/dalamud-plugins/main/repo.json
    ```
 
-4. 플러그인 설치 관리자를 열고 **Battlefield Frontline Collector**를 검색한 뒤 **Install**을 선택합니다.
+4. 플러그인 설치 관리자를 열고 **PVP Chronicle**를 검색한 뒤 **Install**을 선택합니다.
 
 ## 주요 기능
 

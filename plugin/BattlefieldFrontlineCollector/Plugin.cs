@@ -29,6 +29,8 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using NativeBattleChara = FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara;
 using NativeEventObject = FFXIVClientStructs.FFXIV.Client.Game.Object.EventObject;
+using NativeGroupManager = FFXIVClientStructs.FFXIV.Client.Game.Group.GroupManager;
+using PvpChronicle.RecordingContract;
 
 namespace BattlefieldFrontlineCollector;
 
@@ -71,6 +73,8 @@ public sealed unsafe class Plugin : IDalamudPlugin
     private readonly IFontHandle? uiFont;
     private readonly MainWindow mainWindow;
     private readonly MatchDetailWindow detailWindow;
+    private readonly RecordingLinkStore recordingLinks;
+    private readonly RecordingIpcBridge recordingIpc;
     private readonly LiveCombatBuffer liveCombat = new();
     private readonly LiveScoreProjectionTracker liveScoreProjection = new();
     private readonly LiveMarkerState liveMarkers = new();
@@ -78,6 +82,7 @@ public sealed unsafe class Plugin : IDalamudPlugin
     private readonly Dictionary<LiveCombatPage, LiveCombatWindow> liveCombatWindows = new();
     private readonly Stopwatch elapsed = new();
     private readonly ConcurrentDictionary<uint, ActionActorIdentity> actorIdentityCache = new();
+    private readonly Dictionary<uint, byte> liveAllianceGroups = new();
     private readonly MovementAnomalyTracker movementAnomaly;
     private readonly CrystallineRankHistory crystallineRankHistory;
     private readonly CrystallineMatchHistory crystallineMatchHistory;
@@ -104,6 +109,7 @@ public sealed unsafe class Plugin : IDalamudPlugin
     private long lastVitalsSampleMs = -10_000;
     private long lastVitalsWriteMs = -10_000;
     private long lastIdentitySampleMs = -10_000;
+    private long lastLivePlayerSampleMs = -10_000;
     private long lastMarkerSampleMs = -10_000;
     private long lastCastSampleMs = -10_000;
     private long lastLocalActionStateSampleMs = -10_000;
@@ -173,6 +179,8 @@ public sealed unsafe class Plugin : IDalamudPlugin
             crystallineHistoryImportDirectory, "cc-history-summary.json"));
         output = new JsonlMatchWriter(captureDirectory, assetRoot);
         repository = new MatchRepository(Path.Combine(baseDirectory, "analysis"), assetRoot);
+        recordingLinks = new RecordingLinkStore(Path.Combine(baseDirectory, "recordings.json"));
+        recordingIpc = new RecordingIpcBridge(PluginInterface, recordingLinks, Log);
         uploads = new UploadService(configuration, repository, Log, Path.Combine(baseDirectory, "cache"),
             () => gameAccountBindingId, assetRoot);
         uploads.ResumePending();
@@ -181,7 +189,7 @@ public sealed unsafe class Plugin : IDalamudPlugin
         uiFont = BuildUiFont(assetRoot);
         actionMetadata = BuildActionMetadataCatalog(assetRoot);
         detailWindow = new MatchDetailWindow(configuration, repository, uploads, DataManager, TextureProvider,
-            assetRoot);
+            recordingIpc, Log, assetRoot);
         void OpenLivePage(LiveCombatPage page)
         {
             if (liveCombatWindows.TryGetValue(page, out var window))
@@ -290,8 +298,6 @@ public sealed unsafe class Plugin : IDalamudPlugin
         }
 
         var thaiPath = FontPath("NotoSansThai-Variable.ttf");
-        var koreanPath = FontPath("NotoSansKR-Variable.ttf");
-        if (thaiPath == null && koreanPath == null) return null;
         return PluginInterface.UiBuilder.FontAtlas.NewDelegateFontHandle(step => step.OnPreBuild(toolkit =>
         {
             var baseFont = toolkit.AddDalamudDefaultFont(-1);
@@ -304,10 +310,16 @@ public sealed unsafe class Plugin : IDalamudPlugin
                 MergeFont = baseFont,
                 GlyphRanges = [0x0E00, 0x0E7F, 0],
             });
-            if (koreanPath != null) toolkit.AddFontFromFile(koreanPath, new SafeFontConfig
+            // Dalamud already ships a Noto CJK collection. Face 3 is Korean,
+            // so carrying another 10 MiB font inside every plugin download is
+            // unnecessary. Explicit ranges keep unrelated CJK faces out of
+            // this merge while preserving Korean UI and player names.
+            toolkit.AddDalamudAssetFont(Dalamud.DalamudAsset.NotoSansCjkRegular,
+                new SafeFontConfig
             {
                 SizePx = 17f,
                 MergeFont = baseFont,
+                FontNo = 3,
                 GlyphRanges =
                 [
                     0x1100, 0x11FF,
@@ -421,6 +433,7 @@ public sealed unsafe class Plugin : IDalamudPlugin
         Array.Clear(previousFieldMarkers);
         markerBaselineCaptured = false;
         lastScoreWriteMs = -10_000; lastVitalsSampleMs = -10_000; lastIdentitySampleMs = -10_000;
+        lastLivePlayerSampleMs = -10_000;
         lastMarkerSampleMs = -10_000;
         // Every elapsed-time gate is relative to this match's fresh stopwatch.
         // Leaving the objective gate at the previous match's elapsed value made
@@ -436,6 +449,8 @@ public sealed unsafe class Plugin : IDalamudPlugin
         movementAnomaly.Reset();
         var mode = GameLayout.CaptureMode(dutyId);
         output.Start(matchUid, dutyId, territoryId, localPlayerName, matchRealm, mode);
+        recordingIpc.Publish(new MatchRecordingEvent(RecordingContract.Schema, "match_started", matchUid,
+            mode, dutyId, territoryId, new DateTimeOffset(startedAtUtc), 0));
         if (configuration.AutoOpenLiveSliceOnMatchStart &&
             LiveCombatPageContract.ShouldAutoOpenLivePages(true, territoryId, dutyId))
             liveCombatWindow.IsOpen = true;
@@ -534,13 +549,23 @@ public sealed unsafe class Plugin : IDalamudPlugin
         {
             lastIdentitySampleMs = elapsedMs;
             RefreshActorIdentityCache();
-            CaptureLivePlayerMapState();
             foreach (var observation in movementAnomaly.ObserveForcedMovement(
                          Schema, matchUid, elapsedMs, ObjectTable.PlayerObjects))
                 output.Write(observation);
             foreach (var candidate in movementAnomaly.Observe(Schema, matchUid, elapsedMs,
                          ObjectTable.PlayerObjects, ObjectTable.LocalPlayer?.Position))
                 output.Write(candidate);
+        }
+
+        // Positions are cheap to read and need a much faster cadence than actor
+        // identity refresh. Sampling at 20 Hz plus render interpolation removes
+        // the visible 250 ms hopping without multiplying identity/anomaly work.
+        // 坐标轻量采样与身份解析解耦；20Hz 采样只更新地图位置，不增加重分析频率。
+        if (elapsedMs - lastLivePlayerSampleMs >=
+            LiveMapSamplingContract.PlayerPositionIntervalMs)
+        {
+            lastLivePlayerSampleMs = elapsedMs;
+            CaptureLivePlayerMapState(elapsedMs);
         }
 
         // Markers are tiny fixed-size snapshots (17 target markers + 8 field markers).
@@ -648,6 +673,7 @@ public sealed unsafe class Plugin : IDalamudPlugin
     {
         try
         {
+            RefreshLiveAllianceGroups();
             foreach (var actor in ObjectTable)
             {
                 if (actor == null || actor.EntityId == 0) continue;
@@ -676,11 +702,41 @@ public sealed unsafe class Plugin : IDalamudPlugin
                 }
                 actorIdentityCache[actor.EntityId] = new ActionActorIdentity(actor.EntityId,
                     actor.Name.TextValue, (ushort)(player?.HomeWorld.RowId ?? 0), battle?.ClassJob.RowId ?? 0,
-                    ownerId, ownerName, ownerWorld, ownerJob, battalion, ownerBattalion);
+                    ownerId, ownerName, ownerWorld, ownerJob, battalion, ownerBattalion,
+                    ReadLiveAllianceGroup(actor.EntityId), ReadLiveAllianceGroup(ownerId));
             }
         }
         catch (Exception ex) { Log.Verbose(ex, "Skipped an invalid actor identity-cache sample."); }
     }
+
+    private void RefreshLiveAllianceGroups()
+    {
+        liveAllianceGroups.Clear();
+        try
+        {
+            var manager = NativeGroupManager.Instance();
+            var group = manager == null ? null : manager->GetGroupWithCheck(false);
+            if (group == null || !group->IsAlliance) return;
+            for (var alliance = 0; alliance < 3; alliance++)
+            for (var memberIndex = 0; memberIndex < 8; memberIndex++)
+            {
+                var member = group->GetAllianceMemberByGroupAndIndex(alliance, memberIndex);
+                if (member == null || member->EntityId == 0 || member->EntityId >= 0xE0000000)
+                    continue;
+                liveAllianceGroups[member->EntityId] = (byte)alliance;
+            }
+        }
+        catch (Exception ex)
+        {
+            // Alliance membership is presentation-only. A game update must
+            // degrade to the faction base colour, never interrupt capture.
+            Log.Verbose(ex, "Skipped live alliance-group colour sampling.");
+            liveAllianceGroups.Clear();
+        }
+    }
+
+    private byte ReadLiveAllianceGroup(uint entityId) =>
+        liveAllianceGroups.TryGetValue(entityId, out var alliance) ? alliance : (byte)255;
 
     private void CaptureCastStarts(long elapsedMs)
     {
@@ -726,7 +782,7 @@ public sealed unsafe class Plugin : IDalamudPlugin
         return value <= 2 ? value : (byte)255;
     }
 
-    private void CaptureLivePlayerMapState()
+    private void CaptureLivePlayerMapState(long sampleAtMs)
     {
         try
         {
@@ -748,11 +804,12 @@ public sealed unsafe class Plugin : IDalamudPlugin
                         identity?.ClassJobId ?? player.ClassJob.RowId,
                         battalion, player.Position.X, player.Position.Y, player.Position.Z,
                         player.Rotation, player.EntityId == localEntityId,
-                        battle.MaxHp == 0 || battle.CurrentHp > 0));
+                        battle.MaxHp == 0 || battle.CurrentHp > 0,
+                        ReadLiveAllianceGroup(player.EntityId)));
                 }
                 catch (Exception ex) { Log.Verbose(ex, "Skipped one invalid live-map player."); }
             }
-            liveMarkers.ReplacePlayers(current);
+            liveMarkers.ReplacePlayers(current, sampleAtMs);
         }
         catch (Exception ex) { Log.Verbose(ex, "Skipped this optional live-map player sample."); }
     }
@@ -1728,6 +1785,9 @@ public sealed unsafe class Plugin : IDalamudPlugin
         var realm = matchRealm;
         foreach (var profile in movementAnomaly.ExportProfiles(Schema, uid, elapsed.ElapsedMilliseconds))
             output.Write(profile);
+        recordingIpc.Publish(new MatchRecordingEvent(RecordingContract.Schema, "match_ended", uid,
+            GameLayout.CaptureMode(dutyId), dutyId, territoryId, DateTimeOffset.UtcNow,
+            elapsed.ElapsedMilliseconds, "{\"result\":\"completed\"}"));
         waitForDutyExit = true;
         ResetCaptureState();
         FinalizeCompletedMatch(uid, path, result, matchStartedAt, realm, playerName);
@@ -1770,6 +1830,9 @@ public sealed unsafe class Plugin : IDalamudPlugin
             GameLayout.LayoutVersion, teams, players);
         foreach (var profile in movementAnomaly.ExportProfiles(Schema, currentUid,
                      elapsed.ElapsedMilliseconds)) output.Write(profile);
+        recordingIpc.Publish(new MatchRecordingEvent(RecordingContract.Schema, "match_ended", currentUid,
+            GameLayout.CaptureMode(dutyId), dutyId, territoryId, DateTimeOffset.UtcNow,
+            elapsed.ElapsedMilliseconds, "{\"result\":\"completed\"}"));
         var path = output.CurrentPath ?? string.Empty;
         var matchStartedAt = startedAtUtc;
         var realm = matchRealm;
@@ -1868,6 +1931,9 @@ public sealed unsafe class Plugin : IDalamudPlugin
         var path = output.CurrentPath ?? string.Empty;
         foreach (var profile in movementAnomaly.ExportProfiles(Schema, uid, elapsed.ElapsedMilliseconds))
             output.Write(profile);
+        recordingIpc.Publish(new MatchRecordingEvent(RecordingContract.Schema, "match_ended", uid,
+            GameLayout.CaptureMode(dutyId), dutyId, territoryId, DateTimeOffset.UtcNow,
+            elapsed.ElapsedMilliseconds, JsonSerializer.Serialize(new { result = "incomplete", reason })));
         ResetCaptureState();
         _ = output.EndAsync(uid, reason).ContinueWith(task =>
         {
@@ -1961,6 +2027,8 @@ public sealed unsafe class Plugin : IDalamudPlugin
         localFieldMarkerCapture.Dispose();
         fieldMarkerNetworkCapture.Dispose();
         localTargetMarkerCapture.Dispose();
+        detailWindow.DisposeRecordingResources();
+        recordingIpc.Dispose();
         uploads.Dispose(); output.Dispose();
         windows.RemoveAllWindows();
     }

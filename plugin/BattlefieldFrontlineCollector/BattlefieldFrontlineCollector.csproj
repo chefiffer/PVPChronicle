@@ -1,8 +1,8 @@
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
   <PropertyGroup>
-    <Version>0.0.3</Version>
+    <Version>0.0.3.1</Version>
     <Author>chefiffer</Author>
-    <Name>Battlefield Frontline Collector</Name>
+    <Name>PVP Chronicle</Name>
     <Punchline>Records and reviews Frontline and Crystalline Conflict matches.</Punchline>
     <Description>Informational PvP recorder with local review, optional upload and server-side Logs scoring. It never automates gameplay.</Description>
     <Tags>pvp;frontline;crystalline-conflict;statistics;local</Tags>
@@ -10,6 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.0" />
+    <Compile Include="..\PvpChronicleRecordingContract\RecordingContract.cs" Link="Recording\RecordingContract.cs" />
+    <Compile Include="..\PvpChronicleRecordingContract\RecordingFrameTransport.cs" Link="Recording\RecordingFrameTransport.cs" />
     <PackageReference Include="ZstdSharp.Port" Version="0.8.8" />
     <Content Include="..\..\LICENSE" Link="LICENSE">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

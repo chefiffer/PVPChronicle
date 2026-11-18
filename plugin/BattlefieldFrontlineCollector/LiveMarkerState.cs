@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,7 +8,8 @@ internal sealed record LiveFieldMarker(int Index, string Key, float X, float Y, 
 internal sealed record LiveTargetMarker(int Index, string Key, uint EntityId, string Name,
     ushort WorldId, uint JobId, byte Team, float X, float Y, float Z, bool PositionVisible);
 internal sealed record LivePlayerMarker(uint EntityId, string Name, ushort WorldId, uint JobId,
-    byte Battalion, float X, float Y, float Z, float Rotation, bool IsLocal, bool IsAlive);
+    byte Battalion, float X, float Y, float Z, float Rotation, bool IsLocal, bool IsAlive,
+    byte Alliance = 255);
 internal sealed record LiveObjectiveMarker(uint Id, string Label, string State, byte OwnerTeam,
     float X, float Y, float Z, uint CurrentHp = 0, uint MaxHp = 0,
     string EvidenceScope = "", int? RemainingSeconds = null,
@@ -17,6 +19,12 @@ internal sealed record LiveMarkerSnapshot(IReadOnlyList<LiveFieldMarker> Fields,
     IReadOnlyList<LivePlayerMarker> Players);
 
 internal enum LivePlayerRelation { Local, Ally, Enemy, Unknown }
+
+internal static class LiveMapSamplingContract
+{
+    internal const long PlayerPositionIntervalMs = 50;
+    internal const long PlayerInterpolationDelayMs = 50;
+}
 
 internal static class LivePlayerMapContract
 {
@@ -38,15 +46,26 @@ internal static class LivePlayerMapContract
 /// </summary>
 internal sealed class LiveMarkerState
 {
+    private const float MaximumInterpolatedDistance = 30f;
     private readonly object gate = new();
     private readonly Dictionary<int, LiveFieldMarker> fields = new();
     private readonly Dictionary<int, LiveTargetMarker> targets = new();
     private readonly Dictionary<uint, LiveObjectiveMarker> objectives = new();
     private readonly Dictionary<uint, LivePlayerMarker> players = new();
+    private readonly Dictionary<uint, LivePlayerMarker> previousPlayers = new();
+    private long previousPlayersAtMs;
+    private long playersAtMs;
+    private bool hasPreviousPlayerSample;
+    private bool hasPlayerSample;
 
     public void Reset()
     {
-        lock (gate) { fields.Clear(); targets.Clear(); objectives.Clear(); players.Clear(); }
+        lock (gate)
+        {
+            fields.Clear(); targets.Clear(); objectives.Clear(); players.Clear();
+            previousPlayers.Clear(); previousPlayersAtMs = 0; playersAtMs = 0;
+            hasPreviousPlayerSample = false; hasPlayerSample = false;
+        }
     }
 
     public void SetField(LiveFieldMarker marker)
@@ -83,10 +102,19 @@ internal sealed class LiveMarkerState
         lock (gate) objectives.Remove(id);
     }
 
-    public void ReplacePlayers(IEnumerable<LivePlayerMarker> current)
+    public void ReplacePlayers(IEnumerable<LivePlayerMarker> current) =>
+        ReplacePlayers(current, Environment.TickCount64);
+
+    internal void ReplacePlayers(IEnumerable<LivePlayerMarker> current, long sampleAtMs)
     {
         lock (gate)
         {
+            previousPlayers.Clear();
+            foreach (var pair in players) previousPlayers[pair.Key] = pair.Value;
+            hasPreviousPlayerSample = hasPlayerSample;
+            previousPlayersAtMs = playersAtMs;
+            playersAtMs = sampleAtMs;
+            hasPlayerSample = true;
             players.Clear();
             foreach (var player in current)
                 if (player.EntityId != 0)
@@ -94,11 +122,50 @@ internal sealed class LiveMarkerState
         }
     }
 
-    public LiveMarkerSnapshot Snapshot()
+    public LiveMarkerSnapshot Snapshot() => Snapshot(Environment.TickCount64);
+
+    internal LiveMarkerSnapshot Snapshot(long renderNowMs)
     {
-        lock (gate) return new LiveMarkerSnapshot(fields.Values.OrderBy(x => x.Index).ToArray(),
-            targets.Values.OrderBy(x => x.Index).ToArray(),
-            objectives.Values.OrderBy(x => x.Label).ThenBy(x => x.Id).ToArray(),
-            players.Values.OrderBy(x => x.IsLocal).ThenBy(x => x.EntityId).ToArray());
+        lock (gate)
+        {
+            var renderedPlayers = players.Values.Select(player =>
+                    InterpolatePlayer(player,
+                        renderNowMs - LiveMapSamplingContract.PlayerInterpolationDelayMs))
+                .OrderBy(x => x.IsLocal).ThenBy(x => x.EntityId).ToArray();
+            return new LiveMarkerSnapshot(fields.Values.OrderBy(x => x.Index).ToArray(),
+                targets.Values.OrderBy(x => x.Index).ToArray(),
+                objectives.Values.OrderBy(x => x.Label).ThenBy(x => x.Id).ToArray(),
+                renderedPlayers);
+        }
+    }
+
+    private LivePlayerMarker InterpolatePlayer(LivePlayerMarker current, long renderAtMs)
+    {
+        if (!previousPlayers.TryGetValue(current.EntityId, out var previous) ||
+            !hasPreviousPlayerSample || playersAtMs <= previousPlayersAtMs ||
+            previous.Name != current.Name || previous.WorldId != current.WorldId ||
+            previous.Battalion != current.Battalion || previous.IsLocal != current.IsLocal ||
+            previous.IsAlive != current.IsAlive || previous.Alliance != current.Alliance)
+            return current;
+
+        var dx = current.X - previous.X;
+        var dy = current.Y - previous.Y;
+        var dz = current.Z - previous.Z;
+        if (dx * dx + dy * dy + dz * dz >
+            MaximumInterpolatedDistance * MaximumInterpolatedDistance)
+            return current;
+
+        var amount = Math.Clamp(
+            (float)(renderAtMs - previousPlayersAtMs) / (playersAtMs - previousPlayersAtMs),
+            0f, 1f);
+        var rotationDelta = MathF.IEEERemainder(current.Rotation - previous.Rotation,
+            MathF.PI * 2);
+        return current with
+        {
+            X = previous.X + dx * amount,
+            Y = previous.Y + dy * amount,
+            Z = previous.Z + dz * amount,
+            Rotation = previous.Rotation + rotationDelta * amount
+        };
     }
 }

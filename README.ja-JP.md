@@ -1,5 +1,4 @@
-# PvP Chronicle
-
+# PVP Chronicle
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko-KR.md) | [Русский](README.ru-RU.md) | [Português (Brasil)](README.pt-BR.md) | [Español](README.es-ES.md) | [ไทย](README.th-TH.md) | [Tiếng Việt](README.vi-VN.md) | **日本語** | [Deutsch](README.de-DE.md) | [Français](README.fr-FR.md)
 
 PvP Chronicle は、『ファイナルファンタジーXIV』の PvP 試合を記録・振り返るための Dalamud プラグインです。フロントラインとクリスタルコンフリクトの履歴、リプレイ、マップ目標、パフォーマンス統計、そして観測可能な証拠の範囲に限定した行動整合性レビューに対応しています。
@@ -14,7 +13,7 @@ PvP Chronicle は、『ファイナルファンタジーXIV』の PvP 試合を�
    https://raw.githubusercontent.com/chefiffer/dalamud-plugins/main/repo.json
    ```
 
-4. プラグインインストーラーを開き、**Battlefield Frontline Collector** を検索して **Install** を選択します。
+4. プラグインインストーラーを開き、**PVP Chronicle** を検索して **Install** を選択します。
 
 ## 主な機能
 

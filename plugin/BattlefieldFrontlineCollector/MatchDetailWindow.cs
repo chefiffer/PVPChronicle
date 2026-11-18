@@ -15,6 +15,7 @@ using ActionSheet = Lumina.Excel.Sheets.Action;
 using StatusSheet = Lumina.Excel.Sheets.Status;
 using MapSheet = Lumina.Excel.Sheets.Map;
 using TerritoryTypeSheet = Lumina.Excel.Sheets.TerritoryType;
+using PvpChronicle.RecordingContract;
 
 namespace BattlefieldFrontlineCollector;
 
@@ -29,6 +30,8 @@ internal sealed class MatchDetailWindow : Window
     private readonly UploadService uploads;
     private readonly IDataManager dataManager;
     private readonly ITextureProvider textureProvider;
+    private readonly RecordingIpcBridge recordingIpc;
+    private readonly RecordingFrameTexture recordingFrameTexture;
     private readonly string assetRoot;
     private readonly ActionLocalizationCatalog actionCatalog;
     private readonly StatusLocalizationCatalog statusCatalog;
@@ -67,11 +70,15 @@ internal sealed class MatchDetailWindow : Window
     private bool selectDeathTab;
     private bool currentMatchIsCrystalline;
     private uint currentTerritoryId;
+    private bool recordingSeekPending;
+    private float recordingPlaybackSpeed = 1f;
+    private int recordingFrameWidth = 1920;
+    private bool recordingReplayDrawnThisFrame;
+    private bool recordingPlaybackWasVisible;
     private readonly HashSet<string> requestedIntegrityCohorts = new(StringComparer.Ordinal);
 
-    private sealed record MapAsset(string FileName, string NameKey);
     private sealed record MechanismDamageRow(string PlayerName, ushort WorldId,
-        byte JobId, byte Team, uint ActionId, string ActionName, long Damage,
+        byte JobId, byte Team, byte Alliance, uint ActionId, string ActionName, long Damage,
         long PlayerTotalDamage, long FirstMs, long LastMs);
     private sealed record SecureMechanismRound(long ElapsedMs, string Id, string Label,
         int OfficialPool, long[] ObservedDamage, string Evidence);
@@ -86,13 +93,13 @@ internal sealed class MatchDetailWindow : Window
         uint SourceOwnerEntityId = 0, string SourceOwnerName = "", ushort SourceOwnerWorldId = 0,
         byte SourceOwnerJobId = 0, uint TargetOwnerEntityId = 0, string TargetOwnerName = "",
         ushort TargetOwnerWorldId = 0, byte TargetOwnerJobId = 0, string EffectKind = "");
-    private static readonly IReadOnlyDictionary<uint, MapAsset> MapAssets = new Dictionary<uint, MapAsset>
+    private static readonly IReadOnlyDictionary<uint, string> MapNameKeys = new Dictionary<uint, string>
     {
-        [127] = new("borderland_ruins.png", "mapBorderland"),
-        [130] = new("seal_rock.png", "mapSealRock"),
-        [180] = new("fields_of_glory.png", "mapShatter"),
-        [701] = new("onsal_hakair.png", "mapOnsal"),
-        [1080] = new("worqor_chirteh.png", "mapWorqor")
+        [127] = "mapBorderland",
+        [130] = "mapSealRock",
+        [180] = "mapShatter",
+        [701] = "mapOnsal",
+        [1080] = "mapWorqor"
     };
 
     private Vector4 Cyan => BattlefieldUiTheme.Accent(configuration.UiTheme);
@@ -102,7 +109,8 @@ internal sealed class MatchDetailWindow : Window
 
     public MatchDetailWindow(Configuration configuration, MatchRepository repository, UploadService uploads,
         IDataManager dataManager,
-        ITextureProvider textureProvider, string assetRoot)
+        ITextureProvider textureProvider, RecordingIpcBridge recordingIpc, IPluginLog log,
+        string assetRoot)
         : base("Battlefield Chronicle · Detailed analysis###BattlefieldDetailedAnalysis",
             ImGuiWindowFlags.NoScrollbar)
     {
@@ -111,6 +119,8 @@ internal sealed class MatchDetailWindow : Window
         this.uploads = uploads;
         this.dataManager = dataManager;
         this.textureProvider = textureProvider;
+        this.recordingIpc = recordingIpc;
+        recordingFrameTexture = new RecordingFrameTexture(textureProvider, log);
         this.assetRoot = assetRoot;
         actionCatalog = new ActionLocalizationCatalog(assetRoot);
         statusCatalog = new StatusLocalizationCatalog(assetRoot);
@@ -119,8 +129,20 @@ internal sealed class MatchDetailWindow : Window
         RespectCloseHotkey = true;
     }
 
-    public override void PreDraw() => BattlefieldUiTheme.Push(configuration.UiTheme);
-    public override void PostDraw() => BattlefieldUiTheme.Pop();
+    public override void PreDraw()
+    {
+        recordingReplayDrawnThisFrame = false;
+        BattlefieldUiTheme.Push(configuration.UiTheme);
+    }
+
+    public override void PostDraw()
+    {
+        if (!recordingReplayDrawnThisFrame && recordingPlaybackWasVisible)
+            HideRecordingPlayback();
+        BattlefieldUiTheme.Pop();
+    }
+
+    public override void OnClose() => HideRecordingPlayback();
 
     public void Open(LocalMatchAnalysis match)
     {
@@ -140,6 +162,9 @@ internal sealed class MatchDetailWindow : Window
         scrollToSelectedAnomaly = false;
         scrollIntegrityToTop = false;
         requestedIntegrityCohorts.Clear();
+        recordingSeekPending = false;
+        recordingPlaybackSpeed = 1f;
+        recordingFrameWidth = 1920;
         // Opening a replay is a local operation. A cached BFDetail remains
         // viewable after credential expiry and must never trigger network IO.
         // Users can still choose the explicit refresh action in the match list.
@@ -185,6 +210,13 @@ internal sealed class MatchDetailWindow : Window
         {
             ImGui.BeginChild("markers-scroll", Vector2.Zero, false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
             DrawMarkerHistory(detail);
+            ImGui.EndChild(); ImGui.EndTabItem();
+        }
+        if (ImGui.BeginTabItem(T("recordingReplay")))
+        {
+            ImGui.BeginChild("recording-replay-scroll", Vector2.Zero, false,
+                ImGuiWindowFlags.AlwaysVerticalScrollbar);
+            DrawRecordingReplay(match, detail);
             ImGui.EndChild(); ImGui.EndTabItem();
         }
         if (ImGui.BeginTabItem(T("behaviorCandidates")))
@@ -259,6 +291,13 @@ internal sealed class MatchDetailWindow : Window
             ImGui.BeginChild("cc-markers-scroll", Vector2.Zero, false,
                 ImGuiWindowFlags.AlwaysVerticalScrollbar);
             DrawMarkerHistory(detail);
+            ImGui.EndChild(); ImGui.EndTabItem();
+        }
+        if (ImGui.BeginTabItem(T("recordingReplay")))
+        {
+            ImGui.BeginChild("cc-recording-replay-scroll", Vector2.Zero, false,
+                ImGuiWindowFlags.AlwaysVerticalScrollbar);
+            DrawRecordingReplay(match, detail);
             ImGui.EndChild(); ImGui.EndTabItem();
         }
         if (ImGui.BeginTabItem(T("behaviorCandidates")))
@@ -469,18 +508,19 @@ internal sealed class MatchDetailWindow : Window
                     Name = string.IsNullOrWhiteSpace(action.SourceOwnerName) ? action.SourceName : action.SourceOwnerName,
                     WorldId = action.SourceOwnerWorldId != 0 ? action.SourceOwnerWorldId : action.SourceWorldId,
                     JobId = action.SourceOwnerJobId != 0 ? action.SourceOwnerJobId : action.SourceJobId,
-                    action.SourceTeam, action.ActionId, action.ActionName
+                    action.SourceTeam, action.SourceAlliance, action.ActionId, action.ActionName
                 })
                 .Select(group => new MechanismDamageRow(group.Key.Name, group.Key.WorldId,
-                    group.Key.JobId, group.Key.SourceTeam, group.Key.ActionId, group.Key.ActionName,
+                    group.Key.JobId, group.Key.SourceTeam, group.Key.SourceAlliance,
+                    group.Key.ActionId, group.Key.ActionName,
                     group.Sum(action => action.Damage), playerTotals[group.Key.EntityId],
                     group.Min(action => action.ElapsedMs),
                     group.Max(action => action.ElapsedMs))).ToArray();
             Func<MechanismDamageRow, IComparable> sortKey = mechanismSortColumn switch
             {
-                0 => row => row.PlayerName,
+                0 => row => FrontlinePlayerIdentityContract.TeamSquadSortKey(row.Team, row.Alliance),
                 1 => row => row.JobId,
-                2 => row => row.Team,
+                2 => row => row.PlayerName,
                 3 => row => ActionName(row.ActionId, row.ActionName),
                 4 => row => row.PlayerTotalDamage,
                 5 => row => row.Damage,
@@ -494,11 +534,11 @@ internal sealed class MatchDetailWindow : Window
                     ImGuiTableFlags.Resizable | ImGuiTableFlags.ScrollY | ImGuiTableFlags.SizingFixedFit,
                     new Vector2(0, Math.Min(278, 31 + rows.Length * 27))))
             {
-                var headers = new[] { T("player"), T("job"), T("team"), T("action"),
+                var headers = new[] { T("team"), T("job"), T("player"), T("action"),
                     T("playerTotalDamage"), T("damage"), T("targetHpPercent"), T("time") };
-                ImGui.TableSetupColumn(headers[0], ImGuiTableColumnFlags.WidthStretch, 1.4f);
+                ImGui.TableSetupColumn(headers[0], ImGuiTableColumnFlags.WidthFixed, 28);
                 ImGui.TableSetupColumn(headers[1], ImGuiTableColumnFlags.WidthFixed, 34);
-                ImGui.TableSetupColumn(headers[2], ImGuiTableColumnFlags.WidthFixed, 82);
+                ImGui.TableSetupColumn(headers[2], ImGuiTableColumnFlags.WidthStretch, 1.4f);
                 ImGui.TableSetupColumn(headers[3], ImGuiTableColumnFlags.WidthStretch, 1.3f);
                 ImGui.TableSetupColumn(headers[4], ImGuiTableColumnFlags.WidthFixed, 100);
                 ImGui.TableSetupColumn(headers[5], ImGuiTableColumnFlags.WidthFixed, 100);
@@ -520,11 +560,10 @@ internal sealed class MatchDetailWindow : Window
                 foreach (var row in rows)
                 {
                     ImGui.TableNextRow(); ImGui.TableNextColumn();
-                    DrawCopyableText($"{row.PlayerName}@{WorldName(row.WorldId)}", TextColor);
+                    DrawTeamSquad(row.Team, row.Alliance);
                     ImGui.TableNextColumn(); DrawJobIcon(row.JobId);
-                    ImGui.TableNextColumn();
-                    ImGui.TextColored(row.Team < 3 ? TeamColors[row.Team] : Muted,
-                        row.Team < 3 ? TeamName(row.Team) : T("unknown"));
+                    ImGui.TableNextColumn(); DrawCopyableText(
+                        $"{row.PlayerName}@{WorldName(row.WorldId)}", TextColor);
                     ImGui.TableNextColumn(); DrawActionGlyph(row.ActionId, 20); ImGui.SameLine(0, 5);
                     ImGui.TextUnformatted(ActionName(row.ActionId, row.ActionName));
                     Cell(row.PlayerTotalDamage.ToString("N0"));
@@ -1351,22 +1390,23 @@ internal sealed class MatchDetailWindow : Window
                      ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInnerV |
                      ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable, new Vector2(0, 340)))
         {
-            foreach (var key in new[] { "player", "job", "team", "objective", "damage", "actions",
+            foreach (var key in new[] { "team", "job", "player", "objective", "damage", "actions",
                          "objectiveBuffs", "firstSeen", "lastSeen" })
                 ImGui.TableSetupColumn(T(key));
             ImGui.TableSetupScrollFreeze(0, 1); ImGui.TableHeadersRow();
             var groups = objectiveActions.GroupBy(row => new
-                { row.SourceName, row.SourceWorldId, row.SourceJobId, row.SourceTeam, row.TargetEntityId, row.TargetName })
+                { row.SourceName, row.SourceWorldId, row.SourceJobId, row.SourceTeam,
+                    row.SourceAlliance, row.TargetEntityId, row.TargetName })
                 .Select(group => new { group.Key, Damage = group.Sum(row => row.Damage), Count = group.Count(),
                     First = group.Min(row => row.ElapsedMs), Last = group.Max(row => row.ElapsedMs) })
                 .OrderByDescending(row => row.Damage).ToArray();
             foreach (var row in groups)
             {
                 ImGui.TableNextRow();
-                ImGui.TableNextColumn(); DrawCopyableText($"{row.Key.SourceName}@{WorldName(row.Key.SourceWorldId)}", TextColor);
+                ImGui.TableNextColumn(); DrawTeamSquad(row.Key.SourceTeam, row.Key.SourceAlliance);
                 ImGui.TableNextColumn(); DrawJobIcon(row.Key.SourceJobId);
-                ImGui.TableNextColumn(); ImGui.TextColored(row.Key.SourceTeam < 3 ? TeamColors[row.Key.SourceTeam] : Muted,
-                    row.Key.SourceTeam < 3 ? TeamName(row.Key.SourceTeam) : T("unknown"));
+                ImGui.TableNextColumn(); DrawCopyableText(
+                    $"{row.Key.SourceName}@{WorldName(row.Key.SourceWorldId)}", TextColor);
                 Cell(ObjectiveInstanceDisplayName(match.DutyId, detail, row.Key.TargetEntityId,
                     row.Key.TargetName, row.Last));
                 Cell(row.Damage.ToString("N0")); Cell(row.Count.ToString("N0"));
@@ -1393,19 +1433,17 @@ internal sealed class MatchDetailWindow : Window
                      ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInnerV |
                      ImGuiTableFlags.ScrollY | ImGuiTableFlags.Resizable, new Vector2(0, 320)))
         {
-            foreach (var key in new[] { "time", "player", "job", "team", "action", "objective", "damage", "hp" })
+            foreach (var key in new[] { "time", "team", "job", "player", "action", "objective", "damage", "hp" })
                 ImGui.TableSetupColumn(T(key));
             ImGui.TableSetupScrollFreeze(0, 1); ImGui.TableHeadersRow();
             foreach (var row in objectiveActions.OrderBy(value => value.ElapsedMs).TakeLast(800))
             {
                 ImGui.TableNextRow();
                 Cell(Clock(row.ElapsedMs));
-                ImGui.TableNextColumn();
-                DrawCopyableText($"{row.SourceName}@{WorldName(row.SourceWorldId)}", TextColor);
+                ImGui.TableNextColumn(); DrawTeamSquad(row.SourceTeam, row.SourceAlliance);
                 ImGui.TableNextColumn(); DrawJobIcon(row.SourceJobId);
-                ImGui.TableNextColumn();
-                ImGui.TextColored(row.SourceTeam < 3 ? TeamColors[row.SourceTeam] : Muted,
-                    row.SourceTeam < 3 ? TeamName(row.SourceTeam) : T("unknown"));
+                ImGui.TableNextColumn(); DrawCopyableText(
+                    $"{row.SourceName}@{WorldName(row.SourceWorldId)}", TextColor);
                 ImGui.TableNextColumn(); DrawActionGlyph(row.ActionId, 20); ImGui.SameLine(0, 5);
                 ImGui.TextUnformatted(ActionName(row.ActionId, row.ActionName));
                 Cell(ObjectiveInstanceDisplayName(match.DutyId, detail, row.TargetEntityId,
@@ -1543,8 +1581,10 @@ internal sealed class MatchDetailWindow : Window
         ImGui.TextColored(Cyan, T("adaptiveTimeline"));
         ImGui.SameLine(); ImGui.TextDisabled(Clock((long)selectedMs));
         ImGui.SetNextItemWidth(-1);
-        ImGui.SliderFloat("##detail-time", ref selectedMs, 0, maxMs, string.Empty,
-            ImGuiSliderFlags.AlwaysClamp | ImGuiSliderFlags.NoInput);
+        if (ImGui.SliderFloat("##detail-time", ref selectedMs, 0, maxMs, string.Empty,
+                ImGuiSliderFlags.AlwaysClamp | ImGuiSliderFlags.NoInput))
+            recordingSeekPending = true;
+        DrawRecordingJump(match);
         var score = NearestScore(detail, (long)selectedMs);
         var movement = NearestMovement(detail, (long)selectedMs);
         if (match.Schema == LocalMatchAnalyzer.CrystallineSchema)
@@ -1567,6 +1607,271 @@ internal sealed class MatchDetailWindow : Window
             ImGui.TextDisabled($"{T("visible")} {movement.VisibleActors} · {T("frameTime")} {Clock(movement.ElapsedMs)}");
         }
     }
+
+    private void DrawRecordingJump(LocalMatchAnalysis match)
+    {
+        var attachment = recordingIpc.Find(match.MatchUid);
+        if (attachment == null)
+        {
+            ImGui.TextDisabled(T("recordingNotAttached"));
+            return;
+        }
+        var videoMs = RecordingTimeMap.ToVideoMs(attachment, (long)selectedMs);
+        ImGui.TextDisabled(string.Format(T("recordingAttachedHint"), Clock(videoMs)));
+    }
+
+    /// <summary>
+    /// Integrates Recorder's decoded frames with Chronicle's evidence timeline. Recorder publishes
+    /// a local BGRA buffer; Chronicle turns it into a Dalamud texture and ImGui draws it here.
+    /// </summary>
+    private void DrawRecordingReplay(LocalMatchAnalysis match, DetailedAnalysis detail)
+    {
+        recordingReplayDrawnThisFrame = true;
+        recordingPlaybackWasVisible = true;
+        var attachment = recordingIpc.Find(match.MatchUid);
+        if (attachment == null)
+        {
+            ImGui.TextColored(Cyan, T("recordingReplay"));
+            ImGui.TextWrapped(T("recordingNotAttachedLong"));
+            return;
+        }
+
+        if (!ImGui.BeginTable("recording-replay-layout", 2,
+                ImGuiTableFlags.Resizable | ImGuiTableFlags.BordersInnerV |
+                ImGuiTableFlags.SizingStretchProp)) return;
+        ImGui.TableSetupColumn("video", ImGuiTableColumnFlags.WidthStretch, 2f);
+        ImGui.TableSetupColumn("moments", ImGuiTableColumnFlags.WidthStretch, 1f);
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+
+        var columnWidth = Math.Max(16f, ImGui.GetContentRegionAvail().X);
+        var videoOrigin = ImGui.GetCursorScreenPos();
+        var command = recordingSeekPending ? "activate_seek" : "activate";
+        var state = recordingIpc.Control(new RecordingPlaybackRequest(
+            RecordingContract.Schema, command, match.MatchUid, (long)selectedMs,
+            (int)MathF.Round(videoOrigin.X), (int)MathF.Round(videoOrigin.Y), 0, 0, true,
+            recordingPlaybackSpeed, recordingFrameWidth));
+        recordingFrameTexture.Update(state);
+
+        // Fit the native frame inside the left column without ever stretching it.  When the
+        // source dimensions are not known yet, 16:9 is only a temporary loading placeholder.
+        var aspect = state.FrameWidth > 0 && state.FrameHeight > 0
+            ? state.FrameWidth / (float)state.FrameHeight
+            : 16f / 9f;
+        var videoWidth = columnWidth;
+        var videoHeight = videoWidth / Math.Max(.1f, aspect);
+        if (videoHeight > 620f)
+        {
+            videoHeight = 620f;
+            videoWidth = videoHeight * aspect;
+        }
+        videoOrigin += new Vector2(Math.Max(0f, (columnWidth - videoWidth) * .5f), 0f);
+        ImGui.SetCursorScreenPos(videoOrigin);
+        var draw = ImGui.GetWindowDrawList();
+        draw.AddRectFilled(videoOrigin, videoOrigin + new Vector2(videoWidth, videoHeight),
+            ImGui.GetColorU32(new Vector4(.025f, .03f, .035f, 1f)), 5f);
+        if (recordingFrameTexture.Available)
+            draw.AddImage(recordingFrameTexture.Handle, videoOrigin,
+                videoOrigin + new Vector2(videoWidth, videoHeight));
+        draw.AddRect(videoOrigin, videoOrigin + new Vector2(videoWidth, videoHeight),
+            ImGui.GetColorU32(new Vector4(Cyan.X, Cyan.Y, Cyan.Z, .48f)), 5f,
+            ImDrawFlags.None, 1.5f);
+        ImGui.InvisibleButton("recording-video-toggle", new Vector2(videoWidth, videoHeight));
+        if (ImGui.IsItemClicked() && state.Loaded)
+            state = SendPlaybackCommand(match, state.Playing ? "pause" : "play", videoOrigin,
+                videoWidth, videoHeight, recordingPlaybackSpeed);
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip(state.Playing ? T("pauseRecording") : T("playRecording"));
+        ImGui.SetCursorPosX(ImGui.GetCursorPosX() - Math.Max(0f, (columnWidth - videoWidth) * .5f));
+
+        var sentSeek = recordingSeekPending;
+        recordingSeekPending = false;
+        if (state.Loaded && state.Playing && !sentSeek)
+        {
+            var maxMs = ReplayMaximumMs(detail);
+            selectedMs = Math.Clamp(state.MatchElapsedMs, 0, maxMs);
+        }
+        recordingPlaybackSpeed = (float)Math.Clamp(state.Speed, .25, 4);
+
+        ImGui.Spacing();
+        if (!state.RecorderAvailable)
+            ImGui.TextColored(new Vector4(1f, .55f, .3f, 1f), T("recorderPluginUnavailable"));
+        else if (!string.IsNullOrWhiteSpace(state.Error))
+            ImGui.TextColored(new Vector4(1f, .42f, .35f, 1f), state.Error);
+        else if (!state.Loaded)
+            ImGui.TextDisabled(T(state.Status == "opening" || state.Status == "flyleaf_starting"
+                ? "recordingOpening" : "recordingWaiting"));
+
+        // A compact, conventional video transport. Skip changes the shared replay cursor, so
+        // Chronicle's evidence column and the recording always land on the same moment.
+        if (ImGui.Button("-10s##recording-back-10", new Vector2(48, 0)))
+        {
+            selectedMs = Math.Max(0, selectedMs - 10_000);
+            recordingSeekPending = true;
+        }
+        if (ImGui.IsItemHovered()) ImGui.SetTooltip(T("recordingBack10"));
+        ImGui.SameLine();
+        if (ImGui.Button((state.Playing ? "Ⅱ" : T("playRecording")) +
+                         "###recording-toggle", new Vector2(48, 0)))
+            state = SendPlaybackCommand(match, state.Playing ? "pause" : "play", videoOrigin,
+                videoWidth, videoHeight, recordingPlaybackSpeed);
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip(state.Playing ? T("pauseRecording") : T("playRecording"));
+        ImGui.SameLine();
+        if (ImGui.Button("+10s##recording-forward-10", new Vector2(48, 0)))
+        {
+            selectedMs = Math.Min(ReplayMaximumMs(detail), selectedMs + 10_000);
+            recordingSeekPending = true;
+        }
+        if (ImGui.IsItemHovered()) ImGui.SetTooltip(T("recordingForward10"));
+        ImGui.SameLine();
+        if (ImGui.Button(T("seekRecordingToReplay") + "###recording-seek"))
+            state = SendPlaybackCommand(match, "seek", videoOrigin, videoWidth, videoHeight,
+                recordingPlaybackSpeed);
+        ImGui.SameLine();
+        ImGui.TextDisabled($"{Clock(state.VideoElapsedMs)} / {Clock(state.DurationMs)}");
+
+        ImGui.TextDisabled(T("playbackSpeed"));
+        foreach (var speed in new[] { .5f, 1f, 1.5f, 2f })
+        {
+            ImGui.SameLine();
+            var selected = Math.Abs(recordingPlaybackSpeed - speed) < .01f;
+            if (selected) ImGui.PushStyleColor(ImGuiCol.Button,
+                new Vector4(Cyan.X, Cyan.Y, Cyan.Z, .55f));
+            if (ImGui.SmallButton($"{speed:0.#}×##recording-speed-{speed:0.0}"))
+            {
+                recordingPlaybackSpeed = speed;
+                SendPlaybackCommand(match, "speed", videoOrigin, videoWidth, videoHeight, speed);
+            }
+            if (selected) ImGui.PopStyleColor();
+        }
+
+        ImGui.TextDisabled(T("recordingQuality"));
+        foreach (var quality in new[] { (640, "recordingQualitySmooth"), (960, "recordingQualityHd"),
+                     (1280, "recordingQualityClear"), (1920, "recordingQualityOriginal") })
+        {
+            ImGui.SameLine();
+            var selected = recordingFrameWidth == quality.Item1;
+            if (selected) ImGui.PushStyleColor(ImGuiCol.Button,
+                new Vector4(Cyan.X, Cyan.Y, Cyan.Z, .55f));
+            if (ImGui.SmallButton($"{T(quality.Item2)}##recording-quality-{quality.Item1}"))
+                recordingFrameWidth = quality.Item1;
+            if (selected) ImGui.PopStyleColor();
+        }
+
+        ImGui.TableNextColumn();
+        var rightColumnHeight = Math.Max(420f, videoHeight + 92f);
+        var replayMapHeight = Math.Clamp(rightColumnHeight * .58f, 240f, 430f);
+        var replayEvidenceHeight = Math.Max(150f, rightColumnHeight - replayMapHeight - 8f);
+
+        // Reuse the exact replay map renderer and the same selectedMs cursor used elsewhere.
+        // Video playback, seeking and map actors/objectives therefore advance as one timeline.
+        ImGui.BeginChild("recording-synced-map", new Vector2(0, replayMapHeight), false,
+            ImGuiWindowFlags.NoScrollbar);
+        DrawMovementMap(match, detail, new Vector2(0, replayMapHeight));
+        ImGui.EndChild();
+        ImGui.Spacing();
+        ImGui.BeginChild("recording-moments", new Vector2(0, replayEvidenceHeight),
+            false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
+        DrawRecordingMomentEvidence(match, detail);
+        ImGui.EndChild();
+        ImGui.EndTable();
+    }
+
+    private RecordingPlaybackState SendPlaybackCommand(LocalMatchAnalysis match, string command,
+        Vector2 origin, float width, float height, float speed) =>
+        recordingIpc.Control(new RecordingPlaybackRequest(RecordingContract.Schema, command,
+            match.MatchUid, (long)selectedMs, (int)MathF.Round(origin.X), (int)MathF.Round(origin.Y),
+            (int)MathF.Round(width), (int)MathF.Round(height), true, speed,
+            recordingFrameWidth));
+
+    private void HideRecordingPlayback()
+    {
+        if (!recordingPlaybackWasVisible || string.IsNullOrWhiteSpace(matchUid)) return;
+        recordingPlaybackWasVisible = false;
+        try
+        {
+            recordingIpc.Control(new RecordingPlaybackRequest(RecordingContract.Schema, "hide",
+                matchUid, (long)selectedMs, Visible: false, Speed: recordingPlaybackSpeed,
+                PreferredFrameWidth: recordingFrameWidth));
+        }
+        catch
+        {
+            // Recorder is optional and may already have unloaded. Closing Chronicle must remain safe.
+        }
+    }
+
+    public void DisposeRecordingResources()
+    {
+        HideRecordingPlayback();
+        recordingFrameTexture.Dispose();
+    }
+
+    private void DrawRecordingMomentEvidence(LocalMatchAnalysis match, DetailedAnalysis detail)
+    {
+        ImGui.TextColored(Cyan, T("recordingMomentEvidence"));
+        var now = (long)selectedMs;
+        var score = NearestScore(detail, now);
+        var movement = NearestMovement(detail, now);
+        if (score != null)
+            ImGui.TextUnformatted($"{Clock(now)}  ·  {score.Maelstrom} / {score.Adders} / {score.Flames}");
+        if (movement != null)
+            ImGui.TextDisabled($"{T("visible")} {movement.VisibleActors} · {T("frameTime")} {Clock(movement.ElapsedMs)}");
+
+        var nearbyObjectives = (detail.ObjectiveTimeline ?? [])
+            .Where(row => Math.Abs(row.ElapsedMs - now) <= 5_000)
+            .OrderBy(row => Math.Abs(row.ElapsedMs - now)).ThenBy(row => row.ElapsedMs)
+            .Take(8).ToArray();
+        var nearbyDeaths = (detail.DeathTimeline ?? [])
+            .Where(row => Math.Abs(row.ElapsedMs - now) <= 5_000)
+            .OrderBy(row => Math.Abs(row.ElapsedMs - now)).Take(4).ToArray();
+        var nearbyActions = (detail.Actions ?? [])
+            .Where(row => Math.Abs(row.ElapsedMs - now) <= 2_500 &&
+                          (row.Damage > 0 || row.Healing > 0))
+            .OrderBy(row => Math.Abs(row.ElapsedMs - now)).Take(10).ToArray();
+
+        if (nearbyObjectives.Length == 0 && nearbyDeaths.Length == 0 && nearbyActions.Length == 0)
+        {
+            ImGui.TextDisabled(T("recordingNoNearbyEvidence"));
+            return;
+        }
+        foreach (var row in nearbyObjectives)
+        {
+            if (ImGui.SmallButton($"{Clock(row.ElapsedMs)}##recording-objective-{row.ObjectId}-{row.ElapsedMs}"))
+            {
+                selectedMs = row.ElapsedMs;
+                recordingSeekPending = true;
+            }
+            ImGui.SameLine();
+            ImGui.TextUnformatted($"{row.Label} · {row.State}" +
+                                  (string.IsNullOrWhiteSpace(row.DisplayText) ? string.Empty : $" · {row.DisplayText}"));
+        }
+        foreach (var row in nearbyDeaths)
+        {
+            if (ImGui.SmallButton($"{Clock(row.ElapsedMs)}##recording-death-{row.TargetEntityId}-{row.ElapsedMs}"))
+            {
+                selectedMs = row.ElapsedMs;
+                recordingSeekPending = true;
+            }
+            ImGui.SameLine();
+            ImGui.TextColored(new Vector4(1f, .42f, .42f, 1f), T("deathRecords"));
+        }
+        foreach (var row in nearbyActions)
+        {
+            if (ImGui.SmallButton($"{Clock(row.ElapsedMs)}##recording-action-{row.ActionId}-{row.ElapsedMs}"))
+            {
+                selectedMs = row.ElapsedMs;
+                recordingSeekPending = true;
+            }
+            ImGui.SameLine();
+            var amount = row.Damage > 0 ? $"-{row.Damage:N0}" : $"+{row.Healing:N0}";
+            ImGui.TextUnformatted($"{row.SourceName} → {row.TargetName} · {row.ActionName} · {amount}");
+        }
+    }
+
+    private static long ReplayMaximumMs(DetailedAnalysis detail) => Math.Max(1,
+        Math.Max(detail.ScoreTimeline.LastOrDefault()?.ElapsedMs ?? 0,
+            detail.MovementTimeline.LastOrDefault()?.ElapsedMs ?? 0));
 
     private void DrawCrystallineTeamIdentity(LocalMatchAnalysis match, DetailedAnalysis detail,
         ScorePoint? score, MovementPoint? movement)
@@ -1837,46 +2142,31 @@ internal sealed class MatchDetailWindow : Window
         var mapOffsetX = 0;
         var mapOffsetY = 0;
         var mapBackgroundLoaded = false;
-        if (MapAssets.TryGetValue(match.DutyId, out var mapAsset))
-        {
-            try
-            {
-                if (!mapTextures.TryGetValue(match.DutyId, out var texture))
-                    mapTextures[match.DutyId] = texture = textureProvider.GetFromFile(
-                        Path.Combine(assetRoot, "assets", "maps", mapAsset.FileName));
-                var wrap = texture.GetWrapOrDefault();
-                if (wrap != null)
-                {
-                    draw.AddImage(wrap.Handle, origin, origin + size, uvMin, uvMax,
-                        ImGui.ColorConvertFloat4ToU32(new Vector4(1, 1, 1, .9f)));
-                    mapBackgroundLoaded = true;
-                }
-            }
-            catch { /* Fall back to the coordinate grid when an optional map asset cannot load. */ }
-        }
-        else if (match.Schema == LocalMatchAnalyzer.CrystallineSchema)
+        if (match.TerritoryId != 0)
         {
             try
             {
                 var territory = dataManager.GetExcelSheet<TerritoryTypeSheet>().GetRow(match.TerritoryId);
                 var map = territory.Map.Value;
-                mapFactor = Math.Max(1, (int)map.SizeFactor);
-                mapOffsetX = map.OffsetX;
-                mapOffsetY = map.OffsetY;
-                var id = map.Id.ToString();
-                var texturePath = $"ui/map/{id}/{id.Replace("/", string.Empty)}_m.tex";
-                if (!mapTextures.TryGetValue(match.DutyId, out var texture))
-                    mapTextures[match.DutyId] = texture = textureProvider.GetFromGame(texturePath);
+                var texturePath = GameAssetPresentation.MapTexturePath(map.Id.ToString());
+                var textureKey = GameAssetPresentation.MapTextureCacheKey(match.TerritoryId);
+                if (!mapTextures.TryGetValue(textureKey, out var texture))
+                    mapTextures[textureKey] = texture = textureProvider.GetFromGame(texturePath);
                 var wrap = texture.GetWrapOrDefault();
                 if (wrap != null)
                 {
+                    mapFactor = Math.Max(1, (int)map.SizeFactor);
+                    mapOffsetX = map.OffsetX;
+                    mapOffsetY = map.OffsetY;
                     draw.AddImage(wrap.Handle, origin, origin + size, uvMin, uvMax,
                         ImGui.ColorConvertFloat4ToU32(new Vector4(1, 1, 1, .9f)));
                     mapBackgroundLoaded = true;
                 }
             }
-            catch { /* Keep the coordinate-grid replay when the game map texture is unavailable. */ }
+            catch { /* The packaged map remains a temporary validation fallback. */ }
         }
+        // Game-owned map textures are available for every supported PvP
+        // territory. A missing future texture degrades to the coordinate grid.
         // FFXIV map-space conversion: the map sheet supplies its scale and world offsets.
         Vector2 Point(double x, double z)
         {
@@ -2496,9 +2786,9 @@ internal sealed class MatchDetailWindow : Window
         }
         draw.AddText(origin + new Vector2(12, size.Y - 22), ImGui.ColorConvertFloat4ToU32(Muted),
             $"{T("tenSecondTrail")} · {T("mapControls")}");
-        if (MapAssets.TryGetValue(match.DutyId, out var asset))
+        if (MapNameKeys.TryGetValue(match.DutyId, out var nameKey))
             draw.AddText(origin + new Vector2(12, 10), ImGui.ColorConvertFloat4ToU32(Vector4.One),
-                $"{T(asset.NameKey)} · {T("mapOverlay")}");
+                $"{T(nameKey)} · {(mapBackgroundLoaded ? T("mapOverlay") : T("coordinateGrid"))}");
         else if (match.Schema == LocalMatchAnalyzer.CrystallineSchema)
             draw.AddText(origin + new Vector2(12, 10), ImGui.ColorConvertFloat4ToU32(Vector4.One),
                 $"{T("ccCrystalReplay")} · {(mapBackgroundLoaded ? T("mapOverlay") : T("coordinateGrid"))}");
@@ -2824,7 +3114,7 @@ internal sealed class MatchDetailWindow : Window
                          IsAnyCloudNineGaleSphereLoaded(detail, row.ElapsedMs + 1)))
                 pickups.Add((row.ElapsedMs, row.X, row.Z, true));
 
-            // The real 0.8.93 archive carries status 4385 in actor-vitals
+            // A historical archive carries status 4385 in actor-vitals
             // snapshots rather than status_change packets. Detect its first
             // observed frame as a fallback for captures where the field object
             // was outside the observer's loaded-object radius.
@@ -3960,13 +4250,8 @@ internal sealed class MatchDetailWindow : Window
             try
             {
                 if (!markerIcons.TryGetValue(iconId, out var texture))
-                {
-                    var bundled = Path.Combine(assetRoot, "assets", "markers",
-                        MarkerUiPrimitives.AssetFileName(iconId));
-                    markerIcons[iconId] = texture = File.Exists(bundled)
-                        ? textureProvider.GetFromFile(bundled)
-                        : textureProvider.GetFromGameIcon(new GameIconLookup(iconId, hiRes: true));
-                }
+                    markerIcons[iconId] = texture = textureProvider.GetFromGameIcon(
+                        new GameIconLookup(iconId, hiRes: true));
                 var wrap = texture.GetWrapOrDefault();
                 if (wrap != null)
                 {
@@ -4183,9 +4468,13 @@ internal sealed class MatchDetailWindow : Window
             .ToArray();
         actorRows = (sliceSortColumn switch
         {
-            0 => sliceSortDescending ? actorRows.OrderByDescending(x => x.Player.Team) : actorRows.OrderBy(x => x.Player.Team),
-            1 => sliceSortDescending ? actorRows.OrderByDescending(x => x.Player.Name) : actorRows.OrderBy(x => x.Player.Name),
-            2 => sliceSortDescending ? actorRows.OrderByDescending(x => x.Player.ClassJobId) : actorRows.OrderBy(x => x.Player.ClassJobId),
+            0 => sliceSortDescending
+                ? actorRows.OrderByDescending(x => FrontlinePlayerIdentityContract.TeamSquadSortKey(
+                    x.Player.Team, x.Player.Alliance))
+                : actorRows.OrderBy(x => FrontlinePlayerIdentityContract.TeamSquadSortKey(
+                    x.Player.Team, x.Player.Alliance)),
+            1 => sliceSortDescending ? actorRows.OrderByDescending(x => x.Player.ClassJobId) : actorRows.OrderBy(x => x.Player.ClassJobId),
+            2 => sliceSortDescending ? actorRows.OrderByDescending(x => x.Player.Name) : actorRows.OrderBy(x => x.Player.Name),
             3 => sliceSortDescending ? actorRows.OrderByDescending(x => x.Output) : actorRows.OrderBy(x => x.Output),
             4 => sliceSortDescending ? actorRows.OrderByDescending(x => x.Taken) : actorRows.OrderBy(x => x.Taken),
             5 => sliceSortDescending ? actorRows.OrderByDescending(x => x.Healing) : actorRows.OrderBy(x => x.Healing),
@@ -4196,10 +4485,11 @@ internal sealed class MatchDetailWindow : Window
             ImGuiTableFlags.Resizable | ImGuiTableFlags.ScrollY | ImGuiTableFlags.SizingFixedFit,
             new Vector2(0, 185)))
         {
-            var headers = new[] { T("team"), T("player"), T("job"), T("output"), T("damageTaken"), T("healing"), T("downs") };
-            ImGui.TableSetupColumn(headers[0], ImGuiTableColumnFlags.WidthFixed, 82);
-            ImGui.TableSetupColumn(headers[1], ImGuiTableColumnFlags.WidthStretch, 1);
-            ImGui.TableSetupColumn(headers[2], ImGuiTableColumnFlags.WidthFixed, 34);
+            var headers = new[] { T("team"), T("job"), T("player"), T("output"), T("damageTaken"), T("healing"), T("downs") };
+            ImGui.TableSetupColumn(headers[0], ImGuiTableColumnFlags.WidthFixed,
+                match.Schema == LocalMatchAnalyzer.CrystallineSchema ? 58 : 28);
+            ImGui.TableSetupColumn(headers[1], ImGuiTableColumnFlags.WidthFixed, 34);
+            ImGui.TableSetupColumn(headers[2], ImGuiTableColumnFlags.WidthStretch, 1);
             for (var i = 3; i < headers.Length; i++) ImGui.TableSetupColumn(headers[i], ImGuiTableColumnFlags.WidthFixed, 92);
             ImGui.TableSetupScrollFreeze(0, 1);
             ImGui.TableNextRow(ImGuiTableRowFlags.Headers);
@@ -4222,11 +4512,12 @@ internal sealed class MatchDetailWindow : Window
                         T(row.Player.Team == 0 ? "ccAstra" : "ccUmbra"));
                 else DrawTeamSquad(row.Player.Team, row.Player.Alliance);
                 ImGui.TableNextColumn();
+                DrawJobIcon(row.Player.ClassJobId);
+                ImGui.TableNextColumn();
                 var focusClicked = DrawCompactFocusButton($"slice-{row.Player.WorldId}-{row.Player.Name}");
                 if (focusClicked)
                     SetFocus(row.Player, detail);
                 ImGui.SameLine(0, 5); DrawCopyableText($"{row.Player.Name}@{WorldName(row.Player.WorldId)}");
-                ImGui.TableNextColumn(); DrawJobIcon(row.Player.ClassJobId);
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(row.Output.ToString("N0"));
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(row.Taken.ToString("N0"));
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(row.Healing.ToString("N0"));
@@ -4254,6 +4545,11 @@ internal sealed class MatchDetailWindow : Window
         ushort ownerWorldId, LocalPlayerAnalysis player) =>
         (name == player.Name && (worldId == 0 || worldId == player.WorldId)) ||
         (ownerName == player.Name && (ownerWorldId == 0 || ownerWorldId == player.WorldId));
+
+    private static LocalPlayerAnalysis? FindMatchPlayer(LocalMatchAnalysis match,
+        string name, ushort worldId) => match.Players.FirstOrDefault(player =>
+        string.Equals(player.Name, name, StringComparison.Ordinal) &&
+        (worldId == 0 || player.WorldId == 0 || player.WorldId == worldId));
 
     private void MetricOrUnavailable(long value)
     {
@@ -4399,10 +4695,10 @@ internal sealed class MatchDetailWindow : Window
                         (group.AdvanceSupportLinks > 0
                             ? $" · {T("advanceSupport")} {group.AdvanceSupport:0} ({group.AdvanceSupportLinks})"
                             : string.Empty));
-                    if (ImGui.BeginTable($"group-members-{group.Team}-{group.Alliance}", 5,
+                    if (ImGui.BeginTable($"group-members-{group.Team}-{group.Alliance}", 6,
                         ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInnerH | ImGuiTableFlags.SizingStretchProp))
                     {
-                        foreach (var title in new[] { T("job"), T("player"), "KDA", T("damage"), T("focus") })
+                        foreach (var title in new[] { T("team"), T("job"), T("player"), "KDA", T("damage"), T("focus") })
                             ImGui.TableSetupColumn(title);
                         ImGui.TableHeadersRow();
                         for (var memberIndex = 0; memberIndex < group.Members.Count; memberIndex++)
@@ -4413,7 +4709,9 @@ internal sealed class MatchDetailWindow : Window
                             var deaths = member.Kills != 0 || member.Deaths != 0 || member.Assists != 0 ? member.Deaths : player?.Deaths ?? 0;
                             var assists = member.Kills != 0 || member.Deaths != 0 || member.Assists != 0 ? member.Assists : player?.Assists ?? 0;
                             var damage = member.Damage != 0 ? member.Damage : player?.DamageDealt ?? 0;
-                            ImGui.TableNextRow(); ImGui.TableNextColumn(); DrawJobIcon(member.ClassJobId);
+                            ImGui.TableNextRow(); ImGui.TableNextColumn();
+                            DrawTeamSquad(group.Team, group.Alliance);
+                            ImGui.TableNextColumn(); DrawJobIcon(member.ClassJobId);
                             ImGui.TableNextColumn(); DrawCopyableText($"{member.Name}@{WorldName(member.WorldId)}");
                             ImGui.TableNextColumn(); ImGui.TextUnformatted($"{kills}/{deaths}/{assists}");
                             ImGui.TableNextColumn(); ImGui.TextUnformatted(damage.ToString("N0"));
@@ -4443,8 +4741,8 @@ internal sealed class MatchDetailWindow : Window
                 new Vector2(0, item.CoordinationNote ? 135 : 165)))
             {
                 ImGui.TableSetupColumn("#", ImGuiTableColumnFlags.WidthFixed, 28);
+                ImGui.TableSetupColumn(T("teamAndSquad"), ImGuiTableColumnFlags.WidthFixed, 28);
                 ImGui.TableSetupColumn(T("job"), ImGuiTableColumnFlags.WidthFixed, 34);
-                ImGui.TableSetupColumn(T("teamAndSquad"), ImGuiTableColumnFlags.WidthFixed, 92);
                 ImGui.TableSetupColumn(T("player"));
                 ImGui.TableSetupColumn("Logs", ImGuiTableColumnFlags.WidthFixed, 54);
                 ImGui.TableSetupScrollFreeze(0, 1); ImGui.TableHeadersRow();
@@ -4454,8 +4752,8 @@ internal sealed class MatchDetailWindow : Window
                     if (IsPlayerFocused(row.Player))
                         ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg0,
                             ImGui.ColorConvertFloat4ToU32(new Vector4(.42f, .34f, .08f, .62f)));
-                    ImGui.TableNextColumn(); DrawJobIcon(row.Player.ClassJobId);
                     ImGui.TableNextColumn(); DrawTeamSquad(row.Player.Team, row.Player.Alliance);
+                    ImGui.TableNextColumn(); DrawJobIcon(row.Player.ClassJobId);
                     ImGui.TableNextColumn();
                     if (DrawCompactFocusButton($"{item.Title}-{i}"))
                         SetFocus(row.Player, detail);
@@ -4492,7 +4790,7 @@ internal sealed class MatchDetailWindow : Window
         }
         if (selectedAnomalyKey == null || rows.All(row => AnomalyKey(row) != selectedAnomalyKey))
             SelectAnomaly(rows[0], detail);
-        DrawIntegrityReviewSummary(rows, detail);
+        DrawIntegrityReviewSummary(match, rows, detail);
         ImGui.Spacing();
         if (ImGui.TreeNode($"{T("candidateReviewQueue")} ({rows.Length})##candidate-review-queue"))
         {
@@ -4514,10 +4812,17 @@ internal sealed class MatchDetailWindow : Window
                     ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg0,
                         ImGui.ColorConvertFloat4ToU32(WithAlpha(Cyan, .24f)));
                 ImGui.TableNextColumn();
+                var player = FindMatchPlayer(match, row.PlayerName, row.WorldId);
+                if (player != null)
+                {
+                    DrawTeamSquad(player.Team, player.Alliance);
+                    ImGui.SameLine(0, 4);
+                }
+                DrawJobIcon(row.ClassJobId);
+                ImGui.SameLine(0, 5); DrawCopyableText($"{row.PlayerName}@{WorldName(row.WorldId)}");
+                ImGui.SameLine(0, 4);
                 if (ImGui.SmallButton($"{(selected ? "●" : "○")}##anomaly-select-{AnomalyKey(row)}"))
                     SelectAnomaly(row, detail);
-                ImGui.SameLine(0, 4); DrawJobIcon(row.ClassJobId);
-                ImGui.SameLine(0, 5); DrawCopyableText($"{row.PlayerName}@{WorldName(row.WorldId)}");
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(T(row.Kind));
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(row.Occurrences.ToString());
                 ImGui.TableNextColumn();
@@ -4535,8 +4840,8 @@ internal sealed class MatchDetailWindow : Window
         DrawIntegrityMethodDisclosure(detail);
     }
 
-    private void DrawIntegrityReviewSummary(IReadOnlyList<AnomalyCandidate> rows,
-        DetailedAnalysis detail)
+    private void DrawIntegrityReviewSummary(LocalMatchAnalysis match,
+        IReadOnlyList<AnomalyCandidate> rows, DetailedAnalysis detail)
     {
         var players = rows.Select(row => (row.PlayerName, row.WorldId)).Distinct().Count();
         var episodes = rows.Sum(row => Math.Max(0, row.Occurrences));
@@ -4562,6 +4867,12 @@ internal sealed class MatchDetailWindow : Window
                 : WithAlpha(Muted, .42f));
             ImGui.BeginChild("candidate-summary-card", new Vector2(0, 108), true,
                 ImGuiWindowFlags.NoScrollbar);
+            var player = FindMatchPlayer(match, row.PlayerName, row.WorldId);
+            if (player != null)
+            {
+                DrawTeamSquad(player.Team, player.Alliance);
+                ImGui.SameLine(0, 4);
+            }
             DrawJobIcon(row.ClassJobId); ImGui.SameLine(0, 6);
             DrawCopyableText($"{row.PlayerName}@{WorldName(row.WorldId)}", selected ? Cyan : Vector4.One);
             ImGui.SameLine(0, 10);
@@ -4668,6 +4979,12 @@ internal sealed class MatchDetailWindow : Window
             DrawMovementMap(match, detail, new Vector2(0, evidenceMapHeight), chosen);
             if (evidenceColumns == 1) { ImGui.TableNextRow(); ImGui.TableNextColumn(); }
             else ImGui.TableNextColumn();
+            var player = FindMatchPlayer(match, chosen.PlayerName, chosen.WorldId);
+            if (player != null)
+            {
+                DrawTeamSquad(player.Team, player.Alliance);
+                ImGui.SameLine(0, 4);
+            }
             DrawJobIcon(chosen.ClassJobId); ImGui.SameLine(0, 5);
             DrawCopyableText($"{chosen.PlayerName}@{WorldName(chosen.WorldId)}", Cyan);
             ImGui.SameLine(0, 7); ImGui.TextColored(Cyan, T(chosen.Kind));
@@ -4686,8 +5003,6 @@ internal sealed class MatchDetailWindow : Window
             }
             var distribution = FindAnomalyDistribution(detail, chosen) ??
                                BuildCandidateDistribution(chosen, ExpectedDistributionKind(chosen.Kind));
-            var player = match.Players.FirstOrDefault(x => x.Name == chosen.PlayerName &&
-                (chosen.WorldId == 0 || x.WorldId == 0 || x.WorldId == chosen.WorldId));
             var fragility = player == null ? null : TendenciesFor(match, player)
                 .FirstOrDefault(x => x.Key == "fragility");
             // Default comparison always uses the single downloaded full snapshot.
@@ -4695,7 +5010,7 @@ internal sealed class MatchDetailWindow : Window
             var useFragilityCohort = false;
             var cohort = IntegrityCohortFor(match, chosen, distribution?.EvidenceScope ?? string.Empty);
             if (distribution != null)
-                DrawAnomalyHistogram(distribution, chosen, cohort, useFragilityCohort);
+                DrawAnomalyHistogram(match, distribution, chosen, cohort, useFragilityCohort);
             else ImGui.TextDisabled(T("noDistributionData"));
             if (chosen.Kind == "animation_lock_triple_weave")
             {
@@ -4709,7 +5024,7 @@ internal sealed class MatchDetailWindow : Window
                     var intervalCohort = IntegrityCohortFor(match, intervalCandidate,
                         intervalDistribution.EvidenceScope,
                         useFragilityCohort ? "fragility" : null, useFragilityCohort ? 25 : null);
-                    DrawAnomalyHistogram(intervalDistribution, chosen, intervalCohort,
+                    DrawAnomalyHistogram(match, intervalDistribution, chosen, intervalCohort,
                         useFragilityCohort);
                 }
             }
@@ -5200,7 +5515,7 @@ internal sealed class MatchDetailWindow : Window
         var synthetic = new AnomalyCandidate(first.Kind, string.Empty, 0, first.ClassJobId,
             0, 0, "observed", aggregate.EvidenceScope, string.Empty, ActionId: first.ActionId);
         var cohort = IntegrityCohortFor(match, synthetic, aggregate.EvidenceScope);
-        DrawAnomalyHistogram(aggregate, synthetic, cohort, false, compatible, true);
+        DrawAnomalyHistogram(match, aggregate, synthetic, cohort, false, compatible, true);
     }
 
     private IntegrityCohortSnapshot IntegrityCohortFor(LocalMatchAnalysis match,
@@ -5284,8 +5599,8 @@ internal sealed class MatchDetailWindow : Window
         _ => null
     };
 
-    private void DrawAnomalyHistogram(AnomalyDistribution distribution, AnomalyCandidate candidate,
-        IntegrityCohortSnapshot cohort, bool fragilityFiltered,
+    private void DrawAnomalyHistogram(LocalMatchAnalysis match, AnomalyDistribution distribution,
+        AnomalyCandidate candidate, IntegrityCohortSnapshot cohort, bool fragilityFiltered,
         IReadOnlyList<AnomalyDistribution>? playerOverlays = null, bool compact = false)
     {
         ImGui.Spacing();
@@ -5506,6 +5821,12 @@ internal sealed class MatchDetailWindow : Window
             ImGui.TextColored(new Vector4(1f,.55f,.28f,1f), T("robustTailMarkers"));
             foreach (var outlier in outlierLabels)
             {
+                var player = FindMatchPlayer(match, outlier.Row.PlayerName, outlier.Row.WorldId);
+                if (player != null)
+                {
+                    DrawTeamSquad(player.Team, player.Alliance);
+                    ImGui.SameLine(0, 4);
+                }
                 DrawJobIcon(outlier.Row.ClassJobId); ImGui.SameLine(0, 4);
                 DrawCopyableText($"{outlier.Row.PlayerName}@{WorldName(outlier.Row.WorldId)}", outlier.Color);
             }
@@ -5679,23 +6000,25 @@ internal sealed class MatchDetailWindow : Window
         if (ImGui.BeginTable("death-list", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollY |
             ImGuiTableFlags.BordersInnerH | ImGuiTableFlags.Resizable, new Vector2(0, 520)))
         {
-            foreach (var title in new[] { T("time"), T("player"), T("job"), T("team") }) ImGui.TableSetupColumn(title);
+            foreach (var title in new[] { T("time"), T("team"), T("job"), T("player") }) ImGui.TableSetupColumn(title);
             ImGui.TableSetupScrollFreeze(0, 1); ImGui.TableHeadersRow();
             foreach (var death in deaths)
             {
                 ImGui.TableNextRow(); Cell(Clock(death.frame.ElapsedMs));
+                ImGui.TableNextColumn(); DrawCurrentModeTeam(death.actor.Team, death.actor.Alliance);
+                ImGui.TableNextColumn(); DrawJobIcon(death.actor.ClassJobId);
                 ImGui.TableNextColumn();
                 if (DrawCompactFocusButton($"death-{death.frame.ElapsedMs}-{death.actor.EntityId}"))
                 { selectedDeathEntityId = death.actor.EntityId; selectedDeathMs = death.frame.ElapsedMs; }
                 ImGui.SameLine(0, 5); DrawCopyableText($"{death.actor.Name}@{WorldName(death.actor.WorldId)}");
-                ImGui.TableNextColumn(); DrawJobIcon(death.actor.ClassJobId);
-                ImGui.TableNextColumn(); DrawCurrentModeTeam(death.actor.Team, death.actor.Alliance);
             }
             ImGui.EndTable();
         }
         var selected = deaths.FirstOrDefault(x => x.actor.EntityId == selectedDeathEntityId &&
             x.frame.ElapsedMs == selectedDeathMs) is var found && found.actor != null ? found : deaths[0];
         ImGui.TableNextColumn();
+        DrawCurrentModeTeam(selected.actor.Team, selected.actor.Alliance); ImGui.SameLine(0, 4);
+        DrawJobIcon(selected.actor.ClassJobId); ImGui.SameLine(0, 4);
         ImGui.TextColored(Cyan, $"{selected.actor.Name}@{WorldName(selected.actor.WorldId)} · {T("lastFifteenSeconds")}");
         DrawDeathTimeline(detail, selected.actor, selected.frame.ElapsedMs);
         ImGui.Spacing(); ImGui.TextColored(Cyan, T("behaviorRankings"));
@@ -6049,15 +6372,9 @@ internal sealed class MatchDetailWindow : Window
         var isSummon = !string.IsNullOrWhiteSpace(ownerName);
         var focusName = isSummon ? ownerName : name;
         var focusWorld = isSummon ? ownerWorldId : worldId;
-        if (allowFocus && !string.IsNullOrWhiteSpace(focusName))
+        if (team < 3)
         {
-            var focusClicked = DrawCompactFocusButton($"focus-actor-{copyFieldSequence++}");
-            if (focusClicked)
-            {
-                ToggleFocus(focusName, focusWorld, isSummon ? 0 : entityId);
-                if (focusElapsedMs.HasValue) selectedMs = focusElapsedMs.Value;
-            }
-            if (focusElapsedMs.HasValue && ImGui.IsItemHovered()) ImGui.SetTooltip(T("focusMarkedPlayer"));
+            DrawCurrentModeTeam(team, alliance);
             ImGui.SameLine(0, 4);
         }
         DrawJobIcon(isSummon && ownerJobId != 0 ? ownerJobId : classJobId); ImGui.SameLine(0, 4);
@@ -6071,10 +6388,17 @@ internal sealed class MatchDetailWindow : Window
         else if (!string.IsNullOrWhiteSpace(name)) DrawCopyableText(name + world);
         else if (entityId == 0) ImGui.TextDisabled(T("environmentSource"));
         else ImGui.TextDisabled(entityId == uint.MaxValue ? T("unresolvedActor") : $"{T("unresolvedActor")} #{entityId:X8}");
-        if (team < 3)
+        if (allowFocus && !string.IsNullOrWhiteSpace(focusName))
         {
-            ImGui.SameLine(0, 5);
-            DrawCurrentModeTeam(team, alliance);
+            ImGui.SameLine(0, 4);
+            var focusClicked = DrawCompactFocusButton($"focus-actor-{copyFieldSequence++}");
+            if (focusClicked)
+            {
+                ToggleFocus(focusName, focusWorld, isSummon ? 0 : entityId);
+                if (focusElapsedMs.HasValue) selectedMs = focusElapsedMs.Value;
+            }
+            if (focusElapsedMs.HasValue && ImGui.IsItemHovered())
+                ImGui.SetTooltip(T("focusMarkedPlayer"));
         }
     }
     private void DrawActionSource(ActionSliceEvent row)
@@ -6103,16 +6427,9 @@ internal sealed class MatchDetailWindow : Window
     }
     private void DrawTeamSquad(byte team, byte alliance)
     {
-        var color = team < TeamColors.Length ? TeamColors[team] : Muted;
-        if (alliance >= 9) { ImGui.TextColored(color, "?"); return; }
-        var label = ((char)('A' + alliance % 3)).ToString();
-        var at = ImGui.GetCursorScreenPos();
-        ImGui.InvisibleButton($"{label}##squad-{copyFieldSequence++}", new Vector2(15, ImGui.GetTextLineHeight()));
-        var packed = ImGui.ColorConvertFloat4ToU32(color);
-        var draw = ImGui.GetWindowDrawList();
-        draw.AddText(at, packed, label);
-        draw.AddText(at + new Vector2(.65f, 0), packed, label);
-        if (ImGui.IsItemHovered()) ImGui.SetTooltip($"{TeamName(team)} · {label}");
+        FrontlinePlayerIdentityRenderer.DrawSquadBadge(
+            $"detail-{copyFieldSequence++}", team, alliance,
+            $"{TeamName(team)} · {FrontlinePlayerIdentityContract.SquadLabel(alliance)}");
     }
 
     private void DrawCurrentModeTeam(byte team, byte alliance)

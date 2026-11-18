@@ -56,7 +56,6 @@ internal sealed class LiveCombatWindow : Window
     private IReadOnlyList<LiveObservedKda> cachedObservedKda = [];
     private long cachedMatchEvidenceEndMs = -1;
     private long cachedEndMs = -1;
-    private bool cachedEncounterActive;
     private long nextRefreshAt;
     private long copiedUntil;
     private bool frozen;
@@ -65,18 +64,19 @@ internal sealed class LiveCombatWindow : Window
     // unexpected hit: "what did I just take?"
     // 即时切片默认只看本机承受，减少打开页面后的第一次操作。
     private int direction = 2;
+    private int observedKdaSortColumn;
+    private bool observedKdaSortDescending;
     private string activeMatchUid = string.Empty;
     private float markerMapZoom = 1.45f;
     private Vector2 markerMapCenterUv = new(.5f, .5f);
 
-    private sealed record MapAsset(string FileName, string NameKey);
-    private static readonly IReadOnlyDictionary<uint, MapAsset> MapAssets = new Dictionary<uint, MapAsset>
+    private static readonly IReadOnlyDictionary<uint, string> MapNameKeys = new Dictionary<uint, string>
     {
-        [127] = new("borderland_ruins.png", "mapBorderland"),
-        [130] = new("seal_rock.png", "mapSealRock"),
-        [180] = new("fields_of_glory.png", "mapShatter"),
-        [701] = new("onsal_hakair.png", "mapOnsal"),
-        [1080] = new("worqor_chirteh.png", "mapWorqor")
+        [127] = "mapBorderland",
+        [130] = "mapSealRock",
+        [180] = "mapShatter",
+        [701] = "mapOnsal",
+        [1080] = "mapWorqor"
     };
 
     public LiveCombatWindow(Configuration configuration, LiveCombatPage page,
@@ -158,14 +158,17 @@ internal sealed class LiveCombatWindow : Window
             else DrawLiveTendencyCandidates(ui);
             return;
         }
-        if (page == LiveCombatPage.ObservedKda) { DrawObservedKda(); return; }
+        if (page == LiveCombatPage.ObservedKda) { DrawObservedKda(ui, crystalline); return; }
 
-        ImGui.SetNextItemWidth(155);
+        ImGui.SetNextItemWidth(78);
         var options = new[] { 15, 30, 60 }; var index = Array.IndexOf(options, seconds);
-        if (ImGui.Combo(T("secondsBeforeEncounterEnd"), ref index, "15 s\0 30 s\0 60 s\0")) seconds = options[index];
-        ImGui.SameLine(); ImGui.SetNextItemWidth(190);
-        ImGui.Combo(T("liveDirection"), ref direction,
+        if (ImGui.Combo("##live-slice-seconds", ref index, "15 s\0 30 s\0 60 s\0"))
+            seconds = options[index];
+        if (ImGui.IsItemHovered()) ImGui.SetTooltip(T("secondsBeforeEncounterEnd"));
+        ImGui.SameLine(); ImGui.SetNextItemWidth(112);
+        ImGui.Combo("##live-slice-direction", ref direction,
             $"{T("liveAll")}\0{T("liveOutgoing")}\0{T("liveIncoming")}\0");
+        if (ImGui.IsItemHovered()) ImGui.SetTooltip(T("liveDirection"));
         ImGui.SameLine();
         if (ImGui.Button(frozen ? T("resumeBuffer") : T("freezeBuffer")))
         {
@@ -173,9 +176,11 @@ internal sealed class LiveCombatWindow : Window
             else { frozen = false; nextRefreshAt = 0; }
         }
 
-        ImGui.SameLine();
-        var bufferState = frozen ? T("bufferFrozen") : cachedEncounterActive ? T("encounterActive") : T("lastEncounterStored");
-        ImGui.TextColored(frozen ? new Vector4(1f,.72f,.28f,1) : new Vector4(.45f,.8f,1f,1), bufferState);
+        if (!crystalline)
+        {
+            ImGui.SameLine(0, 8);
+            DrawCompactScoreStrip(ui);
+        }
         if (copiedUntil > now) { ImGui.SameLine(); ImGui.TextColored(new Vector4(.35f,.9f,.58f,1), T("copied")); }
         var cutoff = cachedEndMs - seconds * 1000L;
         var actorColumns = LiveCombatPageContract.ActorColumns(direction);
@@ -215,13 +220,15 @@ internal sealed class LiveCombatWindow : Window
             if (actorColumns.ShowSource)
             {
                 ImGui.TableNextColumn(); DrawActor(row.SourceJobId, row.SourceName, row.SourceWorldId,
-                    row.SourceTeam, row.SourceBattalion, ui.LocalPlayerBattalion, sourceSide, crystalline);
+                    row.SourceTeam, row.SourceAlliance, row.SourceBattalion,
+                    ui.LocalPlayerBattalion, sourceSide, crystalline);
             }
             ImGui.TableNextColumn(); DrawAction(row.ActionId, row.ActionType, 18);
             if (actorColumns.ShowTarget)
             {
                 ImGui.TableNextColumn(); DrawActor(row.TargetJobId, row.TargetName, row.TargetWorldId,
-                    row.TargetTeam, row.TargetBattalion, ui.LocalPlayerBattalion, targetSide, crystalline);
+                    row.TargetTeam, row.TargetAlliance, row.TargetBattalion,
+                    ui.LocalPlayerBattalion, targetSide, crystalline);
             }
             ImGui.TableNextColumn(); ImGui.TextColored(row.Kind == "heal" ? new Vector4(.35f,.86f,.58f,1) : new Vector4(1f,.52f,.42f,1),
                 $"{(row.Kind == "heal" ? "+" : "-")}{row.Amount:N0}");
@@ -241,6 +248,10 @@ internal sealed class LiveCombatWindow : Window
     {
         var presentation = LiveCombatPageContract.MarkerPresentation(transparentOverlay);
         var snapshot = markers.Snapshot();
+        var playerOpacity = Math.Clamp(configuration.LiveMapPlayerOpacity, 0f, 1f);
+        var targetMarkerOpacity = Math.Clamp(configuration.LiveMapTargetMarkerOpacity, 0f, 1f);
+        var fieldMarkerOpacity = Math.Clamp(configuration.LiveMapFieldMarkerOpacity, 0f, 1f);
+        var objectiveOpacity = Math.Clamp(configuration.LiveMapObjectiveOpacity, 0f, 1f);
         var available = ImGui.GetContentRegionAvail();
         var size = new Vector2(Math.Max(420, available.X),
             Math.Max(300, available.Y - (transparentOverlay ? 4 : 0)));
@@ -263,39 +274,31 @@ internal sealed class LiveCombatWindow : Window
         var mapFactor = 100;
         var mapOffsetX = 0;
         var mapOffsetY = 0;
-        if (presentation.DrawMapTexture && MapAssets.TryGetValue(ui.DutyId, out var mapAsset))
-        {
-            try
-            {
-                if (!mapTextures.TryGetValue(ui.DutyId, out var texture))
-                    mapTextures[ui.DutyId] = texture = textureProvider.GetFromFile(
-                        Path.Combine(assetRoot, "assets", "maps", mapAsset.FileName));
-                var wrap = texture.GetWrapOrDefault();
-                if (wrap != null) draw.AddImage(wrap.Handle, origin, origin + size, uvMin, uvMax,
-                    ImGui.ColorConvertFloat4ToU32(new Vector4(1, 1, 1, .9f)));
-            }
-            catch { /* Optional map asset: coordinate grid remains usable. */ }
-        }
-        else if (presentation.DrawMapTexture && GameLayout.IsCrystallineDuty(ui.DutyId) && ui.TerritoryId != 0)
+        if (presentation.DrawMapTexture && ui.TerritoryId != 0)
         {
             try
             {
                 var territory = dataManager.GetExcelSheet<TerritoryTypeSheet>().GetRow(ui.TerritoryId);
                 var map = territory.Map.Value;
-                mapFactor = Math.Max(1, (int)map.SizeFactor);
-                mapOffsetX = map.OffsetX;
-                mapOffsetY = map.OffsetY;
-                var id = map.Id.ToString();
-                var texturePath = $"ui/map/{id}/{id.Replace("/", string.Empty)}_m.tex";
-                var textureKey = 0x8000_0000u | ui.TerritoryId;
+                var texturePath = GameAssetPresentation.MapTexturePath(map.Id.ToString());
+                var textureKey = GameAssetPresentation.MapTextureCacheKey(ui.TerritoryId);
                 if (!mapTextures.TryGetValue(textureKey, out var texture))
                     mapTextures[textureKey] = texture = textureProvider.GetFromGame(texturePath);
                 var wrap = texture.GetWrapOrDefault();
-                if (wrap != null) draw.AddImage(wrap.Handle, origin, origin + size, uvMin, uvMax,
-                    ImGui.ColorConvertFloat4ToU32(new Vector4(1, 1, 1, .9f)));
+                if (wrap != null)
+                {
+                    mapFactor = Math.Max(1, (int)map.SizeFactor);
+                    mapOffsetX = map.OffsetX;
+                    mapOffsetY = map.OffsetY;
+                    draw.AddImage(wrap.Handle, origin, origin + size, uvMin, uvMax,
+                        ImGui.ColorConvertFloat4ToU32(new Vector4(1, 1, 1, .9f)));
+                }
             }
-            catch { /* Keep the coordinate grid when the game map texture is unavailable. */ }
+            catch { /* The packaged map remains a temporary validation fallback. */ }
         }
+        // All supported PvP territories were verified against the local SqPack.
+        // If a future game patch removes a texture, retain the coordinate grid
+        // rather than shipping copied game artwork inside the plugin.
 
         Vector2 Point(float x, float z)
         {
@@ -312,14 +315,16 @@ internal sealed class LiveCombatWindow : Window
             draw.AddLine(new Vector2(x, origin.Y), new Vector2(x, origin.Y + size.Y), grid);
             draw.AddLine(new Vector2(origin.X, y), new Vector2(origin.X + size.X, y), grid);
         }
-        foreach (var field in snapshot.Fields)
-            DrawMarkerIcon(draw, Point(field.X, field.Z), field.Key, true, 14f, field.Index);
-        var weather = snapshot.Objectives
+        if (configuration.ShowLiveMapFieldMarkers)
+            foreach (var field in snapshot.Fields)
+                DrawFieldMarkerFlag(draw, Point(field.X, field.Z), field.Key, field.Index,
+                    fieldMarkerOpacity);
+        var weather = configuration.ShowLiveMapObjectives ? snapshot.Objectives
             .Where(x => x.Id == WorqorWeatherMechanics.WeatherObjectiveId ||
                         x.Label == WorqorWeatherMechanics.WeatherLabel)
             .OrderByDescending(x => WorqorWeatherMechanics.IsWarningState(x.State))
-            .FirstOrDefault();
-        if (ui.DutyId == 127)
+            .FirstOrDefault() : null;
+        if (configuration.ShowLiveMapObjectives && ui.DutyId == 127)
         {
             foreach (var node in SecureObjectiveCatalog.Nodes)
             {
@@ -339,11 +344,12 @@ internal sealed class LiveCombatWindow : Window
                     : new Vector4(.56f, .60f, .62f, .92f);
                 var labelColor = node.HomeTeam is byte homeTeam ? TeamColors[homeTeam] : ownerColor;
                 ObjectiveMapGlyphRenderer.DrawSecureNode(draw, Point(node.X, node.Z), node.Code,
-                    node.HomeTeam.HasValue, ownerColor, labelColor);
+                    node.HomeTeam.HasValue, ownerColor, labelColor, objectiveOpacity);
             }
         }
 
-        IEnumerable<LiveObjectiveMarker> objectivesToRender = snapshot.Objectives;
+        IEnumerable<LiveObjectiveMarker> objectivesToRender = configuration.ShowLiveMapObjectives
+            ? snapshot.Objectives : Array.Empty<LiveObjectiveMarker>();
         if (ui.DutyId == SealRockObjectiveCatalog.DutyId)
         {
             var spawns = snapshot.Objectives.Where(row =>
@@ -381,7 +387,7 @@ internal sealed class LiveCombatWindow : Window
             {
                 var spawnColor = TeamColors[spawnTeam];
                 ObjectiveMapGlyphRenderer.DrawSpawnLabel(draw, point, TeamName(spawnTeam),
-                    spawnColor, ui.LocalPlayerBattalion == spawnTeam);
+                    spawnColor, ui.LocalPlayerBattalion == spawnTeam, objectiveOpacity);
                 continue;
             }
             var ownerTeam = objective.OwnerTeam < 3 ? objective.OwnerTeam :
@@ -399,11 +405,12 @@ internal sealed class LiveCombatWindow : Window
                         : new Vector4(.48f, .52f, .55f, .9f);
             if (ui.DutyId == WorqorObjectiveCatalog.DutyId)
                 draw.AddCircleFilled(point, 10f, ImGui.ColorConvertFloat4ToU32(
-                    color with { W = ownerTeam < 3 ? .46f : .18f }), 24);
+                    color with { W = objectiveOpacity * (ownerTeam < 3 ? .46f : .18f) }), 24);
             ObjectiveMapGlyphRenderer.Draw(draw, point, ui.DutyId,
                 objective.Label ?? string.Empty, objective.MaxHp, color,
                 (objective.State ?? string.Empty).Contains("captur",
-                    StringComparison.OrdinalIgnoreCase), objective.State ?? string.Empty);
+                    StringComparison.OrdinalIgnoreCase), objective.State ?? string.Empty,
+                objectiveOpacity);
             var shatterPercent = ui.DutyId == ShatterObjectiveCatalog.DutyId
                 ? ShatterObjectiveCatalog.ResolveDisplayedHealthPercent(
                     objective.CurrentHp, objective.MaxHp, objective.ProgressPercent)
@@ -441,33 +448,58 @@ internal sealed class LiveCombatWindow : Window
             // does not expose each field's colour during a contested capture,
             // so never fabricate N/N from that aggregate state.
             draw.AddText(point + new Vector2(11, -9),
-                ImGui.ColorConvertFloat4ToU32(Vector4.One), objectiveLabel + suffix);
+                ImGui.ColorConvertFloat4ToU32(new Vector4(1f, 1f, 1f, objectiveOpacity)),
+                objectiveLabel + suffix);
             if (ui.DutyId == OnsalObjectiveCatalog.DutyId &&
                 (objective.RemainingSeconds ??
                  OnsalObjectiveCatalog.ParseDisplayedCountdownSeconds(objective.DisplayText) ??
                  OnsalObjectiveCatalog.ParseDisplayedCountdownSeconds(objective.Label)) is int onsalSeconds)
             {
-                DrawCompactCountdownBar(draw, point + new Vector2(-16, 12), onsalSeconds, color);
+                DrawCompactCountdownBar(draw, point + new Vector2(-16, 12), onsalSeconds,
+                    color with { W = color.W * objectiveOpacity });
             }
         }
         var crystallinePlayers = GameLayout.IsCrystallineDuty(ui.DutyId);
-        foreach (var player in snapshot.Players.Where(x => !x.IsLocal))
-            DrawLivePlayerMarker(draw, Point(player.X, player.Z), player,
-                LivePlayerMapContract.Resolve(crystallinePlayers, player.Battalion,
-                    ui.LocalPlayerBattalion, false));
-        foreach (var player in snapshot.Players.Where(x => x.IsLocal))
-            DrawLivePlayerMarker(draw, Point(player.X, player.Z), player,
-                LivePlayerRelation.Local);
-        foreach (var target in snapshot.Targets.Where(x => x.PositionVisible))
+        if (configuration.ShowLiveMapPlayers)
         {
-            var point = Point(target.X, target.Z);
-            DrawMarkerIcon(draw, point, target.Key, false, 10f, target.Index);
-            if (!string.IsNullOrWhiteSpace(target.Name))
-                draw.AddText(point + new Vector2(13, -9), ImGui.ColorConvertFloat4ToU32(Vector4.One),
-                    Display(target.Name, target.WorldId));
+            foreach (var player in snapshot.Players.Where(x => !x.IsLocal))
+                DrawLivePlayerMarker(draw, Point(player.X, player.Z), player,
+                    LivePlayerMapContract.Resolve(crystallinePlayers, player.Battalion,
+                        ui.LocalPlayerBattalion, false), crystallinePlayers, playerOpacity);
+            foreach (var player in snapshot.Players.Where(x => x.IsLocal))
+                DrawLivePlayerMarker(draw, Point(player.X, player.Z), player,
+                    LivePlayerRelation.Local, crystallinePlayers, playerOpacity);
         }
-        if (snapshot.Fields.Count == 0 && snapshot.Targets.Count == 0 &&
-            snapshot.Objectives.Count == 0 && snapshot.Players.Count == 0)
+        if (configuration.ShowLiveMapTargetMarkers)
+        {
+            var crowdPoints = snapshot.Players.Select(x => Point(x.X, x.Z))
+                .Concat(snapshot.Targets.Where(x => x.PositionVisible)
+                    .Select(x => Point(x.X, x.Z))).ToArray();
+            foreach (var target in snapshot.Targets.Where(x => x.PositionVisible))
+            {
+                var point = Point(target.X, target.Z);
+                if (configuration.UseDenseMarkerCallouts &&
+                    LiveMapPresentationContract.IsCrowded(point, crowdPoints))
+                    DrawTargetMarkerCallout(draw, point, target, origin, origin + size,
+                        targetMarkerOpacity);
+                else
+                {
+                    DrawMarkerIcon(draw, point, target.Key, false, 10f, target.Index,
+                        targetMarkerOpacity);
+                    if (!string.IsNullOrWhiteSpace(target.Name))
+                        draw.AddText(point + new Vector2(13, -9),
+                            ImGui.ColorConvertFloat4ToU32(
+                                new Vector4(1f, 1f, 1f, targetMarkerOpacity)),
+                            Display(target.Name, target.WorldId));
+                }
+            }
+        }
+        var noVisibleLayerContent =
+            (!configuration.ShowLiveMapFieldMarkers || snapshot.Fields.Count == 0) &&
+            (!configuration.ShowLiveMapTargetMarkers || snapshot.Targets.Count == 0) &&
+            (!configuration.ShowLiveMapObjectives || snapshot.Objectives.Count == 0) &&
+            (!configuration.ShowLiveMapPlayers || snapshot.Players.Count == 0);
+        if (noVisibleLayerContent)
         {
             var message = T("noMarkerEvents");
             var extent = ImGui.CalcTextSize(message);
@@ -476,7 +508,7 @@ internal sealed class LiveCombatWindow : Window
         }
         if (!transparentOverlay)
             draw.AddText(origin + new Vector2(12, 10), ImGui.ColorConvertFloat4ToU32(Vector4.One),
-                MapAssets.TryGetValue(ui.DutyId, out var asset) ? T(asset.NameKey) : T("mapOverlay"));
+                MapNameKeys.TryGetValue(ui.DutyId, out var nameKey) ? T(nameKey) : T("mapOverlay"));
         if (ui.DutyId == WorqorWeatherMechanics.DutyId && weather != null)
         {
             var key = WorqorWeatherMechanics.TextKey(weather.State);
@@ -487,7 +519,8 @@ internal sealed class LiveCombatWindow : Window
                     ? string.Format(T(key), seconds)
                     : T(key);
                 draw.AddText(origin + new Vector2(12, 32),
-                    ImGui.ColorConvertFloat4ToU32(new Vector4(.30f, .88f, 1f, 1f)), text);
+                    ImGui.ColorConvertFloat4ToU32(
+                        new Vector4(.30f, .88f, 1f, objectiveOpacity)), text);
             }
         }
         if (!transparentOverlay)
@@ -540,28 +573,33 @@ internal sealed class LiveCombatWindow : Window
     {
         const float width = 32, height = 4;
         draw.AddRectFilled(at, at + new Vector2(width, height),
-            ImGui.ColorConvertFloat4ToU32(new Vector4(.04f, .06f, .07f, .88f)), 2);
+            ImGui.ColorConvertFloat4ToU32(
+                new Vector4(.04f, .06f, .07f, .88f * color.W)), 2);
         draw.AddRectFilled(at, at + new Vector2(width *
                 (float)(OnsalObjectiveCatalog.CountdownPercent(remainingSeconds) / 100d), height),
             ImGui.ColorConvertFloat4ToU32(color), 2);
     }
 
     private static void DrawLivePlayerMarker(ImDrawListPtr draw, Vector2 center,
-        LivePlayerMarker player, LivePlayerRelation relation)
+        LivePlayerMarker player, LivePlayerRelation relation, bool crystalline, float opacity)
     {
-        var color = relation switch
-        {
-            LivePlayerRelation.Local => MapLocalPlayerColor,
-            LivePlayerRelation.Ally => MapAllyPlayerColor,
-            LivePlayerRelation.Enemy => MapEnemyPlayerColor,
-            _ => MapUnknownPlayerColor
-        };
-        if (!player.IsAlive) color = color with { W = .52f };
+        opacity = Math.Clamp(opacity, 0f, 1f);
+        var color = !crystalline && player.Battalion < 3
+            ? LiveMapPresentationContract.FrontlineSquadColor(
+                player.Battalion, player.Alliance, opacity)
+            : (relation switch
+            {
+                LivePlayerRelation.Local => MapLocalPlayerColor,
+                LivePlayerRelation.Ally => MapAllyPlayerColor,
+                LivePlayerRelation.Enemy => MapEnemyPlayerColor,
+                _ => MapUnknownPlayerColor
+            }) with { W = opacity };
+        if (!player.IsAlive) color = color with { W = .52f * opacity };
         var fill = ImGui.ColorConvertFloat4ToU32(color);
         var outline = ImGui.ColorConvertFloat4ToU32(
             relation == LivePlayerRelation.Local
-                ? new Vector4(1f, 1f, 1f, .96f)
-                : new Vector4(.06f, .08f, .09f, .82f));
+                ? new Vector4(1f, 1f, 1f, .96f * opacity)
+                : new Vector4(.06f, .08f, .09f, .82f * opacity));
         var radius = relation == LivePlayerRelation.Local ? 8f : 6f;
         var direction = new Vector2(MathF.Sin(player.Rotation), -MathF.Cos(player.Rotation));
         var right = new Vector2(-direction.Y, direction.X);
@@ -575,41 +613,84 @@ internal sealed class LiveCombatWindow : Window
         if (!player.IsAlive)
         {
             var cross = radius * .72f;
-            var dead = ImGui.ColorConvertFloat4ToU32(new Vector4(1f, 1f, 1f, .9f));
+            var dead = ImGui.ColorConvertFloat4ToU32(new Vector4(1f, 1f, 1f, .9f * opacity));
             draw.AddLine(center - new Vector2(cross), center + new Vector2(cross), dead, 1.5f);
             draw.AddLine(center + new Vector2(-cross, cross),
                 center + new Vector2(cross, -cross), dead, 1.5f);
         }
     }
 
-    private void DrawMarkerIcon(ImDrawListPtr draw, Vector2 center, string markerKey,
-        bool field, float radius, int markerIndex = -1)
+    private void DrawFieldMarkerFlag(ImDrawListPtr draw, Vector2 anchor, string markerKey,
+        int markerIndex, float opacity)
     {
+        opacity = Math.Clamp(opacity, 0f, 1f);
+        var poleTop = anchor + new Vector2(0, -25);
+        var flagCenter = poleTop + new Vector2(11, 7);
+        var line = ImGui.ColorConvertFloat4ToU32(new Vector4(.92f, .94f, .96f, .88f * opacity));
+        var fill = ImGui.ColorConvertFloat4ToU32(new Vector4(.06f, .08f, .10f, .58f * opacity));
+        draw.AddLine(anchor, poleTop + new Vector2(0, 16), line, 1.5f);
+        draw.AddTriangleFilled(poleTop, poleTop + new Vector2(0, 15),
+            poleTop + new Vector2(24, 7.5f), fill);
+        draw.AddLine(poleTop, poleTop + new Vector2(0, 15), line, 1.5f);
+        draw.AddLine(poleTop, poleTop + new Vector2(24, 7.5f), line, 1.2f);
+        DrawMarkerIcon(draw, flagCenter, markerKey, true, 8.5f, markerIndex, opacity);
+    }
+
+    private void DrawTargetMarkerCallout(ImDrawListPtr draw, Vector2 anchor,
+        LiveTargetMarker target, Vector2 canvasMin, Vector2 canvasMax, float opacity)
+    {
+        opacity = Math.Clamp(opacity, 0f, 1f);
+        var diagonal = LiveMapPresentationContract.CalloutDiagonal(target.Index);
+        var elbow = anchor + diagonal;
+        var direction = MathF.Sign(diagonal.X);
+        var markerCenter = elbow + new Vector2(direction * 20f, 0);
+        markerCenter = Vector2.Clamp(markerCenter, canvasMin + new Vector2(16),
+            canvasMax - new Vector2(16));
+        elbow = new Vector2(markerCenter.X - direction * 20f, markerCenter.Y);
+        var color = target.Team < 3
+            ? LiveMapPresentationContract.FrontlineSquadColor(target.Team, 255, opacity)
+            : new Vector4(.92f, .94f, .96f, opacity);
+        var packed = ImGui.ColorConvertFloat4ToU32(color);
+        draw.AddLine(anchor, elbow, packed, 1.35f);
+        draw.AddLine(elbow, markerCenter, packed, 1.35f);
+        DrawMarkerIcon(draw, markerCenter, target.Key, false, 10f, target.Index, opacity);
+        if (string.IsNullOrWhiteSpace(target.Name)) return;
+        var text = Display(target.Name, target.WorldId);
+        var extent = ImGui.CalcTextSize(text);
+        var textAt = direction > 0
+            ? markerCenter + new Vector2(13, -extent.Y / 2)
+            : markerCenter - new Vector2(13 + extent.X, extent.Y / 2);
+        textAt.X = Math.Clamp(textAt.X, canvasMin.X + 2,
+            Math.Max(canvasMin.X + 2, canvasMax.X - extent.X - 2));
+        draw.AddText(textAt, packed, text);
+    }
+
+    private void DrawMarkerIcon(ImDrawListPtr draw, Vector2 center, string markerKey,
+        bool field, float radius, int markerIndex = -1, float opacity = 1f)
+    {
+        opacity = Math.Clamp(opacity, 0f, 1f);
         var iconId = MarkerUiPrimitives.IconId(markerKey, field, markerIndex);
         if (iconId != 0)
         {
             try
             {
                 if (!markerIcons.TryGetValue(iconId, out var texture))
-                {
-                    var bundled = Path.Combine(assetRoot, "assets", "markers",
-                        MarkerUiPrimitives.AssetFileName(iconId));
-                    markerIcons[iconId] = texture = File.Exists(bundled)
-                        ? textureProvider.GetFromFile(bundled)
-                        : textureProvider.GetFromGameIcon(new GameIconLookup(iconId, hiRes: true));
-                }
+                    markerIcons[iconId] = texture = textureProvider.GetFromGameIcon(
+                        new GameIconLookup(iconId, hiRes: true));
                 var wrap = texture.GetWrapOrDefault();
                 if (wrap != null)
                 {
                     var extent = new Vector2(radius * 2.35f);
-                    draw.AddImage(wrap.Handle, center - extent / 2, center + extent / 2);
+                    draw.AddImage(wrap.Handle, center - extent / 2, center + extent / 2,
+                        Vector2.Zero, Vector2.One,
+                        ImGui.ColorConvertFloat4ToU32(new Vector4(1f, 1f, 1f, opacity)));
                     return;
                 }
             }
             catch { /* Never replace a missing official icon with a different-looking badge. */ }
             return;
         }
-        var muted = ImGui.ColorConvertFloat4ToU32(new Vector4(.53f, .61f, .66f, 1f));
+        var muted = ImGui.ColorConvertFloat4ToU32(new Vector4(.53f, .61f, .66f, opacity));
         draw.AddCircle(center, radius, muted, 16, 1.5f);
         draw.AddText(center - ImGui.CalcTextSize("?") / 2, muted, "?");
     }
@@ -623,25 +704,99 @@ internal sealed class LiveCombatWindow : Window
         cachedObservedKda = snapshot.ObservedKda;
         cachedEndMs = snapshot.EndElapsedMs;
         cachedMatchEvidenceEndMs = snapshot.MatchEvidenceEndElapsedMs;
-        cachedEncounterActive = snapshot.IsActive;
     }
 
-    private void DrawObservedKda()
+    private void DrawCompactScoreStrip(CollectorUiState ui)
+    {
+        var scoreOrder = LiveCombatPageContract.FrontlineScoreDisplayOrder;
+        for (var index = 0; index < scoreOrder.Length; index++)
+        {
+            var team = scoreOrder[index];
+            if (index > 0) ImGui.SameLine(0, 7);
+            var currentValue = ui.Score.Current(team);
+            var current = currentValue.ToString(CultureInfo.InvariantCulture);
+            var projected = ui.Score.Projected(team);
+            var projectedDelta = projected.HasValue ? projected.Value - currentValue : 0;
+            var projectionText = projectedDelta > 0 ? $" ({projected!.Value})" : string.Empty;
+            var display = current + projectionText;
+            var width = Math.Max(34f, ImGui.CalcTextSize(display).X + 7);
+            var height = ImGui.GetTextLineHeight() + 5;
+            var at = ImGui.GetCursorScreenPos();
+            ImGui.InvisibleButton($"##live-score-{team}", new Vector2(width, height));
+            var draw = ImGui.GetWindowDrawList();
+            var color = FrontlinePlayerIdentityContract.TeamColor(team);
+            var extent = ImGui.CalcTextSize(display);
+            draw.AddText(at + new Vector2((width - extent.X) / 2, 0),
+                ImGui.ColorConvertFloat4ToU32(color), display);
+            if (ui.LocalPlayerBattalion == team)
+                draw.AddLine(at + new Vector2(2, height - 1), at + new Vector2(width - 2, height - 1),
+                    ImGui.ColorConvertFloat4ToU32(color), 3f);
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip(projectionText.Length == 0
+                    ? string.Format(T("liveCurrentScoreHelp"), current)
+                    : string.Format(T("liveProjectedScoreHelp"), projectedDelta));
+        }
+    }
+
+    private void DrawObservedKda(CollectorUiState ui, bool crystalline)
     {
         var rows = cachedObservedKda.Where(x => x.Kills + x.Deaths + x.Assists > 0).ToArray();
         if (rows.Length == 0) { ImGui.TextDisabled(T("noObservedKda")); return; }
-        if (!ImGui.BeginTable("live-observed-kda", 4,
+        rows = (observedKdaSortColumn switch
+        {
+            0 => observedKdaSortDescending
+                ? rows.OrderByDescending(x => FrontlinePlayerIdentityContract.TeamSquadSortKey(x.Team, x.Alliance))
+                : rows.OrderBy(x => FrontlinePlayerIdentityContract.TeamSquadSortKey(x.Team, x.Alliance)),
+            1 => observedKdaSortDescending ? rows.OrderByDescending(x => x.JobId) : rows.OrderBy(x => x.JobId),
+            2 => observedKdaSortDescending
+                ? rows.OrderByDescending(x => x.Name, StringComparer.CurrentCultureIgnoreCase)
+                : rows.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase),
+            3 => observedKdaSortDescending ? rows.OrderByDescending(x => x.Kills) : rows.OrderBy(x => x.Kills),
+            4 => observedKdaSortDescending ? rows.OrderByDescending(x => x.Deaths) : rows.OrderBy(x => x.Deaths),
+            _ => observedKdaSortDescending ? rows.OrderByDescending(x => x.Assists) : rows.OrderBy(x => x.Assists)
+        }).ThenBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase).ToArray();
+        if (!ImGui.BeginTable("live-observed-kda", crystalline ? 5 : 6,
                 ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInnerH |
-                ImGuiTableFlags.SizingStretchProp)) return;
-        ImGui.TableSetupColumn(T("player"), ImGuiTableColumnFlags.WidthStretch, 2f);
-        ImGui.TableSetupColumn("K", ImGuiTableColumnFlags.WidthFixed, 42);
-        ImGui.TableSetupColumn("D", ImGuiTableColumnFlags.WidthFixed, 42);
-        ImGui.TableSetupColumn("A", ImGuiTableColumnFlags.WidthFixed, 42);
-        ImGui.TableSetupScrollFreeze(0, 1); ImGui.TableHeadersRow();
+                ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.Resizable)) return;
+        var headers = crystalline
+            ? new[] { T("job"), T("player"), "K", "D", "A" }
+            : new[] { T("team"), T("job"), T("player"), "K", "D", "A" };
+        if (!crystalline)
+            ImGui.TableSetupColumn(headers[0], ImGuiTableColumnFlags.WidthFixed, 24);
+        ImGui.TableSetupColumn(T("job"), ImGuiTableColumnFlags.WidthFixed, 28);
+        ImGui.TableSetupColumn(T("player"), ImGuiTableColumnFlags.WidthStretch, 1f);
+        ImGui.TableSetupColumn("K", ImGuiTableColumnFlags.WidthFixed, 27);
+        ImGui.TableSetupColumn("D", ImGuiTableColumnFlags.WidthFixed, 27);
+        ImGui.TableSetupColumn("A", ImGuiTableColumnFlags.WidthFixed, 27);
+        ImGui.TableSetupScrollFreeze(0, 1);
+        ImGui.TableNextRow(ImGuiTableRowFlags.Headers);
+        for (var index = 0; index < headers.Length; index++)
+        {
+            var sortIndex = crystalline ? index + 1 : index;
+            ImGui.TableSetColumnIndex(index);
+            ImGui.TableHeader(headers[index] + (sortIndex == observedKdaSortColumn
+                ? observedKdaSortDescending ? " ▼" : " ▲" : string.Empty));
+            if (!ImGui.IsItemClicked()) continue;
+            if (observedKdaSortColumn == sortIndex)
+                observedKdaSortDescending = !observedKdaSortDescending;
+            else
+            {
+                observedKdaSortColumn = sortIndex;
+                observedKdaSortDescending = false;
+            }
+        }
         foreach (var row in rows)
         {
-            ImGui.TableNextRow(); ImGui.TableNextColumn(); DrawJob(row.JobId); ImGui.SameLine(0, 4);
-            ImGui.TextUnformatted(Display(row.Name, row.WorldId));
+            ImGui.TableNextRow();
+            if (!crystalline)
+            {
+                ImGui.TableNextColumn();
+                FrontlinePlayerIdentityRenderer.DrawSquadBadge(
+                    $"live-kda-{row.EntityId}", row.Team, row.Alliance,
+                    $"{TeamName(row.Team)} · {FrontlinePlayerIdentityContract.SquadLabel(row.Alliance)}");
+            }
+            ImGui.TableNextColumn(); DrawJob(row.JobId, 18);
+            ImGui.TableNextColumn(); ImGui.TextUnformatted(Display(row.Name, row.WorldId));
             ImGui.TableNextColumn(); ImGui.TextUnformatted(row.Kills.ToString());
             ImGui.TableNextColumn(); ImGui.TextUnformatted(row.Deaths.ToString());
             ImGui.TableNextColumn(); ImGui.TextUnformatted(row.Assists.ToString());
@@ -789,13 +944,22 @@ internal sealed class LiveCombatWindow : Window
                (ui.LocalPlayerWorldId == 0 || worldId == 0 || worldId == ui.LocalPlayerWorldId);
     }
 
-    private void DrawActor(byte jobId, string name, ushort worldId, byte team, byte battalion,
-        byte localBattalion, LiveSide side, bool crystalline)
+    private void DrawActor(byte jobId, string name, ushort worldId, byte team, byte alliance,
+        byte battalion, byte localBattalion, LiveSide side, bool crystalline)
     {
-        DrawJob(jobId, 18); ImGui.SameLine(0, 3);
         var isOwn = localBattalion <= (crystalline ? 1 : 2) && battalion == localBattalion ||
                     side == LiveSide.Own;
         var displayedTeam = LiveCombatPageContract.ResolveDisplayedTeam(crystalline, team, battalion);
+        if (!crystalline)
+        {
+            var badgeTeam = displayedTeam ?? (byte)255;
+            FrontlinePlayerIdentityRenderer.DrawSquadBadge(
+                $"live-actor-{name}-{worldId}-{team}-{alliance}-{ImGui.GetCursorPosY():0}",
+                badgeTeam, alliance,
+                $"{TeamName(badgeTeam)} · {FrontlinePlayerIdentityContract.SquadLabel(alliance)}");
+            ImGui.SameLine(0, 3);
+        }
+        DrawJob(jobId, 18); ImGui.SameLine(0, 3);
         var color = crystalline && displayedTeam is byte ccTeam
             ? CrystallineTeamColors[ccTeam]
             : !crystalline && displayedTeam is byte frontlineTeam

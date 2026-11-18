@@ -616,6 +616,7 @@ internal sealed class MainWindow : Window
         ImGui.TextUnformatted(MapName(row.Match.DutyId));
         if (row.Player != null)
         {
+            DrawCompactSquadBadge(row.Player.Team, row.Player.Alliance); ImGui.SameLine(0, 4);
             DrawJobIcon(row.Player.ClassJobId, 17); ImGui.SameLine(0, 5);
             ImGui.TextUnformatted($"KDA {row.Player.Kills}/{row.Player.Deaths}/{row.Player.Assists}");
             ImGui.SameLine();
@@ -1793,6 +1794,9 @@ internal sealed class MainWindow : Window
                 saveConfiguration();
             }
             ImGui.SameLine(); ImGui.TextDisabled(T("liveMarkerOverlayStatusHelp"));
+            // 地图图层是实时观察时会频繁调整的控制项，因此直接放在“当前状态”页。
+            // 不再套折叠菜单，也不在插件设置页重复绘制，避免两处入口让用户误以为是两套配置。
+            DrawLiveMapLayerSettings("status");
             var autoOpenLiveSlice = configuration.AutoOpenLiveSliceOnMatchStart;
             if (ImGui.Checkbox(T("autoOpenLiveSlice") + "##status-auto-live-slice", ref autoOpenLiveSlice))
             {
@@ -1898,6 +1902,8 @@ internal sealed class MainWindow : Window
         ImGui.TextColored(UploadColor(match.UploadState), $"● {UploadLabel(match.UploadState)}");
         if (row.Player != null)
         {
+            DrawCompactSquadBadge(row.Player.Team, row.Player.Alliance);
+            ImGui.SameLine(0, 4);
             DrawJobIcon(row.Player.ClassJobId, 17);
             ImGui.SameLine();
             if (row.Score?.Overall is double logs)
@@ -2117,19 +2123,22 @@ internal sealed class MainWindow : Window
             ImGuiTableFlags.Resizable | ImGuiTableFlags.Reorderable | ImGuiTableFlags.Hideable,
             new Vector2(0, playerTableHeight)))
         {
-            var titles = new[] { T("player"), T("job"), T("team"), "K", "K Logs", "D", "D Logs",
+            var titles = new[] { T("team"), T("job"), T("player"), "K", "K Logs", "D", "D Logs",
                 "A", "A Logs", T("damage"), T("damageLogs"), T("healing"), T("healingLogs"),
                 T("overallLogs"), T("tendency") };
-            for (var i = 0; i < columns; i++) ImGui.TableSetupColumn(titles[i]);
+            ImGui.TableSetupColumn(titles[0], ImGuiTableColumnFlags.WidthFixed, 28);
+            ImGui.TableSetupColumn(titles[1], ImGuiTableColumnFlags.WidthFixed, 30);
+            ImGui.TableSetupColumn(titles[2], ImGuiTableColumnFlags.WidthStretch, 1f);
+            for (var i = 3; i < columns; i++) ImGui.TableSetupColumn(titles[i]);
             ImGui.TableSetupScrollFreeze(0, 1);
             DrawSortableHeaders(titles);
             foreach (var player in SortPlayers(match))
             {
                 var score = ScoreFor(match, player);
                 ImGui.TableNextRow();
-                ImGui.TableNextColumn(); ImGui.TextUnformatted($"{player.Name}@{WorldName(player.WorldId)}");
-                ImGui.TableNextColumn(); DrawJobIcon(player.ClassJobId);
                 ImGui.TableNextColumn(); DrawCompactSquadBadge(player.Team, player.Alliance);
+                ImGui.TableNextColumn(); DrawJobIcon(player.ClassJobId);
+                ImGui.TableNextColumn(); ImGui.TextUnformatted($"{player.Name}@{WorldName(player.WorldId)}");
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(player.Kills.ToString());
                 ImGui.TableNextColumn(); DrawLogs(score?.Kills);
                 ImGui.TableNextColumn(); ImGui.TextUnformatted(player.Deaths.ToString());
@@ -2263,8 +2272,8 @@ internal sealed class MainWindow : Window
         var players = match.Players;
         Func<LocalPlayerAnalysis, double> number = playerSortColumn switch
         {
+            0 => p => FrontlinePlayerIdentityContract.TeamSquadSortKey(p.Team, p.Alliance),
             1 => p => JobSortKey(p.ClassJobId),
-            2 => p => p.Team * 10 + p.Alliance % 3,
             3 => p => p.Kills,
             4 => p => ScoreFor(match, p)?.Kills ?? -1,
             5 => p => p.Deaths,
@@ -2279,12 +2288,16 @@ internal sealed class MainWindow : Window
             14 => p => TopTendencyScore(match, p),
             _ => _ => 0
         };
-        if (playerSortColumn == 0)
+        if (playerSortColumn == 2)
             return playerSortDescending
                 ? players.OrderByDescending(p => p.Name, StringComparer.CurrentCultureIgnoreCase)
                 : players.OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase);
         if (playerSortColumn == 1)
-            return players.OrderBy(p => JobRole(p.ClassJobId)).ThenBy(p => p.ClassJobId).ThenBy(p => p.Name);
+        {
+            var ordered = players.OrderBy(p => JobRole(p.ClassJobId))
+                .ThenBy(p => p.ClassJobId).ThenBy(p => p.Name);
+            return playerSortDescending ? ordered.Reverse() : ordered;
+        }
         return playerSortDescending ? players.OrderByDescending(number).ThenBy(p => p.Name)
             : players.OrderBy(number).ThenBy(p => p.Name);
     }
@@ -2357,26 +2370,11 @@ internal sealed class MainWindow : Window
     {
         0 => T("maelstrom"), 1 => T("adders"), 2 => T("flames"), _ => T("unknownTeam")
     };
-    private static Vector4 TeamColor(byte team) => team switch
-    {
-        0 => new Vector4(.95f, .3f, .3f, 1f),
-        1 => new Vector4(.95f, .78f, .25f, 1f),
-        2 => new Vector4(.35f, .65f, 1f, 1f),
-        _ => new Vector4(.7f, .7f, .7f, 1f)
-    };
-
     private void DrawCompactSquadBadge(byte team, byte alliance)
     {
-        if (alliance >= 9) { ImGui.TextDisabled("?"); return; }
-        var label = ((char)('A' + alliance % 3)).ToString();
-        var at = ImGui.GetCursorScreenPos();
-        ImGui.InvisibleButton($"{label}##main-squad-{team}-{alliance}-{at.Y:0}",
-            new Vector2(15, ImGui.GetTextLineHeight()));
-        var packed = ImGui.ColorConvertFloat4ToU32(TeamColor(team));
-        var draw = ImGui.GetWindowDrawList();
-        draw.AddText(at, packed, label);
-        draw.AddText(at + new Vector2(.65f, 0), packed, label);
-        if (ImGui.IsItemHovered()) ImGui.SetTooltip($"{TeamName(team)} · {label}");
+        FrontlinePlayerIdentityRenderer.DrawSquadBadge(
+            $"main-{team}-{alliance}-{ImGui.GetCursorPosY():0}", team, alliance,
+            $"{TeamName(team)} · {FrontlinePlayerIdentityContract.SquadLabel(alliance)}");
     }
 
     private string MapName(uint dutyId) => dutyId switch
@@ -2480,6 +2478,69 @@ internal sealed class MainWindow : Window
         { configuration.UiTheme = themes[themeIndex]; saveConfiguration(); }
         ImGui.Separator();
         ImGui.TextWrapped(T("privacy"));
+    }
+
+    private void DrawLiveMapLayerSettings(string idSuffix)
+    {
+        ImGui.TextColored(BattlefieldUiTheme.Accent(configuration.UiTheme),
+            T("liveMapLayerSettings"));
+        ImGui.TextWrapped(T("liveMapLayerHelp"));
+        var showPlayers = configuration.ShowLiveMapPlayers;
+        var showTargets = configuration.ShowLiveMapTargetMarkers;
+        var showFields = configuration.ShowLiveMapFieldMarkers;
+        var showObjectives = configuration.ShowLiveMapObjectives;
+        var playerOpacity = configuration.LiveMapPlayerOpacity;
+        var targetOpacity = configuration.LiveMapTargetMarkerOpacity;
+        var fieldOpacity = configuration.LiveMapFieldMarkerOpacity;
+        var objectiveOpacity = configuration.LiveMapObjectiveOpacity;
+        var changed = false;
+        if (ImGui.BeginTable($"live-map-layers-{idSuffix}", 3,
+                ImGuiTableFlags.SizingStretchProp | ImGuiTableFlags.BordersInnerH))
+        {
+            changed |= DrawLiveMapLayerRow(T("liveMapPlayersLayer"),
+                $"players-{idSuffix}", ref showPlayers, ref playerOpacity);
+            changed |= DrawLiveMapLayerRow(T("liveMapTargetMarkersLayer"),
+                $"targets-{idSuffix}", ref showTargets, ref targetOpacity);
+            changed |= DrawLiveMapLayerRow(T("liveMapFieldMarkersLayer"),
+                $"fields-{idSuffix}", ref showFields, ref fieldOpacity);
+            changed |= DrawLiveMapLayerRow(T("liveMapObjectivesLayer"),
+                $"objectives-{idSuffix}", ref showObjectives, ref objectiveOpacity);
+            ImGui.EndTable();
+        }
+        var callouts = configuration.UseDenseMarkerCallouts;
+        if (ImGui.Checkbox($"{T("liveMapDenseCallouts")}##dense-callouts-{idSuffix}",
+                ref callouts))
+        {
+            configuration.UseDenseMarkerCallouts = callouts;
+            changed = true;
+        }
+        if (!changed) return;
+        configuration.ShowLiveMapPlayers = showPlayers;
+        configuration.ShowLiveMapTargetMarkers = showTargets;
+        configuration.ShowLiveMapFieldMarkers = showFields;
+        configuration.ShowLiveMapObjectives = showObjectives;
+        configuration.LiveMapPlayerOpacity = playerOpacity;
+        configuration.LiveMapTargetMarkerOpacity = targetOpacity;
+        configuration.LiveMapFieldMarkerOpacity = fieldOpacity;
+        configuration.LiveMapObjectiveOpacity = objectiveOpacity;
+        saveConfiguration();
+    }
+
+    private bool DrawLiveMapLayerRow(string label, string id, ref bool enabled,
+        ref float opacity)
+    {
+        ImGui.TableNextRow();
+        ImGui.TableNextColumn();
+        var changed = ImGui.Checkbox($"{label}##show-{id}", ref enabled);
+        ImGui.TableNextColumn(); ImGui.TextDisabled(T("liveMapOpacity"));
+        ImGui.TableNextColumn(); ImGui.SetNextItemWidth(-1);
+        var percent = (int)Math.Round(Math.Clamp(opacity, 0f, 1f) * 100);
+        if (ImGui.SliderInt($"##opacity-{id}", ref percent, 0, 100, "%d%%"))
+        {
+            opacity = percent / 100f;
+            changed = true;
+        }
+        return changed;
     }
 
     private void BeginCredentialRegistration(string keyKind, string bindingId, string label)
@@ -2717,6 +2778,7 @@ internal sealed class MainWindow : Window
         "network_error" => T("networkError"),
         "analysis_timeout" => T("analysisTimeout"),
         "client_upgrade_required" => T("clientUpgradeRequired"),
+        "server_upgrade_required" => T("serverUpgradeRequired"),
         "server_action_required" => T("transferActionRequired"),
         _ => error
     };

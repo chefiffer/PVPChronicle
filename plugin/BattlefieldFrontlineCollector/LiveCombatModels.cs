@@ -4,7 +4,7 @@ namespace BattlefieldFrontlineCollector;
 
 internal sealed record LiveTargetState(uint EntityId, IReadOnlyList<uint> StatusIds);
 internal sealed record LiveObservedKda(uint EntityId, string Name, ushort WorldId, byte JobId,
-    int Kills, int Deaths, int Assists);
+    byte Team, byte Alliance, int Kills, int Deaths, int Assists);
 internal sealed record LiveCombatSnapshot(IReadOnlyList<LiveCombatRow> Rows,
     IReadOnlyList<LiveCoordinationRow> Coordination,
     IReadOnlyList<LiveCombatRow> MatchTendencyRows,

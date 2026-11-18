@@ -1,5 +1,4 @@
-# PvP Chronicle
-
+# PVP Chronicle
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko-KR.md) | **Русский** | [Português (Brasil)](README.pt-BR.md) | [Español](README.es-ES.md) | [ไทย](README.th-TH.md) | [Tiếng Việt](README.vi-VN.md) | [日本語](README.ja-JP.md) | [Deutsch](README.de-DE.md) | [Français](README.fr-FR.md)
 
 PvP Chronicle — плагин Dalamud для записи и разбора PvP-матчей FINAL FANTASY XIV. Он поддерживает историю и повторы Frontline и Crystalline Conflict, цели на карте, статистику эффективности и проверку целостности поведения, ограниченную только наблюдаемыми свидетельствами.
@@ -14,7 +13,7 @@ PvP Chronicle — плагин Dalamud для записи и разбора PvP
    https://raw.githubusercontent.com/chefiffer/dalamud-plugins/main/repo.json
    ```
 
-4. Откройте установщик плагинов, найдите **Battlefield Frontline Collector** и выберите **Install**.
+4. Откройте установщик плагинов, найдите **PVP Chronicle** и выберите **Install**.
 
 ## Основные возможности
 

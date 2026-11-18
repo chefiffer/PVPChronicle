@@ -39,16 +39,20 @@ internal sealed class LiveCombatBuffer
         uint TargetEntityId, uint ActionId, string Kind);
     private readonly record struct DamageCredit(long ElapsedMs, uint SourceEntityId,
         uint TargetEntityId);
-    private sealed class MutableObservedKda(uint entityId, string name, ushort worldId, byte jobId)
+    private sealed class MutableObservedKda(uint entityId, string name, ushort worldId, byte jobId,
+        byte team, byte alliance)
     {
         public uint EntityId { get; } = entityId;
         public string Name { get; set; } = name;
         public ushort WorldId { get; set; } = worldId;
         public byte JobId { get; set; } = jobId;
+        public byte Team { get; set; } = team;
+        public byte Alliance { get; set; } = alliance;
         public int Kills { get; set; }
         public int Deaths { get; set; }
         public int Assists { get; set; }
-        public LiveObservedKda Snapshot() => new(EntityId, Name, WorldId, JobId, Kills, Deaths, Assists);
+        public LiveObservedKda Snapshot() => new(EntityId, Name, WorldId, JobId, Team, Alliance,
+            Kills, Deaths, Assists);
     }
 
     public void Add(ActionEffectEvent value, LiveTargetState? localTargetState)
@@ -64,13 +68,15 @@ internal sealed class LiveCombatBuffer
         var sourceJob = source?.OwnerClassJobId is > 0 ? source.OwnerClassJobId : source?.ClassJobId ?? 0;
         var sourceBattalion = source?.OwnerEntityId is > 0
             ? source.OwnerBattalion : source?.Battalion ?? 255;
+        var sourceAlliance = source?.OwnerEntityId is > 0
+            ? source.OwnerAlliance : source?.Alliance ?? 255;
         var selectableSource = source?.OwnerEntityId is > 0 ? source.OwnerEntityId : value.SourceEntityId;
         var appended = new List<LiveCombatRow>(value.Effects.Count);
         if (AdvanceSupportActions.Contains(value.ActionId) && !string.IsNullOrWhiteSpace(sourceName))
             appended.Add(new LiveCombatRow(value.ElapsedMs, value.ActionId, value.ActionType,
                 selectableSource, sourceName, sourceWorld, (byte)Math.Min(byte.MaxValue, sourceJob),
                 0, string.Empty, 0, 0, 1, "advance_support", 0, 0, 0,
-                null, 255, 255, 255, 255, sourceBattalion, 255));
+                null, 255, sourceAlliance, 255, 255, sourceBattalion, 255));
         foreach (var effect in value.Effects)
         {
             var kind = effect.Type switch
@@ -87,7 +93,8 @@ internal sealed class LiveCombatBuffer
                 (byte)Math.Min(byte.MaxValue, target?.ClassJobId ?? 0), effect.Amount, kind,
                 effect.TargetCurrentHp, effect.TargetMaxHp, effect.TargetShieldPercent,
                 localTargetState?.EntityId == effect.TargetEntityId ? localTargetState.StatusIds : null,
-                255, 255, 255, 255, sourceBattalion, target?.Battalion ?? 255));
+                255, sourceAlliance, 255, target?.Alliance ?? 255,
+                sourceBattalion, target?.Battalion ?? 255));
         }
         if (appended.Count == 0) return;
         lock (gate)
@@ -100,8 +107,10 @@ internal sealed class LiveCombatBuffer
             foreach (var row in appended)
             {
                 AddMatchTendencyRow(row);
-                RegisterActor(row.SourceEntityId, row.SourceName, row.SourceWorldId, row.SourceJobId);
-                RegisterActor(row.TargetEntityId, row.TargetName, row.TargetWorldId, row.TargetJobId);
+                RegisterActor(row.SourceEntityId, row.SourceName, row.SourceWorldId, row.SourceJobId,
+                    row.SourceBattalion, row.SourceAlliance);
+                RegisterActor(row.TargetEntityId, row.TargetName, row.TargetWorldId, row.TargetJobId,
+                    row.TargetBattalion, row.TargetAlliance);
                 if (row.Kind == "damage" && row.SourceEntityId != 0 && row.TargetEntityId != 0 &&
                     row.SourceEntityId != row.TargetEntityId)
                     recentDamage.Enqueue(new DamageCredit(row.ElapsedMs, row.SourceEntityId,
@@ -186,7 +195,6 @@ internal sealed class LiveCombatBuffer
             .ToDictionary(group => group.Key, group => group.First());
         lock (gate)
         {
-            if (rows.Count == 0) return;
             var updated = new Queue<LiveCombatRow>(rows.Count);
             foreach (var row in rows)
             {
@@ -219,6 +227,14 @@ internal sealed class LiveCombatBuffer
                         TargetAlliance = target?.Alliance ?? row.TargetAlliance
                     });
                 }
+            }
+
+            foreach (var actor in observedKda.Values)
+            {
+                if (!identities.TryGetValue((actor.Name, actor.WorldId), out var identity)) continue;
+                actor.Team = identity.Team;
+                actor.Alliance = identity.Alliance;
+                if (identity.ClassJobId != 0) actor.JobId = identity.ClassJobId;
             }
         }
     }
@@ -259,17 +275,21 @@ internal sealed class LiveCombatBuffer
         };
     }
 
-    private void RegisterActor(uint entityId, string name, ushort worldId, byte jobId)
+    private void RegisterActor(uint entityId, string name, ushort worldId, byte jobId,
+        byte team = 255, byte alliance = 255)
     {
         if (entityId == 0) return;
         if (!observedKda.TryGetValue(entityId, out var actor))
         {
-            observedKda[entityId] = new MutableObservedKda(entityId, name, worldId, jobId);
+            observedKda[entityId] = new MutableObservedKda(entityId, name, worldId, jobId,
+                team, alliance);
             return;
         }
         if (!string.IsNullOrWhiteSpace(name)) actor.Name = name;
         if (worldId != 0) actor.WorldId = worldId;
         if (jobId != 0) actor.JobId = jobId;
+        if (team < 3) actor.Team = team;
+        if (alliance < 3) actor.Alliance = alliance;
     }
 
     public void Reset()

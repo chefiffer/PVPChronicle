@@ -1,5 +1,4 @@
-# PvP Chronicle
-
+# PVP Chronicle
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko-KR.md) | [Русский](README.ru-RU.md) | [Português (Brasil)](README.pt-BR.md) | [Español](README.es-ES.md) | **ไทย** | [Tiếng Việt](README.vi-VN.md) | [日本語](README.ja-JP.md) | [Deutsch](README.de-DE.md) | [Français](README.fr-FR.md)
 
 PvP Chronicle เป็นปลั๊กอิน Dalamud สำหรับบันทึกและทบทวนการแข่งขัน PvP ใน FINAL FANTASY XIV รองรับประวัติและรีเพลย์ของ Frontline และ Crystalline Conflict เป้าหมายบนแผนที่ สถิติประสิทธิภาพ และการตรวจสอบความสมบูรณ์ของพฤติกรรมที่จำกัดอยู่ภายในหลักฐานซึ่งสังเกตได้เท่านั้น
@@ -14,7 +13,7 @@ PvP Chronicle เป็นปลั๊กอิน Dalamud สำหรับบ
    https://raw.githubusercontent.com/chefiffer/dalamud-plugins/main/repo.json
    ```
 
-4. เปิด Plugin Installer ค้นหา **Battlefield Frontline Collector** แล้วเลือก **Install**
+4. เปิด Plugin Installer ค้นหา **PVP Chronicle** แล้วเลือก **Install**
 
 ## คุณสมบัติเด่น
 

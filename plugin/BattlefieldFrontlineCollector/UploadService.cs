@@ -513,11 +513,12 @@ internal sealed class UploadService : IDisposable
                     meta?.ServerVersion);
                 return;
             }
-            if (!UploadProtocolContract.ServerAccepts(
-                    meta.AcceptedUploadProtocols, meta.MinimumUploadProtocol))
+            var uploadProtocolCompatibility = UploadProtocolContract.Evaluate(
+                meta.AcceptedUploadProtocols, meta.MinimumUploadProtocol);
+            if (uploadProtocolCompatibility == UploadProtocolCompatibility.ClientUpgradeRequired)
             {
                 serverCompatibility = new(true, false, false,
-                    "client_upgrade_required", meta.ServerVersion);
+                    UploadProtocolContract.UpgradeRequiredCode, meta.ServerVersion);
                 return;
             }
             serverSupportsBfcap = meta.AcceptedPackageEncodings?.Contains(
@@ -539,7 +540,9 @@ internal sealed class UploadService : IDisposable
                 .ConfigureAwait(false);
             var ready = JsonSerializer.Deserialize<CollectorReadyResponse>(readyBody, JsonOptions);
             if ((int)readyStatus is >= 200 and < 300 && ready?.Ok == true)
-                serverCompatibility = new(true, true, false, "ready", meta.ServerVersion,
+                serverCompatibility = new(true, true, false,
+                    uploadProtocolCompatibility == UploadProtocolCompatibility.LegacyServer
+                        ? UploadProtocolContract.LegacyServerCode : "ready", meta.ServerVersion,
                     meta.DistributedCompute?.Mode, meta.DistributedCompute?.SnapshotSchema);
             else
                 serverCompatibility = new(true, false, true,
@@ -755,6 +758,19 @@ internal sealed class UploadService : IDisposable
             var fetched = await FetchDetailsAsync(localMatchUid, remoteMatchUid, realm);
             var statusCode = fetched.StatusCode;
             var body = fetched.Body;
+            for (var poll = 0; statusCode == HttpStatusCode.Accepted && poll < 120; poll++)
+            {
+                detailProgress[localMatchUid] = new UploadProgress(
+                    "detail_waiting", 0, 0, 0, 0, 0, timer.Elapsed);
+                CollectorDetailResponse? pending = null;
+                try { pending = JsonSerializer.Deserialize<CollectorDetailResponse>(body, JsonOptions); }
+                catch (JsonException) { /* malformed status is handled after polling */ }
+                if (pending?.Status == "action_required") break;
+                await Task.Delay(TimeSpan.FromSeconds(15), stop.Token).ConfigureAwait(false);
+                fetched = await FetchDetailsAsync(localMatchUid, remoteMatchUid, realm);
+                statusCode = fetched.StatusCode;
+                body = fetched.Body;
+            }
             if (UploadRecoveryPolicy.DetailAccessMustBeReestablished(statusCode, body) &&
                 repository.Snapshot().FirstOrDefault(x => x.MatchUid == localMatchUid) is { } local &&
                 File.Exists(local.CapturePath))
@@ -854,6 +870,7 @@ internal sealed class UploadService : IDisposable
     {
         using var request=new HttpRequestMessage(HttpMethod.Get,endpoint);
         PreferHttp2(request); AddAuthorization(request);
+        request.Headers.TryAddWithoutValidation("X-PvPChronicle-Detail-Async", "v1");
         if (serverSupportsBfdetail && preferCompact)
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(BfdetailCodec.MediaType));
         else
@@ -1276,9 +1293,20 @@ internal sealed class UploadService : IDisposable
         }
         if (response.StatusCode == HttpStatusCode.UpgradeRequired)
         {
+            var responseAdvertisesProtocol = false;
+            try
+            {
+                using var document = JsonDocument.Parse(body);
+                responseAdvertisesProtocol =
+                    document.RootElement.TryGetProperty("minimumUploadProtocol", out _) ||
+                    document.RootElement.TryGetProperty("acceptedUploadProtocols", out _);
+            }
+            catch (JsonException) { /* A legacy server may return plain text. */ }
+            var code = UploadProtocolContract.ClassifyUpgradeResponse(
+                responseAdvertisesProtocol);
             serverCompatibility = new(true, false, false,
-                UploadProtocolContract.UpgradeRequiredCode, serverCompatibility.ServerVersion);
-            throw new InvalidOperationException(UploadProtocolContract.UpgradeRequiredCode);
+                code, serverCompatibility.ServerVersion);
+            throw new InvalidOperationException(code);
         }
         if (!response.IsSuccessStatusCode)
             throw new InvalidOperationException(HttpResponseTrace.Append(

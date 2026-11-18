@@ -59,7 +59,8 @@ internal sealed record RawActionEffect(uint TargetEntityId, byte Slot, byte Type
     byte TargetIndex = 0);
 internal sealed record ActionActorIdentity(uint EntityId, string Name, ushort WorldId, uint ClassJobId,
     uint OwnerEntityId, string OwnerName, ushort OwnerWorldId, uint OwnerClassJobId,
-    byte Battalion = 255, byte OwnerBattalion = 255);
+    byte Battalion = 255, byte OwnerBattalion = 255,
+    byte Alliance = 255, byte OwnerAlliance = 255);
 internal readonly record struct ActionCaptureMetadata(short? NominalRange, byte? EffectRange,
     byte ActionCategoryId, ushort Cast100Ms, ushort Recast100Ms, byte CooldownGroup,
     byte MaxCharges, bool AffectsPosition);

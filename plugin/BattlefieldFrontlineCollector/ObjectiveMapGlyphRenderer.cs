@@ -13,8 +13,10 @@ namespace BattlefieldFrontlineCollector;
 internal static class ObjectiveMapGlyphRenderer
 {
     public static void Draw(ImDrawListPtr draw, Vector2 point, uint dutyId, string label,
-        uint maxHp, Vector4 color, bool capturing, string state = "")
+        uint maxHp, Vector4 color, bool capturing, string state = "", float opacity = 1f)
     {
+        opacity = Math.Clamp(opacity, 0f, 1f);
+        color = WithOpacity(color, opacity);
         if (CrystallineMapMarkerCatalog.TryGetIcon(state, out var ccMapIcon))
         {
             DrawCrystallineMapMarker(draw, point, ccMapIcon, color);
@@ -22,7 +24,7 @@ internal static class ObjectiveMapGlyphRenderer
         }
         if (label.Equals("cc_medicine_kit", StringComparison.OrdinalIgnoreCase))
         {
-            var green = Pack(new Vector4(.24f, .88f, .46f, 1f));
+            var green = Pack(WithOpacity(new Vector4(.24f, .88f, .46f, 1f), opacity));
             draw.AddLine(point + new Vector2(-5, 0), point + new Vector2(5, 0), green, 3f);
             draw.AddLine(point + new Vector2(0, -5), point + new Vector2(0, 5), green, 3f);
             return;
@@ -30,7 +32,7 @@ internal static class ObjectiveMapGlyphRenderer
         if (label.Equals(ArcheiaHarmoniasMechanics.HealingGlyphLabel,
                 StringComparison.OrdinalIgnoreCase))
         {
-            var green = Pack(new Vector4(.20f, .94f, .46f, 1f));
+            var green = Pack(WithOpacity(new Vector4(.20f, .94f, .46f, 1f), opacity));
             draw.AddCircle(point, 8f, green, 24, 2f);
             draw.AddLine(point + new Vector2(-5, 0), point + new Vector2(5, 0), green, 2.5f);
             draw.AddLine(point + new Vector2(0, -5), point + new Vector2(0, 5), green, 2.5f);
@@ -39,7 +41,7 @@ internal static class ObjectiveMapGlyphRenderer
         if (label.Equals("cc_cloudnine_black_feather", StringComparison.OrdinalIgnoreCase) ||
             label.Contains("Black Chocobo Feather", StringComparison.OrdinalIgnoreCase))
         {
-            var gold = Pack(new Vector4(1f, .78f, .24f, 1f));
+            var gold = Pack(WithOpacity(new Vector4(1f, .78f, .24f, 1f), opacity));
             draw.AddLine(point + new Vector2(-6, 7), point + new Vector2(6, -7), gold, 2.5f);
             draw.AddLine(point + new Vector2(-4, 3), point + new Vector2(-8, -1), gold, 1.6f);
             draw.AddLine(point + new Vector2(0, -1), point + new Vector2(-3, -6), gold, 1.6f);
@@ -49,7 +51,7 @@ internal static class ObjectiveMapGlyphRenderer
         if (label.Equals("cc_cloudnine_twister", StringComparison.OrdinalIgnoreCase) ||
             label.Equals("Turbulence", StringComparison.OrdinalIgnoreCase))
         {
-            var cyan = Pack(new Vector4(.36f, .86f, 1f, 1f));
+            var cyan = Pack(WithOpacity(new Vector4(.36f, .86f, 1f, 1f), opacity));
             draw.AddCircle(point + new Vector2(0, -4), 7, cyan, 18, 2f);
             draw.AddCircle(point + new Vector2(0, 2), 5, cyan, 16, 2f);
             draw.AddLine(point + new Vector2(-3, 8), point + new Vector2(3, 8), cyan, 2f);
@@ -57,10 +59,11 @@ internal static class ObjectiveMapGlyphRenderer
         }
         if (label.Equals("cc_cloudnine_gale_sphere", StringComparison.OrdinalIgnoreCase))
         {
-            var turquoise = Pack(new Vector4(.12f, .96f, .88f, 1f));
+            var turquoise = Pack(WithOpacity(new Vector4(.12f, .96f, .88f, 1f), opacity));
             draw.AddCircleFilled(point, 6f, turquoise, 20);
             draw.AddCircle(point, 9f, turquoise, 24, 2f);
-            draw.AddCircle(point, 12f, Pack(new Vector4(.12f, .96f, .88f, .36f)), 24, 1.5f);
+            draw.AddCircle(point, 12f,
+                Pack(WithOpacity(new Vector4(.12f, .96f, .88f, .36f), opacity)), 24, 1.5f);
             return;
         }
 
@@ -79,7 +82,8 @@ internal static class ObjectiveMapGlyphRenderer
         {
             var rotation = sides == 4 ? MathF.PI / 4 : -MathF.PI / 2;
             if (dutyId is SealRockObjectiveCatalog.DutyId or OnsalObjectiveCatalog.DutyId)
-                DrawPolygonFilled(draw, point, 11, sides, Pack(color with { W = .46f }), rotation);
+                DrawPolygonFilled(draw, point, 11, sides,
+                    Pack(color with { W = color.W * .46f }), rotation);
             DrawPolygon(draw, point, 11, sides, packed, 3f, rotation);
         }
         else if (dutyId is SealRockObjectiveCatalog.DutyId or OnsalObjectiveCatalog.DutyId)
@@ -99,8 +103,9 @@ internal static class ObjectiveMapGlyphRenderer
     }
 
     public static void DrawSpawnLabel(ImDrawListPtr draw, Vector2 point, string text,
-        Vector4 color, bool isLocalTeam)
+        Vector4 color, bool isLocalTeam, float opacity = 1f)
     {
+        color = WithOpacity(color, opacity);
         var packed = Pack(color);
         var extent = ImGui.CalcTextSize(text);
         var at = point - new Vector2(extent.X / 2, extent.Y / 2);
@@ -111,8 +116,10 @@ internal static class ObjectiveMapGlyphRenderer
     }
 
     public static void DrawSecureNode(ImDrawListPtr draw, Vector2 point, string code,
-        bool isHome, Vector4 ownerColor, Vector4 homeOrLabelColor)
+        bool isHome, Vector4 ownerColor, Vector4 homeOrLabelColor, float opacity = 1f)
     {
+        ownerColor = WithOpacity(ownerColor, opacity);
+        homeOrLabelColor = WithOpacity(homeOrLabelColor, opacity);
         var ownerPacked = Pack(ownerColor);
         var labelPacked = Pack(homeOrLabelColor);
         if (isHome)
@@ -124,7 +131,8 @@ internal static class ObjectiveMapGlyphRenderer
         }
         else
         {
-            draw.AddCircleFilled(point, 5.5f, Pack(ownerColor with { W = .32f }));
+            draw.AddCircleFilled(point, 5.5f,
+                Pack(ownerColor with { W = ownerColor.W * .32f }));
             draw.AddCircle(point, 6.5f, ownerPacked, 20, 2f);
         }
         draw.AddText(point + new Vector2(10, -8), labelPacked, code);
@@ -146,14 +154,15 @@ internal static class ObjectiveMapGlyphRenderer
         if (CrystallineMapMarkerCatalog.IsCheckpointDiamond(iconId))
         {
             draw.AddQuadFilled(point + new Vector2(0, -8), point + new Vector2(8, 0),
-                point + new Vector2(0, 8), point + new Vector2(-8, 0), Pack(color with { W = .42f }));
+                point + new Vector2(0, 8), point + new Vector2(-8, 0),
+                Pack(color with { W = color.W * .42f }));
             draw.AddQuad(point + new Vector2(0, -9), point + new Vector2(9, 0),
                 point + new Vector2(0, 9), point + new Vector2(-9, 0), packed, 2.5f);
             return;
         }
         if (CrystallineMapMarkerCatalog.IsCheckpointRing(iconId))
         {
-            draw.AddCircleFilled(point, 6f, Pack(color with { W = .32f }), 24);
+            draw.AddCircleFilled(point, 6f, Pack(color with { W = color.W * .32f }), 24);
             draw.AddCircle(point, 8f, packed, 24, 2.5f);
         }
     }
@@ -216,4 +225,7 @@ internal static class ObjectiveMapGlyphRenderer
         new(MathF.Cos(angle) * radius, MathF.Sin(angle) * radius);
 
     private static uint Pack(Vector4 color) => ImGui.ColorConvertFloat4ToU32(color);
+
+    private static Vector4 WithOpacity(Vector4 color, float opacity) =>
+        color with { W = color.W * Math.Clamp(opacity, 0f, 1f) };
 }

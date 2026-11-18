@@ -1,5 +1,4 @@
-# PvP Chronicle
-
+# PVP Chronicle
 [English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [한국어](README.ko-KR.md) | [Русский](README.ru-RU.md) | [Português (Brasil)](README.pt-BR.md) | [Español](README.es-ES.md) | [ไทย](README.th-TH.md) | **Tiếng Việt** | [日本語](README.ja-JP.md) | [Deutsch](README.de-DE.md) | [Français](README.fr-FR.md)
 
 PvP Chronicle là plugin Dalamud dùng để ghi lại và xem lại các trận PvP trong FINAL FANTASY XIV. Plugin hỗ trợ lịch sử và replay của Frontline và Crystalline Conflict, mục tiêu trên bản đồ, thống kê hiệu suất và đánh giá tính toàn vẹn hành vi chỉ trong phạm vi bằng chứng có thể quan sát được.
@@ -14,7 +13,7 @@ PvP Chronicle là plugin Dalamud dùng để ghi lại và xem lại các trận
    https://raw.githubusercontent.com/chefiffer/dalamud-plugins/main/repo.json
    ```
 
-4. Mở Plugin Installer, tìm **Battlefield Frontline Collector** rồi chọn **Install**.
+4. Mở Plugin Installer, tìm **PVP Chronicle** rồi chọn **Install**.
 
 ## Tính năng chính
 
